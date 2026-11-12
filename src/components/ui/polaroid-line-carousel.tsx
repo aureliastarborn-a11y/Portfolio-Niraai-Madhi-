@@ -19,6 +19,7 @@ export interface PolaroidLineCarouselProps {
   string?: string;
   background?: string;
   ink?: string;
+  showBar?: boolean;
   onChange?: (index: number) => void;
   className?: string;
   style?: React.CSSProperties;
@@ -94,12 +95,12 @@ const CAROUSEL_STYLES = `
   cursor: inherit;
 }
 .pl-print {
-  margin-top: 6px;
+  margin-top: 5px;
   background: #fbfaf7;
-  padding: 8px 8px 0;
-  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 12px 22px -10px rgba(0,0,0,.22);
+  padding: 5px 5px 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 10px 18px -8px rgba(0,0,0,.22);
   border: 1px solid rgba(0,0,0,0.06);
-  border-radius: 4px;
+  border-radius: 3px;
   transition: transform .5s cubic-bezier(.2,.7,.2,1), filter .5s ease;
 }
 .pl-card[data-on='0'] .pl-print {
@@ -124,15 +125,15 @@ const CAROUSEL_STYLES = `
   pointer-events: none;
 }
 .pl-note {
-  min-height: 38px;
+  min-height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px 6px;
+  padding: 2px 4px;
   font-family: ui-serif, Georgia, 'Times New Roman', serif;
   font-style: italic;
-  font-size: 11.5px;
-  line-height: 1.2;
+  font-size: 10px;
+  line-height: 1.15;
   color: #2e2b26;
   text-align: center;
 }
@@ -140,21 +141,21 @@ const CAROUSEL_STYLES = `
   position: absolute;
   left: 50%;
   top: 0;
-  width: 8px;
-  height: 22px;
-  margin-left: -4px;
-  border-radius: 2px;
+  width: 7px;
+  height: 18px;
+  margin-left: -3.5px;
+  border-radius: 1.5px;
   background: linear-gradient(90deg, #c9a67a, #e3c9a1 45%, #b8915f);
-  box-shadow: 0 2px 3px rgba(0,0,0,.22);
+  box-shadow: 0 1.5px 2.5px rgba(0,0,0,.22);
   z-index: 10;
 }
 .pl-peg::after {
   content: '';
   position: absolute;
-  left: 3px;
-  top: 7px;
-  width: 2px;
-  height: 6px;
+  left: 2.5px;
+  top: 5px;
+  width: 1.5px;
+  height: 5px;
   background: rgba(80,60,30,.45);
   border-radius: 1px;
 }
@@ -257,14 +258,15 @@ const CAROUSEL_STYLES = `
 
 export default function PolaroidLineCarousel({
   slides = [],
-  height = "420px",
-  cardWidth = 240,
-  sag = 38,
+  height = "220px",
+  cardWidth = 130,
+  sag = 18,
   swing = 1,
-  autoplay = 4500,
+  autoplay = 4000,
   string = "#8a7f72",
-  background = "rgba(255, 255, 255, 0.5)",
+  background = "transparent",
   ink = "#18181b",
+  showBar = false,
   onChange,
   className,
   style,
@@ -273,7 +275,7 @@ export default function PolaroidLineCarousel({
   const count = slides.length;
   const [activeIdx, setActiveIdx] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [dims, setDims] = useState({ w: 800, h: 420, cw: cardWidth });
+  const [dims, setDims] = useState({ w: 800, h: 220, cw: cardWidth });
 
   const rootRef = useRef<HTMLDivElement | null>(null);
   const pathRef = useRef<SVGPathElement | null>(null);
@@ -298,7 +300,7 @@ export default function PolaroidLineCarousel({
   const physicsRef = useRef({ sag, swing });
   physicsRef.current = { sag, swing };
 
-  const spacing = dims.cw * 1.08;
+  const spacing = dims.cw * 1.1;
 
   const goTo = useCallback(
     (index: number) => {
@@ -313,7 +315,7 @@ export default function PolaroidLineCarousel({
     const ro = new ResizeObserver(() => {
       const rect = el.getBoundingClientRect();
       const calculatedCw = Math.round(
-        Math.max(135, Math.min(cardWidth, rect.width * 0.38, rect.height * 0.55))
+        Math.max(105, Math.min(cardWidth, rect.width * 0.28, rect.height * 0.65))
       );
       setDims({ w: rect.width, h: rect.height, cw: calculatedCw });
     });
@@ -516,9 +518,7 @@ export default function PolaroidLineCarousel({
   return (
     <div
       ref={rootRef}
-      className={["pl-root border border-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.03)]", className]
-        .filter(Boolean)
-        .join(" ")}
+      className={["pl-root", className].filter(Boolean).join(" ")}
       style={
         {
           height,
@@ -583,67 +583,69 @@ export default function PolaroidLineCarousel({
         </div>
       ))}
 
-      {/* ── BOTTOM CONTROLS & CAPTION BAR ── */}
-      <div className="pl-bar">
-        <div className="pl-cap" aria-hidden="true" key={activeIdx}>
-          {activeSlide.title && (
-            <span className="pl-title">{activeSlide.title}</span>
-          )}
-          {activeSlide.caption && (
-            <span className="pl-sub">{activeSlide.caption}</span>
-          )}
+      {/* ── OPTIONAL BOTTOM CONTROLS & CAPTION BAR ── */}
+      {showBar && (
+        <div className="pl-bar">
+          <div className="pl-cap" aria-hidden="true" key={activeIdx}>
+            {activeSlide.title && (
+              <span className="pl-title">{activeSlide.title}</span>
+            )}
+            {activeSlide.caption && (
+              <span className="pl-sub">{activeSlide.caption}</span>
+            )}
+          </div>
+
+          <span className="pl-count" aria-hidden="true">
+            <b>{pad2(activeIdx + 1)}</b> / {pad2(count)}
+          </span>
+
+          <button
+            type="button"
+            className="pl-btn"
+            aria-label="Previous credential"
+            onClick={() => step(-1)}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M10 3 5 8l5 5"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            className="pl-btn"
+            aria-label="Next credential"
+            onClick={() => step(1)}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="m6 3 5 5-5 5"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
         </div>
-
-        <span className="pl-count" aria-hidden="true">
-          <b>{pad2(activeIdx + 1)}</b> / {pad2(count)}
-        </span>
-
-        <button
-          type="button"
-          className="pl-btn"
-          aria-label="Previous credential"
-          onClick={() => step(-1)}
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M10 3 5 8l5 5"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-
-        <button
-          type="button"
-          className="pl-btn"
-          aria-label="Next credential"
-          onClick={() => step(1)}
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="m6 3 5 5-5 5"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-      </div>
+      )}
 
       <div className="pl-sr" aria-live="polite">
         Credential {activeIdx + 1} of {count}: {activeSlide.title}

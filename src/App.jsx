@@ -336,16 +336,7 @@ export default function App() {
                   </div>
 
                   {/* Certifications - POLAROID LINE CAROUSEL (Clothesline & Pegs from 21st.dev) */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">
-                        Industry Certifications
-                      </div>
-                      <div className="text-[11px] font-mono text-zinc-400 hidden sm:block">
-                        Drag or swipe polaroids
-                      </div>
-                    </div>
-                    
+                  <div className="w-full pt-1">
                     <PolaroidLineCarousel
                       slides={certifications.map((cert, idx) => {
                         const credentialImages = [
@@ -365,14 +356,15 @@ export default function App() {
                           alt: `${cert.name} - ${cert.issuer}`,
                         };
                       })}
-                      height="330px"
-                      cardWidth={185}
-                      sag={26}
+                      height="215px"
+                      cardWidth={130}
+                      sag={18}
                       swing={1}
-                      autoplay={4200}
+                      autoplay={3800}
                       string="#71717a"
-                      background="rgba(255, 255, 255, 0.7)"
+                      background="transparent"
                       ink="#18181b"
+                      showBar={false}
                       ariaLabel="Certifications clothesline carousel"
                     />
                   </div>
