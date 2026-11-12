@@ -321,8 +321,22 @@ export default function App() {
 
                 {/* Right Content */}
                 <div className="lg:col-span-8 space-y-6">
+                  {/* Formal Education Card */}
+                  <div className="p-6 rounded-2xl bg-white/85 backdrop-blur-sm border border-black/[0.06] space-y-2">
+                    <div className="flex items-center justify-between text-xs font-mono text-zinc-500">
+                      <span>{education[0].institution}</span>
+                      <span>{education[0].period}</span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-zinc-900">
+                      {education[0].degree}
+                    </h3>
+                    <p className="text-sm text-zinc-600 leading-relaxed">
+                      {education[0].detail}
+                    </p>
+                  </div>
+
                   {/* Certifications - POLAROID LINE CAROUSEL (Clothesline & Pegs from 21st.dev) */}
-                  <div className="w-full">
+                  <div className="w-full pt-1">
                     <PolaroidLineCarousel
                       slides={certifications.map((cert, idx) => {
                         const credentialImages = [
@@ -355,22 +369,11 @@ export default function App() {
                       ariaLabel="Certifications clothesline carousel"
                     />
                   </div>
-
-                  {/* Formal Education Card */}
-                  <div className="p-6 rounded-2xl bg-white/85 backdrop-blur-sm border border-black/[0.06] space-y-2">
-                    <div className="flex items-center justify-between text-xs font-mono text-zinc-500">
-                      <span>{education[0].institution}</span>
-                      <span>{education[0].period}</span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-zinc-900">
-                      {education[0].degree}
-                    </h3>
-                    <p className="text-sm text-zinc-600 leading-relaxed">
-                      {education[0].detail}
-                    </p>
-                  </div>
                 </div>
               </section>
+
+              {/* ── EMPTY BUFFER SPACE BETWEEN EDUCATION & CREDENTIALS AND TECHNICAL STACK ── */}
+              <div className="h-32 sm:h-44 w-full select-none pointer-events-none" aria-hidden="true" />
 
               {/* ── 05. TECHNICAL STACK (INTERACTIVE 3D SKILLS TREE) ── */}
               <section id="skills" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
