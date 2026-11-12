@@ -4,6 +4,7 @@ import SphereFooter from './components/SphereFooter';
 import FolderCard from './components/FolderCard';
 import FloatingDock from './components/FloatingDock';
 import ImageModal from './components/ImageModal';
+import { LogoBurst } from '@/components/ui/logo-burst';
 import { portfolioData } from './data/portfolioData';
 
 export default function App() {
@@ -27,6 +28,21 @@ export default function App() {
           className="relative z-1 overflow-clip bg-background origin-bottom shadow-[0_1px_0_#00000006]"
           style={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}
         >
+          {/* ── BACKGROUND LOGO BURST (RIGHT SIDE) ────────────── */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute top-4 -right-16 md:right-8 w-[380px] h-[380px] md:w-[580px] md:h-[580px] z-0 opacity-40 select-none overflow-hidden"
+          >
+            <LogoBurst
+              tentacleCount={240}
+              radius={0.48}
+              duration={1.5}
+              breathe={true}
+              replayOnClick={false}
+              theme="auto"
+            />
+          </div>
+
           {/* ── HERO / ORBITAL SPHERE RING ─────────────────────── */}
           <header
             id="top"
