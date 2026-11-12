@@ -72,10 +72,10 @@ function SmallRotatableCuboid3D({ category, items, index }) {
     setRotY(15);
   };
 
-  // Dimensions of the 3D cuboid: calibrated so every single word is fully visible without hiding
-  const W = 175;
-  const H = 165;
-  const D = 44;
+  // Dimensions of the 3D cuboid
+  const W = 164;
+  const H = 150;
+  const D = 40;
 
   return (
     <div className="relative flex flex-col items-center select-none" style={{ perspective: 1000 }}>
@@ -84,17 +84,17 @@ function SmallRotatableCuboid3D({ category, items, index }) {
         {/* Straight vertical drop line */}
         <motion.div
           initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 32, opacity: 1 }}
+          animate={{ height: 30, opacity: 1 }}
           transition={{ duration: 0.35, delay: index * 0.06, ease: 'easeOut' }}
           className="w-[1.5px] bg-zinc-800"
         />
         {/* Connection node on top of cuboid */}
-        <div className="size-2 rounded-full bg-zinc-900 ring-2 ring-white shadow-xs -my-0.5 z-30" />
+        <div className="size-1.5 rounded-full bg-zinc-900 ring-2 ring-white shadow-xs -my-0.5 z-30" />
       </div>
 
       {/* ── 3D CUBOID BODY (DROPS DOWN FROM STRAIGHT LINE) ── */}
       <motion.div
-        initial={{ opacity: 0, y: -45, scale: 0.88 }}
+        initial={{ opacity: 0, y: -40, scale: 0.88 }}
         animate={{ 
           opacity: 1, 
           y: 0, 
@@ -123,9 +123,9 @@ function SmallRotatableCuboid3D({ category, items, index }) {
             transform: `rotateX(${rotX}deg) rotateY(${rotY}deg)`,
           }}
         >
-          {/* 1. FRONT FACE - ALL WORDS 100% VISIBLE WITHOUT HIDING */}
+          {/* 1. FRONT FACE - REDUCED TEXT SIZE WITH FULL WORD VISIBILITY */}
           <div
-            className="absolute inset-0 rounded-xl bg-gradient-to-b from-white via-zinc-50/95 to-zinc-100/90 border border-zinc-200/90 shadow-md p-2.5 flex flex-col justify-between backdrop-blur-xs"
+            className="absolute inset-0 rounded-xl bg-gradient-to-b from-white via-zinc-50/95 to-zinc-100/90 border border-zinc-200/90 shadow-md p-2 flex flex-col justify-between backdrop-blur-xs"
             style={{
               transform: `translateZ(${D / 2}px)`,
               backfaceVisibility: 'hidden',
@@ -135,25 +135,25 @@ function SmallRotatableCuboid3D({ category, items, index }) {
             <div>
               <div className="flex items-center justify-between gap-1 pb-1 border-b border-zinc-200/60">
                 <div className="flex items-center gap-1.5 min-w-0">
-                  <div className="p-1 rounded-md bg-zinc-900 text-white shrink-0">
-                    <Icon className="size-3" />
+                  <div className="p-0.5 rounded bg-zinc-900 text-white shrink-0">
+                    <Icon className="size-2.5" />
                   </div>
-                  <h4 className="text-[11px] sm:text-[11.5px] font-bold text-zinc-900 tracking-tight">
+                  <h4 className="text-[10px] sm:text-[10.5px] font-bold text-zinc-900 tracking-tight">
                     {category}
                   </h4>
                 </div>
-                <span className="font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-zinc-200/80 text-zinc-700 shrink-0">
+                <span className="font-mono text-[8px] font-semibold px-1 py-0.2 rounded-full bg-zinc-200/80 text-zinc-700 shrink-0">
                   {items.length}
                 </span>
               </div>
             </div>
 
-            {/* Skill Badges - Every word fully visible without hiding or abbreviation */}
-            <div className="flex flex-wrap gap-1 py-1">
+            {/* Skill Badges - Reduced text size, clean and fully readable */}
+            <div className="flex flex-wrap gap-1 py-0.5">
               {items.map((item, idx) => (
                 <span
                   key={idx}
-                  className="px-1.5 py-0.5 text-[9px] sm:text-[9.5px] font-medium text-zinc-800 bg-white rounded border border-zinc-200 shadow-2xs hover:bg-zinc-900 hover:text-white transition-colors leading-tight"
+                  className="px-1.5 py-0.5 text-[8px] sm:text-[8.5px] font-medium text-zinc-800 bg-white rounded border border-zinc-200 shadow-2xs hover:bg-zinc-900 hover:text-white transition-colors leading-tight"
                 >
                   {item}
                 </span>
@@ -161,15 +161,15 @@ function SmallRotatableCuboid3D({ category, items, index }) {
             </div>
 
             {/* 3D Rotate Hint */}
-            <div className="flex items-center justify-between pt-1 border-t border-zinc-100">
-              <span className="text-[8px] font-mono text-zinc-400 flex items-center gap-1">
-                <Rotate3d className="size-2 text-zinc-500" />
+            <div className="flex items-center justify-between pt-0.5 border-t border-zinc-100">
+              <span className="text-[7.5px] font-mono text-zinc-400 flex items-center gap-0.5">
+                <Rotate3d className="size-1.5 text-zinc-500" />
                 3D rotate
               </span>
               <button
                 type="button"
                 onClick={handleResetRotation}
-                className="text-[8px] font-mono text-zinc-500 hover:text-zinc-900 underline px-1 rounded hover:bg-zinc-100"
+                className="text-[7.5px] font-mono text-zinc-500 hover:text-zinc-900 underline px-1 rounded hover:bg-zinc-100"
               >
                 Reset
               </button>
@@ -178,23 +178,23 @@ function SmallRotatableCuboid3D({ category, items, index }) {
 
           {/* 2. BACK FACE */}
           <div
-            className="absolute inset-0 rounded-xl bg-zinc-900 border border-zinc-700 text-white p-2.5 flex flex-col justify-between shadow-xl"
+            className="absolute inset-0 rounded-xl bg-zinc-900 border border-zinc-700 text-white p-2 flex flex-col justify-between shadow-xl"
             style={{
               transform: `rotateY(180deg) translateZ(${D / 2}px)`,
               backfaceVisibility: 'hidden',
             }}
           >
             <div>
-              <div className="flex items-center gap-1.5 pb-1 border-b border-zinc-800">
-                <Icon className="size-3 text-zinc-300" />
-                <span className="text-[11px] font-bold text-zinc-100">{category}</span>
+              <div className="flex items-center gap-1 pb-1 border-b border-zinc-800">
+                <Icon className="size-2.5 text-zinc-300" />
+                <span className="text-[10px] font-bold text-zinc-100">{category}</span>
               </div>
-              <p className="text-[9px] text-zinc-300 font-mono mt-1.5 leading-relaxed">
+              <p className="text-[8px] text-zinc-300 font-mono mt-1 leading-relaxed">
                 Production-ready technical tools, algorithms & system architecture.
               </p>
             </div>
             <div className="text-right">
-              <span className="text-[8px] font-mono text-zinc-500">Cuboid Side B</span>
+              <span className="text-[7px] font-mono text-zinc-500">Cuboid Side B</span>
             </div>
           </div>
 
@@ -209,7 +209,7 @@ function SmallRotatableCuboid3D({ category, items, index }) {
               transform: `rotateY(90deg) translateZ(${W / 2}px)`,
             }}
           >
-            <span className="rotate-90 text-[8px] font-mono font-semibold tracking-wider text-zinc-600 whitespace-nowrap">
+            <span className="rotate-90 text-[7.5px] font-mono font-semibold tracking-wider text-zinc-600 whitespace-nowrap">
               3D BLOCK
             </span>
           </div>
@@ -225,7 +225,7 @@ function SmallRotatableCuboid3D({ category, items, index }) {
               transform: `rotateY(-90deg) translateZ(${W / 2}px)`,
             }}
           >
-            <span className="-rotate-90 text-[8px] font-mono font-semibold tracking-wider text-zinc-600 whitespace-nowrap">
+            <span className="-rotate-90 text-[7.5px] font-mono font-semibold tracking-wider text-zinc-600 whitespace-nowrap">
               {category.slice(0, 8).toUpperCase()}
             </span>
           </div>
@@ -261,11 +261,11 @@ function SmallRotatableCuboid3D({ category, items, index }) {
       {/* ── BOTTOM STRAIGHT MERGE LINE (Drops down to merge back into single line) ── */}
       <div className="w-full flex flex-col items-center">
         {/* Connection node at bottom of cuboid */}
-        <div className="size-2 rounded-full bg-zinc-900 ring-2 ring-white shadow-xs -my-0.5 z-30" />
+        <div className="size-1.5 rounded-full bg-zinc-900 ring-2 ring-white shadow-xs -my-0.5 z-30" />
         {/* Straight vertical line to merge */}
         <motion.div
           initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 32, opacity: 1 }}
+          animate={{ height: 30, opacity: 1 }}
           transition={{ duration: 0.35, delay: index * 0.06, ease: 'easeOut' }}
           className="w-[1.5px] bg-zinc-800"
         />
