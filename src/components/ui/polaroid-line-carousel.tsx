@@ -67,7 +67,7 @@ const CAROUSEL_STYLES = `
   -webkit-user-select: none;
   touch-action: pan-y;
   outline: none;
-  cursor: grab;
+  cursor: ew-resize;
   border-radius: 1rem;
 }
 .pl-root[data-drag='1'] {
@@ -92,7 +92,7 @@ const CAROUSEL_STYLES = `
   width: var(--pl-cw);
   transform-origin: 50% 0;
   will-change: transform;
-  cursor: inherit;
+  cursor: pointer;
 }
 .pl-print {
   margin-top: 5px;
@@ -460,28 +460,55 @@ export default function PolaroidLineCarousel({
   };
 
   const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    lastInteractRef.current = performance.now();
     const ptr = pointerRef.current;
-    if (!ptr) return;
-    const dx = e.clientX - ptr.x;
-    if (!ptr.moved && Math.abs(dx) > 5) {
-      ptr.moved = true;
-      setIsDragging(true);
-      try {
-        rootRef.current?.setPointerCapture(e.pointerId);
-      } catch (_) {}
+
+    // 1. If actively dragging (mouse button held down, or touch swipe on mobile)
+    if (ptr) {
+      const dx = e.clientX - ptr.x;
+      if (!ptr.moved && Math.abs(dx) > 5) {
+        ptr.moved = true;
+        setIsDragging(true);
+        try {
+          rootRef.current?.setPointerCapture(e.pointerId);
+        } catch (_) {}
+      }
+      if (!ptr.moved) return;
+
+      const dt = Math.max(1, e.timeStamp - ptr.lt);
+      ptr.v = 0.7 * ((e.clientX - ptr.lx) / dt) + 0.3 * ptr.v;
+      ptr.lx = e.clientX;
+      ptr.lt = e.timeStamp;
+
+      const maxOff = (count - 1) * spacing;
+      let nextOff = ptr.off - dx;
+      if (nextOff < 0) nextOff *= 0.35;
+      if (nextOff > maxOff) nextOff = maxOff + (nextOff - maxOff) * 0.35;
+      stateRef.current.off = nextOff;
+      return;
     }
-    if (!ptr.moved) return;
 
-    const dt = Math.max(1, e.timeStamp - ptr.lt);
-    ptr.v = 0.7 * ((e.clientX - ptr.lx) / dt) + 0.3 * ptr.v;
-    ptr.lx = e.clientX;
-    ptr.lt = e.timeStamp;
+    // 2. Cursor hover movement without clicking (mouse movement over carousel)
+    if (e.pointerType === "mouse" || e.pointerType === "") {
+      const el = rootRef.current;
+      if (!el || count <= 1) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.width > 0) {
+        const padX = Math.min(50, rect.width * 0.08);
+        const relativeX = clamp(e.clientX - rect.left - padX, 0, rect.width - 2 * padX);
+        const progress = relativeX / Math.max(1, rect.width - 2 * padX);
+        const maxOff = (count - 1) * spacing;
+        stateRef.current.target = progress * maxOff;
+      }
+    }
+  };
 
-    const maxOff = (count - 1) * spacing;
-    let nextOff = ptr.off - dx;
-    if (nextOff < 0) nextOff *= 0.35;
-    if (nextOff > maxOff) nextOff = maxOff + (nextOff - maxOff) * 0.35;
-    stateRef.current.off = nextOff;
+  const onLeave = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === "mouse" || e.pointerType === "") {
+      // Gently snap target to nearest card when mouse leaves
+      const nearest = nearestAt(stateRef.current.target, spacing, count);
+      stateRef.current.target = nearest * spacing;
+    }
   };
 
   const onUp = () => {
@@ -540,6 +567,7 @@ export default function PolaroidLineCarousel({
       onPointerMove={onMove}
       onPointerUp={onUp}
       onPointerCancel={onUp}
+      onPointerLeave={onLeave}
     >
       <style>{CAROUSEL_STYLES}</style>
 
