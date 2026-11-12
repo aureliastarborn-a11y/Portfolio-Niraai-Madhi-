@@ -30,12 +30,24 @@ export const portfolioData = {
       items: ["LLMs", "Prompt Engineering", "Generative AI", "AI Agents", "AI Automation"]
     },
     {
-      category: "Data & BI",
-      items: ["Pandas", "NumPy", "EDA", "Data Warehousing", "Power BI", "Tableau", "Excel"]
+      category: "Data Analysis",
+      items: ["Pandas", "NumPy", "Data Cleaning", "EDA", "Basic Statistical Analysis"]
     },
     {
-      category: "Web & Tools",
-      items: ["HTML/CSS", "JavaScript", "REST APIs", "Git", "GitHub"]
+      category: "Data & Visualization",
+      items: ["MS Excel", "Power BI", "Tableau"]
+    },
+    {
+      category: "Database",
+      items: ["SQL Queries", "Filtering", "Aggregation", "Joins", "Data Warehousing"]
+    },
+    {
+      category: "Web Development",
+      items: ["HTML", "CSS", "JavaScript", "Responsive Web Design", "API Integration"]
+    },
+    {
+      category: "Tools",
+      items: ["Git", "GitHub"]
     }
   ],
 
