@@ -4,6 +4,7 @@ import SphereFooter from './components/SphereFooter';
 import FolderCard from './components/FolderCard';
 import { LogoBurst } from '@/components/ui/logo-burst';
 import VinylAlbumCard from '@/components/ui/great-ui-vinyl-album-card';
+import Interactive3DSkillsTree from './components/Interactive3DSkillsTree';
 import { portfolioData } from './data/portfolioData';
 import {
   Sparkles,
@@ -277,41 +278,9 @@ export default function App() {
                   </p>
                 </div>
 
-                {/* Right Uniform Cuboid Blocks Grid (Same Size 3D Cuboids) */}
+                {/* Right Interactive 3D Skills Tree & Rotatable Cuboids */}
                 <div className="lg:col-span-8">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-                    {skills.map((grp, idx) => (
-                      <div
-                        key={idx}
-                        className="group relative h-[165px] sm:h-[175px] w-full p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white/90 backdrop-blur-sm border border-zinc-200/90 border-b-[4px] border-b-zinc-300/80 border-r-[2px] border-r-zinc-300/60 shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all flex flex-col justify-between select-none"
-                      >
-                        {/* Top: Bullet dot, Category Title, Count */}
-                        <div className="flex items-start justify-between gap-1">
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <span className="size-1.5 rounded-full bg-zinc-900 shrink-0" />
-                            <h3 className="text-xs sm:text-[13px] font-bold text-zinc-900 truncate">
-                              {grp.category}
-                            </h3>
-                          </div>
-                          <span className="text-[10px] font-mono text-zinc-400 shrink-0 ml-1">
-                            {grp.items.length}
-                          </span>
-                        </div>
-
-                        {/* Bottom: Skill Pills inside the cuboid */}
-                        <div className="flex flex-wrap gap-1 pt-1.5 overflow-hidden">
-                          {grp.items.map((item, iIdx) => (
-                            <span
-                              key={iIdx}
-                              className="px-2 py-0.5 text-[10.5px] sm:text-[11px] font-medium text-zinc-700 bg-zinc-50 hover:bg-white rounded-md border border-zinc-200/80 shadow-[0_1px_1px_rgba(0,0,0,0.02)] transition-colors"
-                            >
-                              {item}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <Interactive3DSkillsTree skills={skills} />
                 </div>
               </section>
 
