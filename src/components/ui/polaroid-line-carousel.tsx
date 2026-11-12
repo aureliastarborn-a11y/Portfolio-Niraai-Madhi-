@@ -94,10 +94,10 @@ const CAROUSEL_STYLES = `
   cursor: inherit;
 }
 .pl-print {
-  margin-top: 10px;
+  margin-top: 6px;
   background: #fbfaf7;
-  padding: 10px 10px 0;
-  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 16px 28px -12px rgba(0,0,0,.28);
+  padding: 8px 8px 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 12px 22px -10px rgba(0,0,0,.22);
   border: 1px solid rgba(0,0,0,0.06);
   border-radius: 4px;
   transition: transform .5s cubic-bezier(.2,.7,.2,1), filter .5s ease;
@@ -124,15 +124,15 @@ const CAROUSEL_STYLES = `
   pointer-events: none;
 }
 .pl-note {
-  min-height: 48px;
+  min-height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 8px;
+  padding: 4px 6px;
   font-family: ui-serif, Georgia, 'Times New Roman', serif;
   font-style: italic;
-  font-size: 13px;
-  line-height: 1.25;
+  font-size: 11.5px;
+  line-height: 1.2;
   color: #2e2b26;
   text-align: center;
 }
@@ -140,21 +140,21 @@ const CAROUSEL_STYLES = `
   position: absolute;
   left: 50%;
   top: 0;
-  width: 10px;
-  height: 26px;
-  margin-left: -5px;
+  width: 8px;
+  height: 22px;
+  margin-left: -4px;
   border-radius: 2px;
   background: linear-gradient(90deg, #c9a67a, #e3c9a1 45%, #b8915f);
-  box-shadow: 0 2px 4px rgba(0,0,0,.25);
+  box-shadow: 0 2px 3px rgba(0,0,0,.22);
   z-index: 10;
 }
 .pl-peg::after {
   content: '';
   position: absolute;
-  left: 4px;
-  top: 8px;
+  left: 3px;
+  top: 7px;
   width: 2px;
-  height: 7px;
+  height: 6px;
   background: rgba(80,60,30,.45);
   border-radius: 1px;
 }
@@ -313,7 +313,7 @@ export default function PolaroidLineCarousel({
     const ro = new ResizeObserver(() => {
       const rect = el.getBoundingClientRect();
       const calculatedCw = Math.round(
-        Math.max(160, Math.min(cardWidth, rect.width * 0.45, rect.height * 0.58))
+        Math.max(135, Math.min(cardWidth, rect.width * 0.38, rect.height * 0.55))
       );
       setDims({ w: rect.width, h: rect.height, cw: calculatedCw });
     });
@@ -651,3 +651,4 @@ export default function PolaroidLineCarousel({
     </div>
   );
 }
+

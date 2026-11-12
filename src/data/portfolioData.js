@@ -201,6 +201,21 @@ export const portfolioData = {
       year: "2025"
     },
     {
+      name: "Salesforce Certification",
+      issuer: "Salesforce",
+      year: "2024"
+    },
+    {
+      name: "Deloitte Data Analytics Certification",
+      issuer: "Deloitte",
+      year: "2024"
+    },
+    {
+      name: "Java Programming Training Certification",
+      issuer: "Infosys",
+      year: "2024"
+    },
+    {
       name: "Big Data – 301",
       issuer: "Infosys",
       year: "2024"

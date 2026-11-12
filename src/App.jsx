@@ -355,6 +355,8 @@ export default function App() {
                           "/images/covers/cover-emerald.jpg",
                           "/images/covers/cover-lavender.jpg",
                           "/images/covers/cover-rose.jpg",
+                          "/images/covers/cover-original.jpg",
+                          "/images/covers/cover-indigo.jpg",
                         ];
                         return {
                           image: credentialImages[idx % credentialImages.length],
@@ -363,9 +365,9 @@ export default function App() {
                           alt: `${cert.name} - ${cert.issuer}`,
                         };
                       })}
-                      height="380px"
-                      cardWidth={240}
-                      sag={34}
+                      height="330px"
+                      cardWidth={185}
+                      sag={26}
                       swing={1}
                       autoplay={4200}
                       string="#71717a"
