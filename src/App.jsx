@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import SphereRing from './components/SphereRing';
 import SphereFooter from './components/SphereFooter';
 import FolderCard from './components/FolderCard';
@@ -23,6 +23,7 @@ export default function App() {
   const [burstRotation, setBurstRotation] = useState(0);
   const [burstParallax, setBurstParallax] = useState(0);
   const [burstKey, setBurstKey] = useState(0);
+  const burstContainerRef = useRef(null);
 
   const handleBurstClick = () => {
     setBurstKey((k) => k + 1);
@@ -117,6 +118,55 @@ export default function App() {
     };
   }, []);
 
+  // Global click & hover detector: guarantees clicking the burst anywhere in all presented sections triggers explosion
+  useEffect(() => {
+    const isOverBurst = (clientX, clientY) => {
+      if (!burstVisible || !burstContainerRef.current) return false;
+      const rect = burstContainerRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const maxRadius = Math.min(rect.width, rect.height) * 0.52;
+      const dist = Math.hypot(clientX - centerX, clientY - centerY);
+      return dist <= maxRadius;
+    };
+
+    const handleGlobalClick = (e) => {
+      if (!burstVisible) return;
+      if (isOverBurst(e.clientX, e.clientY)) {
+        // Do not intercept interactive hyperlinks or form elements
+        const interactive = e.target.closest('a, input, textarea, select, [data-folder-links]');
+        if (!interactive) {
+          handleBurstClick();
+        }
+      }
+    };
+
+    const handleGlobalMouseMove = (e) => {
+      if (!burstVisible) {
+        if (document.body.style.cursor === 'pointer') document.body.style.cursor = '';
+        return;
+      }
+      const overBurst = isOverBurst(e.clientX, e.clientY);
+      const interactive = e.target.closest('a, button, input, textarea, select, [data-folder-links], .vinyl-card');
+      if (overBurst && !interactive) {
+        document.body.style.cursor = 'pointer';
+      } else if (document.body.style.cursor === 'pointer') {
+        document.body.style.cursor = '';
+      }
+    };
+
+    window.addEventListener('click', handleGlobalClick, true);
+    window.addEventListener('mousemove', handleGlobalMouseMove, { passive: true });
+
+    return () => {
+      window.removeEventListener('click', handleGlobalClick, true);
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+      if (document.body.style.cursor === 'pointer') {
+        document.body.style.cursor = '';
+      }
+    };
+  }, [burstVisible]);
+
   return (
     <div className="min-h-full flex flex-col font-sans bg-background text-foreground antialiased selection:bg-zinc-200">
       {/* Accessibility Skip Link */}
@@ -163,8 +213,9 @@ export default function App() {
 
           {/* ── DYNAMIC BACKGROUND BURST (PRESENT IN BACKGROUND OF MIDDLE CONTENT) ── */}
           <div
+            ref={burstContainerRef}
             className={`fixed top-1/2 right-[-40px] sm:right-[2%] lg:right-[6%] w-[440px] h-[440px] sm:w-[560px] sm:h-[560px] lg:w-[680px] lg:h-[680px] z-1 select-none overflow-visible transition-opacity duration-200 ease-out ${
-              burstVisible ? 'opacity-35 lg:opacity-45 hover:opacity-75 visible cursor-pointer pointer-events-auto' : 'opacity-0 invisible pointer-events-none'
+              burstVisible ? 'opacity-35 lg:opacity-45 hover:opacity-75 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'
             }`}
             style={{
               transform: `translate3d(0, calc(-50% + ${burstParallax}px), 0) rotate(${burstRotation}deg)`
@@ -180,6 +231,7 @@ export default function App() {
               duration={1.35}
               breathe={true}
               theme="light"
+              startSettled={true}
               replayKey={burstKey}
               replayOnClick={true}
             />
@@ -387,10 +439,8 @@ export default function App() {
 
               {/* ── EMPTY SPACE TO FULLY SHOWCASE BACKGROUND BURST (NO OVERWRITING CONTENT) ── */}
               <div 
-                className="h-[70vh] sm:h-[80vh] w-full select-none cursor-pointer" 
-                aria-label="Click to burst"
-                title="Click to burst"
-                onClick={handleBurstClick}
+                className="h-[70vh] sm:h-[80vh] w-full select-none pointer-events-none" 
+                aria-hidden="true" 
               />
 
               {/* ── 05. TECHNICAL STACK (INTERACTIVE 3D SKILLS TREE) ── */}

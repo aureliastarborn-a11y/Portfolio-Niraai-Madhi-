@@ -36,6 +36,8 @@ export type LogoBurstOptions = {
   theme?: LogoBurstTheme
   /** Idle inhale after the burst. Default `true`. */
   breathe?: boolean
+  /** Start already settled without initial auto-burst. Default `false`. */
+  startSettled?: boolean
   /** Fires whenever resolved dark mode changes. */
   onThemeChange?: (dark: boolean) => void
 }
@@ -286,7 +288,7 @@ export function createLogoBurst(
   let raf = 0
   let running = true
   let startedAt = performance.now()
-  let settled = false
+  let settled = Boolean(options.startSettled)
   let dark = resolveDark(themeOf(options.theme))
   options.onThemeChange?.(dark)
 
@@ -579,6 +581,7 @@ export function LogoBurst({
   particleRatio = DEFAULT_PARTICLE_RATIO,
   theme = "auto",
   breathe = true,
+  startSettled = false,
   replayKey = 0,
   replayOnClick = false,
   label = "Logo burst",
@@ -601,6 +604,7 @@ export function LogoBurst({
       particleRatio,
       theme,
       breathe,
+      startSettled,
     })
     return () => {
       instanceRef.current?.destroy()
