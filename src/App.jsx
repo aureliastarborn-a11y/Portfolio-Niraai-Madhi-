@@ -8,13 +8,14 @@ import Experience from './components/Experience';
 import Education from './components/Education';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import AnimatedMenu from './components/AnimatedMenu';
 import ResumeModal from './components/ResumeModal';
 
 export default function App() {
   const [isResumeOpen, setIsResumeOpen] = useState(false);
 
   return (
-    <div className="relative min-h-screen bg-zinc-950 text-zinc-50 overflow-x-hidden font-sans selection:bg-violet-500/30 selection:text-white">
+    <div className="relative min-h-screen bg-zinc-950 text-zinc-50 overflow-x-hidden font-sans selection:bg-violet-500/30 selection:text-white pb-20">
       {/* Background ambient lighting & mesh */}
       <div className="bg-glow" />
       <div className="dot-grid" />
@@ -22,7 +23,7 @@ export default function App() {
       <div className="top-glow" />
 
       {/* Floating Glass Navigation */}
-      <Navbar onOpenResume={() => setIsResumeOpen(true)} />
+      <Navbar />
 
       {/* Main Sections */}
       <main className="relative z-10">
@@ -37,6 +38,9 @@ export default function App() {
 
       {/* Minimal Glass Footer */}
       <Footer />
+
+      {/* Signature Animated Floating Glass Menu / Dock */}
+      <AnimatedMenu onOpenResume={() => setIsResumeOpen(true)} />
 
       {/* Glass Resume Modal */}
       <ResumeModal

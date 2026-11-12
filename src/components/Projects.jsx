@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExternalLink, Layers, ArrowUpRight } from 'lucide-react';
+import { ExternalLink, Layers, ArrowUpRight, Eye } from 'lucide-react';
 import { Github } from './Icons';
 import { portfolioData } from '../data/portfolioData';
 import ProjectModal from './ProjectModal';
@@ -21,16 +21,16 @@ export default function Projects() {
         {/* Section Label */}
         <div className="flex items-center gap-2 text-sm text-zinc-500 font-medium">
           <div className="w-8 h-px bg-gradient-to-r from-violet-500 to-transparent" />
-          Featured Work
+          Project Gallery
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-              Selected Projects & Case Studies
+              Selected Work & Screenshots
             </h2>
             <p className="text-sm text-zinc-400 mt-1 max-w-lg">
-              Explore open-source systems, cloud architectures, and full-stack software.
+              Explore interactive prototypes, enterprise architectures, and production platforms.
             </p>
           </div>
 
@@ -52,20 +52,31 @@ export default function Projects() {
           </div>
         </div>
 
-        {/* Bento / Asymmetric Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {/* Screenshot Gallery Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((proj, idx) => {
             const isFeatured = idx === 0;
             return (
               <div
                 key={proj.id}
-                className={`rounded-2xl glass glass-hover p-5 flex flex-col justify-between group ${
+                className={`rounded-2xl glass glass-hover p-4 sm:p-5 flex flex-col justify-between group ${
                   isFeatured ? 'md:col-span-2' : ''
                 }`}
               >
                 <div>
-                  {/* Thumbnail / Image with subtle glass overlay */}
-                  <div className="relative aspect-video rounded-xl overflow-hidden bg-zinc-900 border border-white/[0.06] mb-5">
+                  {/* Browser Mockup Window Header */}
+                  <div className="flex items-center justify-between px-3 py-2 bg-zinc-950/70 border border-white/[0.05] rounded-t-xl text-[10px] text-zinc-500 font-mono">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-rose-500/80" />
+                      <span className="w-2 h-2 rounded-full bg-amber-500/80" />
+                      <span className="w-2 h-2 rounded-full bg-emerald-500/80" />
+                    </div>
+                    <span className="text-zinc-400 truncate max-w-[150px]">{proj.title}</span>
+                    <span className="text-violet-400 text-[9px]">{proj.category}</span>
+                  </div>
+
+                  {/* Screenshot Thumbnail with Glass Overlay */}
+                  <div className="relative aspect-video rounded-b-xl overflow-hidden bg-zinc-950 border-x border-b border-white/[0.05] mb-4">
                     <img
                       src={proj.image}
                       alt={proj.title}
@@ -74,23 +85,47 @@ export default function Projects() {
                         e.target.src = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1000&q=80';
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent pointer-events-none" />
                     
-                    <span className="absolute top-3 left-3 px-2.5 py-1 text-[11px] font-medium rounded-lg glass border border-white/[0.1] text-zinc-200 backdrop-blur-md">
-                      {proj.category}
-                    </span>
+                    {/* Hover Quick Action Buttons */}
+                    <div className="absolute inset-0 bg-zinc-950/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-xs">
+                      <button
+                        onClick={() => setActiveProject(proj)}
+                        className="p-2.5 rounded-full bg-zinc-900/90 text-white hover:bg-violet-600 transition-colors shadow-lg cursor-pointer"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <a
+                        href={proj.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2.5 rounded-full bg-zinc-900/90 text-white hover:bg-violet-600 transition-colors shadow-lg"
+                        title="View GitHub"
+                      >
+                        <Github className="w-4 h-4" />
+                      </a>
+                      <a
+                        href={proj.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2.5 rounded-full bg-violet-600 text-white hover:bg-violet-500 transition-colors shadow-lg"
+                        title="Open Demo"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    </div>
                   </div>
 
                   {/* Title & Tagline */}
-                  <h3 className="text-lg font-bold text-white group-hover:text-violet-400 transition-colors">
+                  <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-violet-300 transition-colors">
                     {proj.title}
                   </h3>
-                  <p className="text-xs text-zinc-400 mt-2 leading-relaxed line-clamp-2">
+                  <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed line-clamp-2">
                     {proj.tagline || proj.description}
                   </p>
 
-                  {/* Tech stack pills */}
-                  <div className="flex flex-wrap gap-1.5 mt-4">
+                  {/* Tech stack badges */}
+                  <div className="flex flex-wrap gap-1.5 mt-3">
                     {proj.techStack.map((tech, tIdx) => (
                       <span
                         key={tIdx}
@@ -103,7 +138,7 @@ export default function Projects() {
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="flex items-center justify-between pt-5 mt-5 border-t border-white/[0.05]">
+                <div className="flex items-center justify-between pt-4 mt-4 border-t border-white/[0.05]">
                   <button
                     onClick={() => setActiveProject(proj)}
                     className="text-xs font-medium text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
@@ -116,7 +151,7 @@ export default function Projects() {
                       href={proj.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white transition-colors border border-white/[0.05]"
+                      className="p-1.5 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white transition-colors border border-white/[0.05]"
                       title="GitHub"
                     >
                       <Github className="w-3.5 h-3.5" />
@@ -125,7 +160,7 @@ export default function Projects() {
                       href={proj.liveUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-violet-600/80 hover:bg-violet-600 text-white text-xs font-medium shadow-sm transition-all"
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-medium shadow-sm transition-all"
                       title="Live Demo"
                     >
                       <span>Demo</span>
