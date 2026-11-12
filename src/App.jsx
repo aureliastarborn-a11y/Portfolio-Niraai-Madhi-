@@ -131,7 +131,7 @@ export default function App() {
           {/* ── HERO / ORBITAL SPHERE RING (TOP-MOST PHASE - KEPT INTACT) ── */}
           <header
             id="top"
-            className="sphere-ring relative z-10 grid h-[var(--hero-height)] place-items-center overflow-visible isolate [--hero-height:75svh] compact:[--hero-height:62svh]"
+            className="sphere-ring relative z-10 grid min-h-screen h-screen place-items-center overflow-visible isolate"
           >
             {/* The 8 Interactive Refractive Glass Spheres */}
             <SphereRing />
@@ -173,7 +173,7 @@ export default function App() {
           </div>
 
           {/* ── MIDDLE PHASE: MODERN EDITORIAL ASYMMETRIC / BENTO LAYOUT (Z-10 ON TOP OF BURST) ── */}
-          <div className="relative z-10 w-full pt-28 sm:pt-40 pb-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
+          <div className="relative z-10 w-full pt-6 sm:pt-8 pb-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
             <div className="flex flex-col gap-32">
 
               {/* ── 01. ABOUT ME ──────────────────────────────────── */}

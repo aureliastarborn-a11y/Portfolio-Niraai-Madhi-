@@ -13,7 +13,7 @@ export default function SphereRing() {
 
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      const heroHeight = window.innerHeight * 0.75;
+      const heroHeight = window.innerHeight;
       const progress = Math.min(1, Math.max(0, scrollY / heroHeight));
       targetYaw = progress * 0.75 * Math.PI;
     };
@@ -25,7 +25,7 @@ export default function SphereRing() {
       const normY = (e.clientY / window.innerHeight - 0.5) * 0.7;
 
       const scrollY = window.scrollY;
-      const heroHeight = window.innerHeight * 0.75;
+      const heroHeight = window.innerHeight;
       const progress = Math.min(1, Math.max(0, scrollY / heroHeight));
 
       targetYaw = progress * 0.75 * Math.PI + normX;
