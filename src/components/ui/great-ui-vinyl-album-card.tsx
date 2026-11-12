@@ -59,12 +59,12 @@ export default function VinylAlbumCard({
           isCompact ? "h-60 w-60 sm:h-64 sm:w-64" : "h-72 w-72",
         )}
       >
-        {/* Animated Spinning Glassy Beige / Mild Tone CD Disc (Not Black) */}
+        {/* Animated Spinning Champagne Silver (#C9C2B6) CD Disc */}
         <motion.div
           className={cn(
-            "absolute flex items-center justify-center overflow-hidden rounded-full border border-[#d6cfc4]/80 transition-colors duration-300 shadow-2xl backdrop-blur-md",
+            "absolute flex items-center justify-center overflow-hidden rounded-full border border-[#B8B0A2] transition-colors duration-300 shadow-2xl backdrop-blur-md",
             isCompact ? "h-56 w-56 sm:h-60 sm:w-60" : "h-72 w-72",
-            "bg-gradient-to-tr from-[#ece6dc]/95 via-[#f6f2ea]/95 to-[#ede7de]/95",
+            "bg-[#C9C2B6] bg-gradient-to-tr from-[#BCB4A7] via-[#C9C2B6] to-[#D8D2C8]",
           )}
           initial={{ x: 0, rotate: 0 }}
           animate={{
@@ -73,22 +73,22 @@ export default function VinylAlbumCard({
           }}
           transition={{ type: "spring", stiffness: 85, damping: 16, mass: 1 }}
         >
-          {/* Delicate Concentric Grooves in Soft Mild Sand / Champagne Tones */}
-          <div className="absolute inset-1 rounded-full border border-[#dfd7cc]/70" />
-          <div className="absolute inset-2.5 rounded-full border border-[#d5ccbf]/60" />
-          <div className="absolute inset-4 rounded-full border border-[#e5dfd5]/80" />
-          <div className="absolute inset-6 rounded-full border border-[#d5ccbf]/60" />
-          <div className="absolute inset-8 rounded-full border border-[#dfd7cc]/70" />
-          <div className="absolute inset-10 rounded-full border border-[#d5ccbf]/60" />
-          <div className="absolute inset-12 rounded-full border border-[#e5dfd5]/80" />
-          <div className="absolute inset-15 rounded-full border border-[#d5ccbf]/60" />
-          <div className="absolute inset-18 rounded-full border border-[#dfd7cc]/70" />
-          <div className="absolute inset-22 rounded-full border border-[#d5ccbf]/60" />
+          {/* Concentric Grooves in Champagne Silver Tones */}
+          <div className="absolute inset-1 rounded-full border border-[#D8D2C8]/70" />
+          <div className="absolute inset-2.5 rounded-full border border-[#B3AAA0]/60" />
+          <div className="absolute inset-4 rounded-full border border-[#D8D2C8]/80" />
+          <div className="absolute inset-6 rounded-full border border-[#B3AAA0]/60" />
+          <div className="absolute inset-8 rounded-full border border-[#D8D2C8]/70" />
+          <div className="absolute inset-10 rounded-full border border-[#B3AAA0]/60" />
+          <div className="absolute inset-12 rounded-full border border-[#D8D2C8]/80" />
+          <div className="absolute inset-15 rounded-full border border-[#B3AAA0]/60" />
+          <div className="absolute inset-18 rounded-full border border-[#D8D2C8]/70" />
+          <div className="absolute inset-22 rounded-full border border-[#B3AAA0]/60" />
 
           {/* Center Album Label */}
           <div
             className={cn(
-              "relative flex items-center justify-center overflow-hidden rounded-full bg-white shadow-md border border-[#d5ccbf]/80",
+              "relative flex items-center justify-center overflow-hidden rounded-full bg-white shadow-md border border-[#B8B0A2]",
               isCompact ? "h-20 w-20" : "h-24 w-24",
             )}
           >
@@ -97,14 +97,14 @@ export default function VinylAlbumCard({
               alt="label"
               className="absolute inset-0 h-full w-full scale-[1.08] object-cover"
             />
-            {/* Center Spindle Hole with Glassy Rim */}
-            <div className="z-10 h-3.5 w-3.5 rounded-full bg-[#f4efe6] shadow-inner ring-1 ring-[#c8bfb0]" />
-            <div className="absolute inset-0 rounded-full ring-2 inset-ring ring-[#dfd7cc]/60" />
+            {/* Center Spindle Hole with Champagne Silver Rim */}
+            <div className="z-10 h-3.5 w-3.5 rounded-full bg-[#C9C2B6] shadow-inner ring-1 ring-[#A89F92]" />
+            <div className="absolute inset-0 rounded-full ring-2 inset-ring ring-[#D8D2C8]/70" />
           </div>
 
-          {/* Prismatic Glass Holographic Sheen */}
-          <div className="pointer-events-none absolute inset-0 rotate-45 bg-gradient-to-tr from-cyan-400/25 via-pink-400/20 to-amber-300/30 mix-blend-overlay" />
-          <div className="pointer-events-none absolute inset-0 -rotate-45 bg-gradient-to-br from-transparent via-white/50 to-transparent mix-blend-overlay" />
+          {/* Champagne Silver Radial Light Sheen */}
+          <div className="pointer-events-none absolute inset-0 rotate-45 bg-gradient-to-tr from-white/30 via-transparent to-amber-100/20 mix-blend-overlay" />
+          <div className="pointer-events-none absolute inset-0 -rotate-45 bg-gradient-to-br from-transparent via-white/45 to-transparent mix-blend-overlay" />
         </motion.div>
 
         {/* ── ALBUM COVER SLEEVE ── */}
