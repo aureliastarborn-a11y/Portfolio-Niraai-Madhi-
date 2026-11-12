@@ -110,7 +110,7 @@ export default function VinylAlbumCard({
         {/* ── ALBUM COVER SLEEVE ── */}
         <motion.div
           className={cn(
-            "absolute z-20 overflow-hidden rounded-2xl shadow-xl border border-black/10 cursor-pointer bg-zinc-900",
+            "absolute z-20 overflow-hidden rounded-2xl shadow-xl border border-black/10 cursor-default bg-zinc-900",
             isCompact ? "h-60 w-60 sm:h-64 sm:w-64" : "h-72 w-72",
           )}
           initial={{ rotate: 0, scale: 1, x: 0 }}
