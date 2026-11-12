@@ -295,8 +295,10 @@ export function createLogoBurst(
     const parent = canvas.parentElement
     if (!parent) return false
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
-    const w = parent.clientWidth
-    const h = parent.clientHeight
+    const rect = parent.getBoundingClientRect()
+    const w = parent.clientWidth || Math.round(rect.width)
+    const h = parent.clientHeight || Math.round(rect.height)
+    if (w === 0 || h === 0) return false
     size.w = w
     size.h = h
     const width = Math.floor(w * dpr)
@@ -362,6 +364,13 @@ export function createLogoBurst(
 
   const paint = (now: number) => {
     if (!running) return
+
+    if (size.w === 0 || size.h === 0) {
+      if (!resize()) {
+        raf = requestAnimationFrame(paint)
+        return
+      }
+    }
 
     const { w, h } = size
     if (w === 0 || h === 0) {
@@ -685,3 +694,4 @@ export function LogoBurst({
     </div>
   )
 }
+

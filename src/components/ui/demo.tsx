@@ -44,3 +44,4 @@ export default function LogoBurstDemo(props: Partial<typeof settings>) {
     </div>
   )
 }
+
