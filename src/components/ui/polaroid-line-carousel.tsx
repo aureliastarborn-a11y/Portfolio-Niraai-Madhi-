@@ -95,12 +95,12 @@ const CAROUSEL_STYLES = `
   cursor: pointer;
 }
 .pl-print {
-  margin-top: 5px;
+  margin-top: 4px;
   background: #fbfaf7;
-  padding: 5px 5px 0;
-  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 10px 18px -8px rgba(0,0,0,.22);
+  padding: 4px 4px 0;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 8px 14px -6px rgba(0,0,0,.2);
   border: 1px solid rgba(0,0,0,0.06);
-  border-radius: 3px;
+  border-radius: 2px;
   transition: transform .5s cubic-bezier(.2,.7,.2,1), filter .5s ease;
 }
 .pl-card[data-on='0'] .pl-print {
@@ -109,10 +109,10 @@ const CAROUSEL_STYLES = `
 }
 .pl-shot {
   position: relative;
-  aspect-ratio: 1.15;
+  aspect-ratio: 1.12;
   overflow: hidden;
   background: #ece8df;
-  border-radius: 2px;
+  border-radius: 1.5px;
 }
 .pl-shot img {
   position: absolute;
@@ -125,39 +125,37 @@ const CAROUSEL_STYLES = `
   pointer-events: none;
 }
 .pl-note {
-  min-height: 28px;
+  min-height: 22px;
+  max-height: 28px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2px 4px;
-  font-family: ui-serif, Georgia, 'Times New Roman', serif;
-  font-style: italic;
-  font-size: 10px;
-  line-height: 1.15;
-  color: #2e2b26;
+  padding: 2px 2px;
   text-align: center;
+  overflow: hidden;
 }
 .pl-peg {
   position: absolute;
   left: 50%;
   top: 0;
-  width: 7px;
-  height: 18px;
-  margin-left: -3.5px;
-  border-radius: 1.5px;
+  width: 5px;
+  height: 14px;
+  margin-left: -2.5px;
+  border-radius: 1px;
   background: linear-gradient(90deg, #c9a67a, #e3c9a1 45%, #b8915f);
-  box-shadow: 0 1.5px 2.5px rgba(0,0,0,.22);
+  box-shadow: 0 1px 2px rgba(0,0,0,.22);
   z-index: 10;
 }
 .pl-peg::after {
   content: '';
   position: absolute;
-  left: 2.5px;
-  top: 5px;
-  width: 1.5px;
-  height: 5px;
+  left: 1.5px;
+  top: 4px;
+  width: 1px;
+  height: 4px;
   background: rgba(80,60,30,.45);
-  border-radius: 1px;
+  border-radius: 0.5px;
 }
 .pl-bar {
   position: absolute;
@@ -258,9 +256,9 @@ const CAROUSEL_STYLES = `
 
 export default function PolaroidLineCarousel({
   slides = [],
-  height = "220px",
-  cardWidth = 130,
-  sag = 18,
+  height = "165px",
+  cardWidth = 92,
+  sag = 12,
   swing = 1,
   autoplay = 4000,
   string = "#8a7f72",
@@ -275,7 +273,7 @@ export default function PolaroidLineCarousel({
   const count = slides.length;
   const [activeIdx, setActiveIdx] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [dims, setDims] = useState({ w: 800, h: 220, cw: cardWidth });
+  const [dims, setDims] = useState({ w: 800, h: 165, cw: cardWidth });
 
   const rootRef = useRef<HTMLDivElement | null>(null);
   const pathRef = useRef<SVGPathElement | null>(null);
@@ -315,7 +313,7 @@ export default function PolaroidLineCarousel({
     const ro = new ResizeObserver(() => {
       const rect = el.getBoundingClientRect();
       const calculatedCw = Math.round(
-        Math.max(105, Math.min(cardWidth, rect.width * 0.28, rect.height * 0.65))
+        Math.max(75, Math.min(cardWidth, rect.width * 0.22, rect.height * 0.65))
       );
       setDims({ w: rect.width, h: rect.height, cw: calculatedCw });
     });
@@ -351,7 +349,7 @@ export default function PolaroidLineCarousel({
       lastTime = now;
 
       const { w, h, cw } = dims;
-      const stringTop = Math.max(30, h * 0.16);
+      const stringTop = Math.max(14, h * 0.12);
       const ptr = pointerRef.current;
       let force = 0;
 
@@ -606,11 +604,11 @@ export default function PolaroidLineCarousel({
               )}
             </div>
             <div className="pl-note">
-              <span className="font-serif italic text-zinc-900 text-[9.5px] leading-[1.15] line-clamp-2">
+              <span className="font-serif italic text-zinc-900 text-[8px] sm:text-[8.5px] leading-[1.1] line-clamp-1 block">
                 {slide.title}
               </span>
-              {slide.issuer && !slide.title.includes(slide.issuer) && (
-                <span className="text-[7.5px] font-mono font-semibold tracking-wider text-zinc-500 uppercase mt-0.5">
+              {slide.issuer && (
+                <span className="text-[6.5px] sm:text-[7px] font-mono font-semibold tracking-wider text-zinc-500 uppercase leading-none mt-0.5 block">
                   {slide.issuer}
                 </span>
               )}

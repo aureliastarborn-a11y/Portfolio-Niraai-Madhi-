@@ -337,15 +337,15 @@ export default function App() {
                         ];
                         return {
                           image: credentialImages[idx % credentialImages.length],
-                          title: cert.name,
+                          title: cert.shortTitle || cert.name,
                           issuer: cert.issuer,
                           caption: `${cert.issuer} • Issued ${cert.year}`,
                           alt: `${cert.name} - ${cert.issuer}`,
                         };
                       })}
-                      height="215px"
-                      cardWidth={130}
-                      sag={18}
+                      height="165px"
+                      cardWidth={92}
+                      sag={12}
                       swing={1}
                       autoplay={3800}
                       string="#71717a"
