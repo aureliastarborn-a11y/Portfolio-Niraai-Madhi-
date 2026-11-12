@@ -6,9 +6,6 @@ import ImageModal from './components/ImageModal';
 import { LogoBurst } from '@/components/ui/logo-burst';
 import { portfolioData } from './data/portfolioData';
 import {
-  ExternalLink,
-  Copy,
-  Check,
   Sparkles,
   Code2,
   Database,
@@ -16,26 +13,26 @@ import {
   GraduationCap,
   Award,
   ArrowUpRight,
-  MapPin,
-  Mail,
-  Phone
+  MapPin
 } from 'lucide-react';
 
 export default function App() {
   const [activeModalImage, setActiveModalImage] = useState(null);
   const [burstVisible, setBurstVisible] = useState(false);
-  const [copiedKey, setCopiedKey] = useState(null);
+  const [burstRotation, setBurstRotation] = useState(0);
+  const [burstParallax, setBurstParallax] = useState(0);
 
   const { personal, skills, projects, experiences, education, certifications } = portfolioData;
 
-  const handleCopy = (text, key) => {
-    navigator.clipboard.writeText(text);
-    setCopiedKey(key);
-    setTimeout(() => setCopiedKey(null), 2000);
-  };
-
   useEffect(() => {
-    const updateVisibility = () => {
+    let animId;
+    let targetRotation = 0;
+    let currentRotation = 0;
+    let targetParallax = 0;
+    let currentParallax = 0;
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
       const heroEl = document.getElementById('top');
       const footerEl = document.querySelector('[data-footer-reveal]');
@@ -48,7 +45,7 @@ export default function App() {
           inHeroPhase = true;
         }
       } else {
-        inHeroPhase = window.scrollY < windowHeight * 0.7;
+        inHeroPhase = scrollY < windowHeight * 0.7;
       }
 
       // 2. Not in last phase (where bottom sphere rotation is) - must hide instantly even on fast scroll
@@ -60,17 +57,34 @@ export default function App() {
         }
       } else {
         const totalScrollHeight = document.documentElement.scrollHeight;
-        if (window.scrollY > totalScrollHeight - windowHeight - 450) {
+        if (scrollY > totalScrollHeight - windowHeight - 450) {
           inFooterPhase = true;
         }
       }
 
       setBurstVisible(!inHeroPhase && !inFooterPhase);
+
+      // Movement for the burst while scrolling:
+      // Smooth dynamic rotation as the page scrolls
+      targetRotation = (scrollY * 0.12) % 360;
+      // Gentle parallax floating drift
+      const heroHeight = heroEl ? heroEl.offsetHeight : windowHeight * 0.75;
+      const middleProgress = Math.max(0, scrollY - heroHeight);
+      targetParallax = (middleProgress * 0.08) % 180 - 90;
     };
 
-    updateVisibility();
-    window.addEventListener('scroll', updateVisibility, { passive: true });
-    window.addEventListener('resize', updateVisibility);
+    const loop = () => {
+      currentRotation += (targetRotation - currentRotation) * 0.1;
+      currentParallax += (targetParallax - currentParallax) * 0.1;
+      setBurstRotation(currentRotation);
+      setBurstParallax(currentParallax);
+      animId = requestAnimationFrame(loop);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    animId = requestAnimationFrame(loop);
 
     // Fast-scroll guarantee: IntersectionObserver cuts off burst instantly before footer sphere rotation
     let footerObserver;
@@ -90,8 +104,9 @@ export default function App() {
     }
 
     return () => {
-      window.removeEventListener('scroll', updateVisibility);
-      window.removeEventListener('resize', updateVisibility);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+      cancelAnimationFrame(animId);
       if (footerObserver) footerObserver.disconnect();
     };
   }, []);
@@ -106,24 +121,6 @@ export default function App() {
         Skip to content
       </a>
 
-      {/* ── FIXED RIGHT-SIDE BACKGROUND BURST (ACTIVE IN MIDDLE PHASES ONLY) ── */}
-      <div
-        aria-hidden="true"
-        className={`pointer-events-none fixed top-1/2 -translate-y-1/2 right-2 sm:right-6 lg:right-10 w-[160px] h-[160px] sm:w-[220px] sm:h-[220px] lg:w-[280px] lg:h-[280px] z-0 select-none overflow-visible transition-opacity duration-150 ease-out ${
-          burstVisible ? 'opacity-40 lg:opacity-70 visible' : 'opacity-0 invisible pointer-events-none'
-        }`}
-      >
-        <LogoBurst
-          color="#3f3f46"
-          tentacleCount={160}
-          radius={0.38}
-          duration={1.35}
-          breathe={true}
-          theme="light"
-          replayOnClick={false}
-        />
-      </div>
-
       <main className="relative isolate min-h-svh bg-scene [--footer-height:50svh]" data-personal-site="true">
         {/* Main Content White Container */}
         <div
@@ -133,7 +130,7 @@ export default function App() {
           {/* ── HERO / ORBITAL SPHERE RING (TOP-MOST PHASE - KEPT INTACT) ── */}
           <header
             id="top"
-            className="sphere-ring relative z-1 grid h-[var(--hero-height)] place-items-center overflow-visible isolate [--hero-height:75svh] compact:[--hero-height:62svh]"
+            className="sphere-ring relative z-10 grid h-[var(--hero-height)] place-items-center overflow-visible isolate [--hero-height:75svh] compact:[--hero-height:62svh]"
           >
             {/* The 8 Interactive Refractive Glass Spheres */}
             <SphereRing />
@@ -157,8 +154,29 @@ export default function App() {
             </div>
           </header>
 
-          {/* ── MIDDLE PHASE: MODERN EDITORIAL ASYMMETRIC / BENTO LAYOUT (NOT CENTERED) ── */}
-          <div className="relative w-full py-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
+          {/* ── DYNAMIC BACKGROUND BURST (PRESENT IN BACKGROUND OF MIDDLE CONTENT) ── */}
+          <div
+            aria-hidden="true"
+            className={`pointer-events-none fixed top-1/2 right-[-40px] sm:right-[2%] lg:right-[6%] w-[440px] h-[440px] sm:w-[560px] sm:h-[560px] lg:w-[680px] lg:h-[680px] z-0 select-none overflow-visible transition-opacity duration-200 ease-out ${
+              burstVisible ? 'opacity-35 lg:opacity-45 visible' : 'opacity-0 invisible pointer-events-none'
+            }`}
+            style={{
+              transform: `translate3d(0, calc(-50% + ${burstParallax}px), 0) rotate(${burstRotation}deg)`
+            }}
+          >
+            <LogoBurst
+              color="#18181b"
+              tentacleCount={260}
+              radius={0.48}
+              duration={1.35}
+              breathe={true}
+              theme="light"
+              replayOnClick={false}
+            />
+          </div>
+
+          {/* ── MIDDLE PHASE: MODERN EDITORIAL ASYMMETRIC / BENTO LAYOUT (Z-10 ON TOP OF BURST) ── */}
+          <div className="relative z-10 w-full py-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
             <div className="flex flex-col gap-32">
 
               {/* ── 01. ABOUT ME ──────────────────────────────────── */}
@@ -193,7 +211,7 @@ export default function App() {
 
                   {/* Quick Highlights Bento Cards */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2">
-                    <div className="p-4 rounded-xl bg-zinc-50/80 border border-black/[0.06] space-y-1">
+                    <div className="p-4 rounded-xl bg-white/80 backdrop-blur-sm border border-black/[0.06] space-y-1 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
                       <div className="flex items-center gap-2 text-zinc-500 text-xs font-mono">
                         <GraduationCap className="size-3.5" />
                         <span>Academics</span>
@@ -202,7 +220,7 @@ export default function App() {
                       <div className="text-xs text-zinc-500">CGPA 8.0 · 2023–2027</div>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-zinc-50/80 border border-black/[0.06] space-y-1">
+                    <div className="p-4 rounded-xl bg-white/80 backdrop-blur-sm border border-black/[0.06] space-y-1 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
                       <div className="flex items-center gap-2 text-zinc-500 text-xs font-mono">
                         <MapPin className="size-3.5" />
                         <span>Location</span>
@@ -211,7 +229,7 @@ export default function App() {
                       <div className="text-xs text-zinc-500">Open to Remote & Onsite</div>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-zinc-50/80 border border-black/[0.06] space-y-1">
+                    <div className="p-4 rounded-xl bg-white/80 backdrop-blur-sm border border-black/[0.06] space-y-1 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
                       <div className="flex items-center gap-2 text-zinc-500 text-xs font-mono">
                         <Sparkles className="size-3.5" />
                         <span>Specialization</span>
@@ -230,7 +248,7 @@ export default function App() {
                       {personal.softSkills.map((skill, sIdx) => (
                         <span
                           key={sIdx}
-                          className="px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white rounded-lg border border-black/[0.08] shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
+                          className="px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white/90 backdrop-blur-sm rounded-lg border border-black/[0.08] shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
                         >
                           {skill}
                         </span>
@@ -273,10 +291,10 @@ export default function App() {
                       return (
                         <div
                           key={idx}
-                          className="p-5 rounded-2xl bg-zinc-50/70 border border-black/[0.06] hover:bg-white hover:border-black/[0.12] hover:shadow-sm transition-all space-y-3"
+                          className="p-5 rounded-2xl bg-white/80 backdrop-blur-sm border border-black/[0.06] hover:bg-white hover:border-black/[0.12] hover:shadow-sm transition-all space-y-3"
                         >
                           <div className="flex items-center gap-2.5">
-                            <span className="p-1.5 rounded-lg bg-white border border-black/[0.05] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+                            <span className="p-1.5 rounded-lg bg-zinc-50 border border-black/[0.05] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
                               {icons[idx % icons.length]}
                             </span>
                             <h3 className="text-sm font-semibold text-zinc-900 tracking-tight">
@@ -326,7 +344,7 @@ export default function App() {
                     {projects.map((proj) => (
                       <article
                         key={proj.id}
-                        className="group flex flex-col justify-between rounded-2xl bg-zinc-50/70 border border-black/[0.06] hover:bg-white hover:border-black/[0.12] hover:shadow-md transition-all p-5"
+                        className="group flex flex-col justify-between rounded-2xl bg-white/85 backdrop-blur-sm border border-black/[0.06] hover:bg-white hover:border-black/[0.12] hover:shadow-md transition-all p-5"
                       >
                         <div className="space-y-3.5">
                           {/* Visual Lightbox Preview */}
@@ -459,7 +477,7 @@ export default function App() {
                 {/* Right Content */}
                 <div className="lg:col-span-8 space-y-8">
                   {/* Formal Education Card */}
-                  <div className="p-6 rounded-2xl bg-zinc-50/70 border border-black/[0.06] space-y-2">
+                  <div className="p-6 rounded-2xl bg-white/85 backdrop-blur-sm border border-black/[0.06] space-y-2">
                     <div className="flex items-center justify-between text-xs font-mono text-zinc-500">
                       <span>{education[0].institution}</span>
                       <span>{education[0].period}</span>
@@ -518,12 +536,12 @@ export default function App() {
                     Get in Touch
                   </h2>
                   <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
-                    Click any folder to open directly, or copy contact details below.
+                    Click any folder to open directly or connect across platforms.
                   </p>
                 </div>
 
                 {/* Right Content */}
-                <div className="lg:col-span-8 space-y-8">
+                <div className="lg:col-span-8">
                   {/* 4 Skeuomorphic Folders Across Full Width */}
                   <div
                     className="grid grid-cols-2 sm:grid-cols-4 gap-4"
@@ -549,59 +567,6 @@ export default function App() {
                       href={`tel:+91${personal.phone}`}
                       ariaLabel="Call via Phone"
                     />
-                  </div>
-
-                  {/* Quick Direct Copy Badges */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
-                    <div className="p-4 rounded-xl bg-zinc-50/80 border border-black/[0.06] flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <div className="text-xs font-mono text-zinc-400 uppercase">Email Address</div>
-                        <div className="text-sm font-medium text-zinc-900">{personal.email}</div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(personal.email, 'email')}
-                        className="px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white rounded-lg border border-black/[0.08] hover:bg-zinc-100 transition-colors flex items-center gap-1.5 cursor-pointer"
-                        title="Copy email to clipboard"
-                      >
-                        {copiedKey === 'email' ? (
-                          <>
-                            <Check className="size-3.5 text-emerald-600" />
-                            <span>Copied!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="size-3.5 text-zinc-500" />
-                            <span>Copy</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-zinc-50/80 border border-black/[0.06] flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <div className="text-xs font-mono text-zinc-400 uppercase">Phone &amp; Location</div>
-                        <div className="text-sm font-medium text-zinc-900">+91 {personal.phone} · {personal.location}</div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(`+91${personal.phone}`, 'phone')}
-                        className="px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white rounded-lg border border-black/[0.08] hover:bg-zinc-100 transition-colors flex items-center gap-1.5 cursor-pointer"
-                        title="Copy phone to clipboard"
-                      >
-                        {copiedKey === 'phone' ? (
-                          <>
-                            <Check className="size-3.5 text-emerald-600" />
-                            <span>Copied!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="size-3.5 text-zinc-500" />
-                            <span>Copy</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
                   </div>
                 </div>
               </section>
