@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SphereRing from './components/SphereRing';
 import SphereFooter from './components/SphereFooter';
 import FolderCard from './components/FolderCard';
@@ -9,8 +9,32 @@ import { portfolioData } from './data/portfolioData';
 
 export default function App() {
   const [activeModalImage, setActiveModalImage] = useState(null);
+  const [burstVisible, setBurstVisible] = useState(false);
 
   const { personal, skills, projects, experiences, education, certifications } = portfolioData;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      // Not in first phase (where "NIRAAI MADHI" and rotatory spheres are)
+      const heroThreshold = windowHeight * 0.45;
+      const totalScrollHeight = document.documentElement.scrollHeight;
+      // Not in last phase (where bottom sphere rotation is)
+      const footerThreshold = totalScrollHeight - windowHeight - 480;
+
+      const isMiddlePhase = scrollY > heroThreshold && scrollY < footerThreshold;
+      setBurstVisible(isMiddlePhase);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
 
   return (
     <div className="min-h-full flex flex-col font-sans bg-background text-foreground antialiased selection:bg-zinc-200">
@@ -22,15 +46,17 @@ export default function App() {
         Skip to content
       </a>
 
-      {/* ── FIXED RIGHT-SIDE BACKGROUND BURST (PERSISTS & SPARKLES ACROSS ENTIRE PAGE SCROLL) ── */}
+      {/* ── FIXED RIGHT-SIDE BACKGROUND BURST (ACTIVE IN MIDDLE PHASES ONLY) ── */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed top-1/2 -translate-y-1/2 -right-8 sm:right-2 lg:right-8 w-[320px] h-[320px] sm:w-[440px] sm:h-[440px] lg:w-[540px] lg:h-[540px] z-10 select-none overflow-visible"
+        className={`pointer-events-none fixed top-1/2 -translate-y-1/2 right-2 sm:right-6 lg:right-10 w-[240px] h-[240px] sm:w-[300px] sm:h-[300px] lg:w-[380px] lg:h-[380px] z-10 select-none overflow-visible transition-all duration-700 ease-out ${
+          burstVisible ? 'opacity-80 scale-100' : 'opacity-0 scale-90 pointer-events-none'
+        }`}
       >
         <LogoBurst
           color="#27272a"
-          tentacleCount={280}
-          radius={0.48}
+          tentacleCount={220}
+          radius={0.44}
           duration={1.35}
           breathe={true}
           theme="light"

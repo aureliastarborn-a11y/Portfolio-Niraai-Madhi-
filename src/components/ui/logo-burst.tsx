@@ -354,39 +354,6 @@ export function createLogoBurst(
   const mqDark = window.matchMedia("(prefers-color-scheme: dark)")
   mqDark.addEventListener("change", syncTheme)
 
-  // Interactive scroll-burst & sparkle physics
-  let scrollEnergy = 0
-  let lastScrollY = typeof window !== "undefined" ? window.scrollY : 0
-  let lastScrollTime = performance.now()
-
-  const handleWindowScroll = () => {
-    if (!running) return
-    const now = performance.now()
-    const currentY = window.scrollY
-    const dy = Math.abs(currentY - lastScrollY)
-    const dt = Math.max(1, now - lastScrollTime)
-    const velocity = (dy / dt) * 16
-    lastScrollY = currentY
-    lastScrollTime = now
-
-    // Accumulate sparkle & flare energy smoothly
-    scrollEnergy = Math.min(2.5, scrollEnergy + Math.min(1.0, velocity * 0.12) + 0.18)
-
-    // When scrolling briskly, re-trigger a burst surge so tentacles dynamically explode outward
-    if (settled && dy > 12 && !reduce) {
-      settled = false
-      startedAt = now - 350
-    }
-
-    if (!raf && running) {
-      raf = requestAnimationFrame(paint)
-    }
-  }
-
-  if (typeof window !== "undefined") {
-    window.addEventListener("scroll", handleWindowScroll, { passive: true })
-  }
-
   const progressOf = (now: number, tentacle: Tentacle) => {
     if (reduce || settled) return 1
     const elapsed = (now - startedAt) / 1000
@@ -420,10 +387,6 @@ export function createLogoBurst(
     const breathing = settled && !reduce && options.breathe !== false
     const field = breathing ? Math.sin(seconds * 0.92) * 0.015 : 0
 
-    // Smoothly decay scroll energy
-    scrollEnergy *= 0.93
-    const scrollFlare = scrollEnergy * 0.18
-
     ctx.clearRect(0, 0, w, h)
     ctx.lineCap = "round"
 
@@ -437,7 +400,7 @@ export function createLogoBurst(
       const line = breathing
         ? Math.sin(seconds * 1.28 + tentacle.phase) * 0.018
         : 0
-      const scale = 1 + field + line + scrollFlare
+      const scale = 1 + field + line
       const reach = inner + (maxR - inner) * tentacle.length * p * scale
       if (reach <= inner + 0.4) continue
 
@@ -455,18 +418,15 @@ export function createLogoBurst(
       ctx.moveTo(x0, y0)
       ctx.lineTo(x1, y1)
       ctx.strokeStyle = rgba(rgb, tentacle.alpha * (0.55 + p * 0.45) * fade)
-      ctx.lineWidth = tentacle.width * (1 + scrollEnergy * 0.25)
+      ctx.lineWidth = tentacle.width
       ctx.stroke()
 
       for (const mid of tentacle.mids) {
         if (p < mid.t) continue
         const mr = inner + (maxR - inner) * tentacle.length * mid.t * scale
-        const midSparkle = scrollEnergy > 0.02
-          ? 0.6 * Math.sin(seconds * 16.0 + tentacle.phase * 4.0 + mid.t * 8) * scrollEnergy
-          : 0
         ctx.beginPath()
-        ctx.arc(cx + cos * mr, cy + sin * mr, mid.size + Math.max(0, midSparkle), 0, Math.PI * 2)
-        ctx.fillStyle = rgba(rgb, clamp((mid.alpha + Math.abs(midSparkle) * 0.5) * fade, 0, 1))
+        ctx.arc(cx + cos * mr, cy + sin * mr, mid.size, 0, Math.PI * 2)
+        ctx.fillStyle = rgba(rgb, mid.alpha * fade)
         ctx.fill()
       }
 
@@ -478,18 +438,15 @@ export function createLogoBurst(
         const tipPulse = breathing
           ? 1 + 0.1 * Math.sin(seconds * 1.28 + tentacle.phase)
           : 1
-        const tipSparkle = scrollEnergy > 0.02
-          ? (0.8 + 0.8 * Math.sin(seconds * 22.0 + tentacle.phase * 5.0)) * scrollEnergy
-          : 0
         ctx.beginPath()
         ctx.arc(
           cx + cos * tipR,
           cy + sin * tipR,
-          tentacle.tipSize * tipPulse + tipSparkle * 1.6,
+          tentacle.tipSize * tipPulse,
           0,
           Math.PI * 2
         )
-        ctx.fillStyle = rgba(rgb, clamp((0.78 + tipSparkle * 0.35) * appear * fade, 0, 1))
+        ctx.fillStyle = rgba(rgb, 0.78 * appear * fade)
         ctx.fill()
       }
     }
@@ -568,9 +525,6 @@ export function createLogoBurst(
       mo.disconnect()
       mqReduce.removeEventListener("change", onReduce)
       mqDark.removeEventListener("change", syncTheme)
-      if (typeof window !== "undefined") {
-        window.removeEventListener("scroll", handleWindowScroll)
-      }
     },
   }
 }
