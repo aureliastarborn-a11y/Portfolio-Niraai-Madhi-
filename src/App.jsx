@@ -2,16 +2,37 @@ import React, { useState, useEffect } from 'react';
 import SphereRing from './components/SphereRing';
 import SphereFooter from './components/SphereFooter';
 import FolderCard from './components/FolderCard';
-import FloatingDock from './components/FloatingDock';
 import ImageModal from './components/ImageModal';
 import { LogoBurst } from '@/components/ui/logo-burst';
 import { portfolioData } from './data/portfolioData';
+import {
+  ExternalLink,
+  Copy,
+  Check,
+  Sparkles,
+  Code2,
+  Database,
+  Cpu,
+  GraduationCap,
+  Award,
+  ArrowUpRight,
+  MapPin,
+  Mail,
+  Phone
+} from 'lucide-react';
 
 export default function App() {
   const [activeModalImage, setActiveModalImage] = useState(null);
   const [burstVisible, setBurstVisible] = useState(false);
+  const [copiedKey, setCopiedKey] = useState(null);
 
   const { personal, skills, projects, experiences, education, certifications } = portfolioData;
+
+  const handleCopy = (text, key) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
 
   useEffect(() => {
     const updateVisibility = () => {
@@ -23,7 +44,6 @@ export default function App() {
       let inHeroPhase = false;
       if (heroEl) {
         const heroRect = heroEl.getBoundingClientRect();
-        // As long as any part of the hero header is on screen or within 20px
         if (heroRect.bottom > 20) {
           inHeroPhase = true;
         }
@@ -35,7 +55,6 @@ export default function App() {
       let inFooterPhase = false;
       if (footerEl) {
         const footerRect = footerEl.getBoundingClientRect();
-        // Hide well before the sphere rotation footer reveals (150px buffer)
         if (footerRect.top <= windowHeight + 150) {
           inFooterPhase = true;
         }
@@ -90,8 +109,8 @@ export default function App() {
       {/* ── FIXED RIGHT-SIDE BACKGROUND BURST (ACTIVE IN MIDDLE PHASES ONLY) ── */}
       <div
         aria-hidden="true"
-        className={`pointer-events-none fixed top-1/2 -translate-y-1/2 right-2 sm:right-6 lg:right-10 w-[160px] h-[160px] sm:w-[220px] sm:h-[220px] lg:w-[280px] lg:h-[280px] z-10 select-none overflow-visible transition-opacity duration-150 ease-out ${
-          burstVisible ? 'opacity-70 visible' : 'opacity-0 invisible pointer-events-none'
+        className={`pointer-events-none fixed top-1/2 -translate-y-1/2 right-2 sm:right-6 lg:right-10 w-[160px] h-[160px] sm:w-[220px] sm:h-[220px] lg:w-[280px] lg:h-[280px] z-0 select-none overflow-visible transition-opacity duration-150 ease-out ${
+          burstVisible ? 'opacity-40 lg:opacity-70 visible' : 'opacity-0 invisible pointer-events-none'
         }`}
       >
         <LogoBurst
@@ -111,7 +130,7 @@ export default function App() {
           className="relative z-1 overflow-clip bg-background origin-bottom shadow-[0_1px_0_#00000006]"
           style={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}
         >
-          {/* ── HERO / ORBITAL SPHERE RING ─────────────────────── */}
+          {/* ── HERO / ORBITAL SPHERE RING (TOP-MOST PHASE - KEPT INTACT) ── */}
           <header
             id="top"
             className="sphere-ring relative z-1 grid h-[var(--hero-height)] place-items-center overflow-visible isolate [--hero-height:75svh] compact:[--hero-height:62svh]"
@@ -138,314 +157,462 @@ export default function App() {
             </div>
           </header>
 
-          {/* ── SECTIONS COLUMN ───────────────────────────────── */}
-          <div className="relative w-full pt-16 pb-36 compact:pt-12">
-            <div
-              className="mx-auto flex w-[min(var(--container-content),calc(100%-48px))] flex-col gap-28 compact:w-[min(var(--container-content),calc(100%-32px))] compact:gap-20 [&>section]:scroll-mt-8"
-              data-content-column="true"
-            >
-              {/* ── 1. ABOUT ──────────────────────────────────── */}
-              <section id="about" aria-labelledby="about-heading">
-                <h2
-                  id="about-heading"
-                  className="relative text-heading text-[15px] font-medium leading-6 mb-2"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-0 right-[calc(100%+4px)] w-4 text-muted font-normal tabular-nums compact:static compact:mr-2 compact:inline-block"
-                  >
-                    1
-                  </span>
-                  About
-                </h2>
-                <div className="grid gap-4 text-muted text-[15px] leading-relaxed">
-                  {personal.bio.map((paragraph, idx) => (
-                    <p key={idx}>{paragraph}</p>
-                  ))}
+          {/* ── MIDDLE PHASE: MODERN EDITORIAL ASYMMETRIC / BENTO LAYOUT (NOT CENTERED) ── */}
+          <div className="relative w-full py-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
+            <div className="flex flex-col gap-32">
 
-                  {/* Soft skills pill row */}
-                  <div className="pt-2 flex flex-wrap gap-1.5">
-                    {personal.softSkills.map((skill, sIdx) => (
-                      <span
-                        key={sIdx}
-                        className="px-2.5 py-1 text-[12px] font-medium text-heading bg-scene rounded-full border border-black/[0.04]"
-                      >
-                        {skill}
-                      </span>
-                    ))}
+              {/* ── 01. ABOUT ME ──────────────────────────────────── */}
+              <section id="about" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
+                {/* Left Header Column (Sticky) */}
+                <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-500 font-semibold px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200/80">
+                      01
+                    </span>
+                    <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
+                      Overview
+                    </span>
                   </div>
+                  <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+                    About Me
+                  </h2>
+                  <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
+                    Background, core passions, and technical philosophy.
+                  </p>
                 </div>
-              </section>
 
-              {/* ── 2. TECHNICAL SKILLS ────────────────────────── */}
-              <section id="skills" aria-labelledby="skills-heading">
-                <h2
-                  id="skills-heading"
-                  className="relative text-heading text-[15px] font-medium leading-6 mb-4"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-0 right-[calc(100%+4px)] w-4 text-muted font-normal tabular-nums compact:static compact:mr-2 compact:inline-block"
-                  >
-                    2
-                  </span>
-                  Technical skills
-                </h2>
+                {/* Right Content Column */}
+                <div className="lg:col-span-8 space-y-6">
+                  <p className="text-lg sm:text-xl font-normal leading-relaxed text-zinc-900">
+                    {personal.bio[0]}
+                  </p>
 
-                <div className="grid gap-6">
-                  {skills.map((grp, idx) => (
-                    <div key={idx} className="space-y-2">
-                      <h3 className="text-[14px] font-medium text-heading">
-                        {grp.category}
-                      </h3>
-                      <div className="flex flex-wrap gap-1.5">
-                        {grp.items.map((item, iIdx) => (
-                          <span
-                            key={iIdx}
-                            className="px-2.5 py-1 text-[13px] text-muted hover:text-heading bg-white rounded-lg border border-black/[0.08] shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-colors"
-                          >
-                            {item}
-                          </span>
-                        ))}
+                  <p className="text-[15px] leading-relaxed text-zinc-600">
+                    {personal.bio[1]}
+                  </p>
+
+                  {/* Quick Highlights Bento Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2">
+                    <div className="p-4 rounded-xl bg-zinc-50/80 border border-black/[0.06] space-y-1">
+                      <div className="flex items-center gap-2 text-zinc-500 text-xs font-mono">
+                        <GraduationCap className="size-3.5" />
+                        <span>Academics</span>
                       </div>
+                      <div className="text-sm font-medium text-zinc-900">B.Tech AI & DS</div>
+                      <div className="text-xs text-zinc-500">CGPA 8.0 · 2023–2027</div>
                     </div>
-                  ))}
-                </div>
-              </section>
 
-              {/* ── 3. PROJECTS / SELECTED WORK ───────────────── */}
-              <section id="projects" aria-labelledby="projects-heading">
-                <h2
-                  id="projects-heading"
-                  className="relative text-heading text-[15px] font-medium leading-6 mb-4"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-0 right-[calc(100%+4px)] w-4 text-muted font-normal tabular-nums compact:static compact:mr-2 compact:inline-block"
-                  >
-                    3
-                  </span>
-                  Selected Work
-                </h2>
-
-                <div className="grid min-w-0 gap-12 compact:gap-10">
-                  {projects.map((proj) => (
-                    <article
-                      key={proj.id}
-                      className="flex w-full max-w-content min-w-0 flex-col gap-2.5 [&>p]:text-muted text-[15px]"
-                    >
-                      <a
-                        href={proj.link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="group flex w-fit items-center gap-2"
-                      >
-                        <h3 className="text-heading text-[15px] font-medium leading-6 group-hover:underline">
-                          {proj.title}
-                        </h3>
-                        <img
-                          src="/images/external-arrow.svg"
-                          alt=""
-                          className="h-3.5 w-auto opacity-40 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
-                        />
-                        <span className="text-muted text-[13px] font-normal">
-                          · {proj.tagline}
-                        </span>
-                      </a>
-
-                      <p className="leading-relaxed text-[14px]">
-                        {proj.description}
-                      </p>
-
-                      <div className="flex flex-wrap gap-1.5 pt-0.5">
-                        {proj.tags.map((tag, tIdx) => (
-                          <span
-                            key={tIdx}
-                            className="px-2 py-0.5 text-[11px] font-mono text-muted bg-scene rounded border border-black/[0.04]"
-                          >
-                            {tag}
-                          </span>
-                        ))}
+                    <div className="p-4 rounded-xl bg-zinc-50/80 border border-black/[0.06] space-y-1">
+                      <div className="flex items-center gap-2 text-zinc-500 text-xs font-mono">
+                        <MapPin className="size-3.5" />
+                        <span>Location</span>
                       </div>
+                      <div className="text-sm font-medium text-zinc-900">{personal.location}</div>
+                      <div className="text-xs text-zinc-500">Open to Remote & Onsite</div>
+                    </div>
 
-                      {/* Interactive Visual Preview */}
-                      <div
-                        className="relative w-content aspect-project shrink-0 snap-start mt-1 compact:w-[calc(100vw-32px)]"
-                        data-project-preview="true"
-                      >
-                        <button
-                          type="button"
-                          onClick={() => setActiveModalImage(proj)}
-                          aria-label={`Open preview for ${proj.title}`}
-                          className="relative block size-full overflow-hidden rounded-[8px] border-0 bg-preview p-0 shadow-[0_5px_15px_#00000010] cursor-zoom-in appearance-none transition-transform duration-200 hover:scale-[1.01]"
+                    <div className="p-4 rounded-xl bg-zinc-50/80 border border-black/[0.06] space-y-1">
+                      <div className="flex items-center gap-2 text-zinc-500 text-xs font-mono">
+                        <Sparkles className="size-3.5" />
+                        <span>Specialization</span>
+                      </div>
+                      <div className="text-sm font-medium text-zinc-900">GenAI & Agents</div>
+                      <div className="text-xs text-zinc-500">LLMs & Data Warehousing</div>
+                    </div>
+                  </div>
+
+                  {/* Soft Skills Pill Badges */}
+                  <div className="pt-2">
+                    <div className="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-2">
+                      Key Competencies
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {personal.softSkills.map((skill, sIdx) => (
+                        <span
+                          key={sIdx}
+                          className="px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white rounded-lg border border-black/[0.08] shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
                         >
-                          <img
-                            src={proj.bg}
-                            alt=""
-                            className="object-cover select-none absolute inset-0 size-full"
-                          />
-                          <span className="absolute inset-[8%] flex items-center justify-center drop-shadow-[0_8px_14px_#18160f2e]">
-                            <img
-                              src={proj.screenshot}
-                              alt={proj.title}
-                              className="object-contain size-full"
-                            />
-                          </span>
-                        </button>
-                      </div>
-                    </article>
-                  ))}
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </section>
 
-              {/* ── 4. EXPERIENCE ─────────────────────────────── */}
-              <section id="experience" aria-labelledby="experience-heading">
-                <h2
-                  id="experience-heading"
-                  className="relative text-heading text-[15px] font-medium leading-6 mb-4"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-0 right-[calc(100%+4px)] w-4 text-muted font-normal tabular-nums compact:static compact:mr-2 compact:inline-block"
-                  >
-                    4
-                  </span>
-                  Experience
-                </h2>
+              {/* ── 02. TECHNICAL SKILLS ────────────────────────── */}
+              <section id="skills" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
+                {/* Left Header Column (Sticky) */}
+                <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-500 font-semibold px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200/80">
+                      02
+                    </span>
+                    <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
+                      Expertise
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+                    Technical Stack
+                  </h2>
+                  <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
+                    Tools, languages, and frameworks used across my machine learning and data pipelines.
+                  </p>
+                </div>
 
-                <dl
-                  className="grid gap-4 [&>div]:grid [&>div]:grid-cols-[100px_minmax(0,1fr)] [&>div]:gap-[28px] compact:[&>div]:grid-cols-[85px_minmax(0,1fr)] compact:[&>div]:gap-[16px] [&_dt]:whitespace-nowrap [&_dt]:text-muted [&_dd_span]:block [&_dd_span]:text-muted"
-                  data-timeline="true"
-                >
-                  {experiences.map((exp, idx) => (
-                    <div key={idx}>
-                      <dt className="text-[13px] font-mono pt-0.5">{exp.period}</dt>
-                      <dd>
-                        <div className="text-heading text-[15px] font-medium leading-6">
-                          {exp.role} <span className="text-muted font-normal">at {exp.organization}</span>
+                {/* Right Bento Grid */}
+                <div className="lg:col-span-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {skills.map((grp, idx) => {
+                      const icons = [
+                        <Code2 key="code" className="size-4 text-zinc-700" />,
+                        <Sparkles key="ai" className="size-4 text-purple-600" />,
+                        <Database key="data" className="size-4 text-blue-600" />,
+                        <Cpu key="tools" className="size-4 text-emerald-600" />
+                      ];
+                      return (
+                        <div
+                          key={idx}
+                          className="p-5 rounded-2xl bg-zinc-50/70 border border-black/[0.06] hover:bg-white hover:border-black/[0.12] hover:shadow-sm transition-all space-y-3"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="p-1.5 rounded-lg bg-white border border-black/[0.05] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+                              {icons[idx % icons.length]}
+                            </span>
+                            <h3 className="text-sm font-semibold text-zinc-900 tracking-tight">
+                              {grp.category}
+                            </h3>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {grp.items.map((item, iIdx) => (
+                              <span
+                                key={iIdx}
+                                className="px-2.5 py-1 text-xs text-zinc-700 bg-white rounded-md border border-black/[0.08] shadow-[0_1px_1px_rgba(0,0,0,0.02)]"
+                              >
+                                {item}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                        <span className="text-muted text-[13px] leading-relaxed mt-0.5">
-                          {exp.summary}
-                        </span>
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
+                      );
+                    })}
+                  </div>
+                </div>
               </section>
 
-              {/* ── 5. EDUCATION & CERTIFICATIONS ─────────────── */}
-              <section id="education" aria-labelledby="education-heading">
-                <h2
-                  id="education-heading"
-                  className="relative text-heading text-[15px] font-medium leading-6 mb-4"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-0 right-[calc(100%+4px)] w-4 text-muted font-normal tabular-nums compact:static compact:mr-2 compact:inline-block"
-                  >
-                    5
-                  </span>
-                  Education &amp; Certifications
-                </h2>
+              {/* ── 03. SELECTED WORK / PROJECTS ───────────────── */}
+              <section id="projects" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
+                {/* Left Header Column (Sticky) */}
+                <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-500 font-semibold px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200/80">
+                      03
+                    </span>
+                    <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
+                      Portfolio
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+                    Selected Work
+                  </h2>
+                  <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
+                    Autonomous agents, enterprise data warehousing solutions, and exploratory analytics.
+                  </p>
+                </div>
 
-                <dl
-                  className="grid gap-4 mb-6 [&>div]:grid [&>div]:grid-cols-[100px_minmax(0,1fr)] [&>div]:gap-[28px] compact:[&>div]:grid-cols-[85px_minmax(0,1fr)] compact:[&>div]:gap-[16px] [&_dt]:whitespace-nowrap [&_dt]:text-muted [&_dd_span]:block [&_dd_span]:text-muted"
-                  data-timeline="true"
-                >
-                  {education.map((edu, idx) => (
-                    <div key={idx}>
-                      <dt className="text-[13px] font-mono pt-0.5">{edu.period}</dt>
-                      <dd>
-                        <div className="text-heading text-[15px] font-medium leading-6">
-                          {edu.degree}
-                        </div>
-                        <span className="text-muted text-[13px] leading-relaxed">
-                          {edu.institution} · {edu.detail}
-                        </span>
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-
-                {/* Certifications Row */}
-                <div className="pt-3 border-t border-black/[0.06]">
-                  <h3 className="text-muted text-[12px] font-mono uppercase tracking-wider mb-2.5">
-                    Certifications
-                  </h3>
-                  <div className="grid gap-1.5">
-                    {certifications.map((cert, cIdx) => (
-                      <div
-                        key={cIdx}
-                        className="flex items-baseline justify-between text-[13px] py-1"
+                {/* Right Projects Grid */}
+                <div className="lg:col-span-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {projects.map((proj) => (
+                      <article
+                        key={proj.id}
+                        className="group flex flex-col justify-between rounded-2xl bg-zinc-50/70 border border-black/[0.06] hover:bg-white hover:border-black/[0.12] hover:shadow-md transition-all p-5"
                       >
-                        <span className="text-heading font-medium">
-                          {cert.name}
-                        </span>
-                        <span className="text-muted text-[12px] font-mono shrink-0 ml-3">
-                          {cert.issuer} · {cert.year}
-                        </span>
+                        <div className="space-y-3.5">
+                          {/* Visual Lightbox Preview */}
+                          <div
+                            className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-preview shadow-[0_4px_12px_rgba(0,0,0,0.04)] cursor-zoom-in"
+                            onClick={() => setActiveModalImage(proj)}
+                          >
+                            <img
+                              src={proj.bg}
+                              alt=""
+                              className="object-cover select-none absolute inset-0 size-full transition-transform duration-300 group-hover:scale-105"
+                            />
+                            <span className="absolute inset-[10%] flex items-center justify-center drop-shadow-[0_8px_16px_rgba(0,0,0,0.18)]">
+                              <img
+                                src={proj.screenshot}
+                                alt={proj.title}
+                                className="object-contain size-full"
+                              />
+                            </span>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <div className="flex items-start justify-between gap-2">
+                              <a
+                                href={proj.link}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1.5 text-zinc-900 font-semibold text-base group/link hover:text-blue-600 transition-colors"
+                              >
+                                <span>{proj.title}</span>
+                                <ArrowUpRight className="size-4 opacity-50 group-hover/link:opacity-100 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-all" />
+                              </a>
+                            </div>
+
+                            <div className="text-xs font-mono text-zinc-500 font-medium">
+                              {proj.tagline}
+                            </div>
+
+                            <p className="text-[13px] leading-relaxed text-zinc-600">
+                              {proj.description}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Tech tags */}
+                        <div className="flex flex-wrap gap-1.5 pt-4 mt-2 border-t border-black/[0.04]">
+                          {proj.tags.map((tag, tIdx) => (
+                            <span
+                              key={tIdx}
+                              className="px-2 py-0.5 text-[11px] font-mono text-zinc-600 bg-white rounded border border-black/[0.06]"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              {/* ── 04. EXPERIENCE ─────────────────────────────── */}
+              <section id="experience" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
+                {/* Left Header Column (Sticky) */}
+                <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-500 font-semibold px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200/80">
+                      04
+                    </span>
+                    <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
+                      Timeline
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+                    Experience
+                  </h2>
+                  <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
+                    Internship tenures, independent engineering, and technical development.
+                  </p>
+                </div>
+
+                {/* Right Timeline Column */}
+                <div className="lg:col-span-8">
+                  <div className="relative border-l border-zinc-200 ml-3 pl-6 sm:pl-8 space-y-8">
+                    {experiences.map((exp, idx) => (
+                      <div key={idx} className="relative group">
+                        {/* Timeline Node Dot */}
+                        <div className="absolute -left-[31px] sm:-left-[39px] top-1.5 size-3 rounded-full bg-white border-2 border-zinc-400 group-hover:border-zinc-900 group-hover:scale-125 transition-all" />
+
+                        <div className="space-y-1">
+                          <span className="text-xs font-mono text-zinc-500 font-medium">
+                            {exp.period}
+                          </span>
+                          <h3 className="text-base font-semibold text-zinc-900">
+                            {exp.role}{' '}
+                            <span className="text-zinc-500 font-normal">
+                              · {exp.organization}
+                            </span>
+                          </h3>
+                          <p className="text-sm text-zinc-600 leading-relaxed max-w-2xl">
+                            {exp.summary}
+                          </p>
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
               </section>
 
-              {/* ── 6. ELSEWHERE & CONTACT ────────────────────── */}
-              <section id="contact" aria-labelledby="contact-heading">
-                <h2
-                  id="contact-heading"
-                  className="relative text-heading text-[15px] font-medium leading-6 mb-4"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-0 right-[calc(100%+4px)] w-4 text-muted font-normal tabular-nums compact:static compact:mr-2 compact:inline-block"
-                  >
-                    6
-                  </span>
-                  Contact &amp; Elsewhere
-                </h2>
+              {/* ── 05. EDUCATION & CERTIFICATIONS ─────────────── */}
+              <section id="education" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
+                {/* Left Header Column (Sticky) */}
+                <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-500 font-semibold px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200/80">
+                      05
+                    </span>
+                    <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
+                      Academics
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+                    Education &amp; Credentials
+                  </h2>
+                  <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
+                    Formal degree from Tagore Engineering College and verified AI credentials.
+                  </p>
+                </div>
 
-                <p className="mb-6 max-w-[360px] text-muted text-[15px]">
-                  Connect with me across platforms or reach out directly.
-                </p>
+                {/* Right Content */}
+                <div className="lg:col-span-8 space-y-8">
+                  {/* Formal Education Card */}
+                  <div className="p-6 rounded-2xl bg-zinc-50/70 border border-black/[0.06] space-y-2">
+                    <div className="flex items-center justify-between text-xs font-mono text-zinc-500">
+                      <span>{education[0].institution}</span>
+                      <span>{education[0].period}</span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-zinc-900">
+                      {education[0].degree}
+                    </h3>
+                    <p className="text-sm text-zinc-600 leading-relaxed">
+                      {education[0].detail}
+                    </p>
+                  </div>
 
-                {/* 4 Skeuomorphic Folders */}
-                <div
-                  className="grid grid-cols-2 gap-x-6 gap-y-[30px] compact:gap-x-3.5 compact:gap-y-6"
-                  data-folder-links="true"
-                >
-                  <FolderCard
-                    label="LinkedIn"
-                    href={personal.linkedin}
-                    ariaLabel="Connect on LinkedIn"
-                  />
-                  <FolderCard
-                    label="GitHub"
-                    href={personal.github}
-                    ariaLabel="Code on GitHub"
-                  />
-                  <FolderCard
-                    label="Email"
-                    href={`mailto:${personal.email}`}
-                    ariaLabel="Send an Email"
-                  />
-                  <FolderCard
-                    label="Phone"
-                    href={`tel:+91${personal.phone}`}
-                    ariaLabel="Call via Phone"
-                  />
+                  {/* Certifications Grid */}
+                  <div className="space-y-3">
+                    <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                      Industry Certifications
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                      {certifications.map((cert, cIdx) => (
+                        <div
+                          key={cIdx}
+                          className="p-4 rounded-xl bg-white border border-black/[0.08] shadow-[0_1px_2px_rgba(0,0,0,0.03)] space-y-2 flex flex-col justify-between"
+                        >
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 text-zinc-500 text-xs font-mono">
+                              <Award className="size-3.5 text-zinc-700" />
+                              <span>{cert.issuer}</span>
+                            </div>
+                            <div className="text-[13px] font-medium text-zinc-900 leading-snug">
+                              {cert.name}
+                            </div>
+                          </div>
+                          <div className="text-xs font-mono text-zinc-400">
+                            Issued {cert.year}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </section>
+
+              {/* ── 06. CONTACT & ELSEWHERE ────────────────────── */}
+              <section id="contact" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
+                {/* Left Header Column (Sticky) */}
+                <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-500 font-semibold px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200/80">
+                      06
+                    </span>
+                    <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
+                      Connect
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+                    Get in Touch
+                  </h2>
+                  <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
+                    Click any folder to open directly, or copy contact details below.
+                  </p>
+                </div>
+
+                {/* Right Content */}
+                <div className="lg:col-span-8 space-y-8">
+                  {/* 4 Skeuomorphic Folders Across Full Width */}
+                  <div
+                    className="grid grid-cols-2 sm:grid-cols-4 gap-4"
+                    data-folder-links="true"
+                  >
+                    <FolderCard
+                      label="LinkedIn"
+                      href={personal.linkedin}
+                      ariaLabel="Connect on LinkedIn"
+                    />
+                    <FolderCard
+                      label="GitHub"
+                      href={personal.github}
+                      ariaLabel="Code on GitHub"
+                    />
+                    <FolderCard
+                      label="Email"
+                      href={`mailto:${personal.email}`}
+                      ariaLabel="Send an Email"
+                    />
+                    <FolderCard
+                      label="Phone"
+                      href={`tel:+91${personal.phone}`}
+                      ariaLabel="Call via Phone"
+                    />
+                  </div>
+
+                  {/* Quick Direct Copy Badges */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+                    <div className="p-4 rounded-xl bg-zinc-50/80 border border-black/[0.06] flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <div className="text-xs font-mono text-zinc-400 uppercase">Email Address</div>
+                        <div className="text-sm font-medium text-zinc-900">{personal.email}</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(personal.email, 'email')}
+                        className="px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white rounded-lg border border-black/[0.08] hover:bg-zinc-100 transition-colors flex items-center gap-1.5 cursor-pointer"
+                        title="Copy email to clipboard"
+                      >
+                        {copiedKey === 'email' ? (
+                          <>
+                            <Check className="size-3.5 text-emerald-600" />
+                            <span>Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="size-3.5 text-zinc-500" />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-zinc-50/80 border border-black/[0.06] flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <div className="text-xs font-mono text-zinc-400 uppercase">Phone &amp; Location</div>
+                        <div className="text-sm font-medium text-zinc-900">+91 {personal.phone} · {personal.location}</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(`+91${personal.phone}`, 'phone')}
+                        className="px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white rounded-lg border border-black/[0.08] hover:bg-zinc-100 transition-colors flex items-center gap-1.5 cursor-pointer"
+                        title="Copy phone to clipboard"
+                      >
+                        {copiedKey === 'phone' ? (
+                          <>
+                            <Check className="size-3.5 text-emerald-600" />
+                            <span>Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="size-3.5 text-zinc-500" />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
             </div>
           </div>
         </div>
 
-        {/* ── FOOTER SPHERE SCENE ───────────────────────────── */}
+        {/* ── FOOTER SPHERE SCENE (FOOT-MOST PHASE - KEPT INTACT) ── */}
         <SphereFooter />
       </main>
-
-      {/* ── FLOATING PILL DOCK NAVIGATION ───────────────────── */}
-      <FloatingDock />
 
       {/* ── IMAGE LIGHTBOX MODAL ────────────────────────────── */}
       <ImageModal
