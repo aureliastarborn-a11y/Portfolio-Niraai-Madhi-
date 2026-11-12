@@ -391,13 +391,7 @@ export default function App() {
                         artist={exp.organization}
                         releaseType="Experience Track"
                         year={exp.period}
-                        coverImage={
-                          idx === 0
-                            ? "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80"
-                            : idx === 1
-                            ? "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80"
-                            : "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80"
-                        }
+                        coverImage={exp.bg}
                         description={exp.summary}
                         tags={[exp.organization, exp.period.split('–')[0].trim()]}
                         size="compact"
