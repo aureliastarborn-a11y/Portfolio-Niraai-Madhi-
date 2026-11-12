@@ -56,7 +56,7 @@ export const portfolioData = {
       id: "ai-job-finder",
       title: "AI LinkedIn Job Finder",
       tagline: "Autonomous Agent & LLM Pipelines",
-      description: "Automated candidate assessment and job-matching system using prompt engineering, LLM reasoning, and personalized cover-letter generation.",
+      description: "Developed an AI-powered career assistance system to analyze resumes and identify relevant LinkedIn job opportunities using LLMs and prompt engineering.",
       bg: "/images/covers/cover-original.jpg",
       screenshot: "/images/project-screenshots/desktop-agent.png",
       tags: ["Python", "LLMs", "Prompt Engineering"],
@@ -64,22 +64,72 @@ export const portfolioData = {
     },
     {
       id: "data-warehouse",
-      title: "Enterprise Data Warehouse Solution",
+      title: "Data Warehouse",
       tagline: "Multi-Source Analytics & ETL",
-      description: "Designed a consolidated data warehouse architecture featuring star-schema data modeling, automated SQL transformations, and analytical reporting.",
+      description: "Designed and implemented a data warehouse to organize and manage data from multiple sources using SQL and data transformation techniques.",
       bg: "/images/covers/cover-teal.jpg",
       screenshot: "/images/project-screenshots/cli-agent.png",
-      tags: ["SQL", "Data Warehousing", "ETL"],
+      tags: ["SQL", "ETL", "Data Modeling"],
+      link: "https://github.com/niraai-madhi"
+    },
+    {
+      id: "portfolio-website",
+      title: "Personal Portfolio Website",
+      tagline: "Interactive Web Experience",
+      description: "Developed a responsive personal portfolio website to showcase projects, technical skills, certifications, and experience using modern UI tools.",
+      bg: "/images/covers/cover-indigo.jpg",
+      screenshot: "/images/project-screenshots/desktop-agent.png",
+      tags: ["React", "Tailwind CSS", "JavaScript"],
       link: "https://github.com/niraai-madhi"
     },
     {
       id: "airbnb-analysis",
       title: "NYC Airbnb Revenue Analysis",
       tagline: "10,000+ Records EDA & Modeling",
-      description: "Conducted exploratory data analysis across 10,000+ listing records to evaluate location-based pricing dynamics and revenue drivers.",
+      description: "Analyzed 10,000+ Airbnb listing records using Excel and Python (Pandas) to evaluate pricing trends, revenue patterns, and location dynamics.",
       bg: "/images/covers/cover-amber.jpg",
       screenshot: "/images/project-screenshots/editor-plan.png",
-      tags: ["Python", "Pandas", "NumPy"],
+      tags: ["Python", "Pandas", "Excel", "EDA"],
+      link: "https://github.com/niraai-madhi"
+    },
+    {
+      id: "customer-behavior",
+      title: "Customer Behavior Analysis",
+      tagline: "SQL Querying & Segmentation",
+      description: "Analyzed customer transaction data using SQL queries (GROUP BY, JOINs) to derive insights related to customer segmentation and purchasing patterns.",
+      bg: "/images/covers/cover-rose.jpg",
+      screenshot: "/images/project-screenshots/cli-agent.png",
+      tags: ["SQL", "Joins", "Aggregation"],
+      link: "https://github.com/niraai-madhi"
+    },
+    {
+      id: "expense-tracker",
+      title: "Expense Tracker",
+      tagline: "Interactive Dashboard & Monitoring",
+      description: "Developed an interactive expense tracking application to record, categorize, and monitor personal expenses with dashboard-style summaries.",
+      bg: "/images/covers/cover-lavender.jpg",
+      screenshot: "/images/project-screenshots/editor-plan.png",
+      tags: ["JavaScript", "Dashboard", "Analytics"],
+      link: "https://github.com/niraai-madhi"
+    },
+    {
+      id: "cgpa-calculator",
+      title: "CGPA Calculator",
+      tagline: "Python Academic Logic Utility",
+      description: "Developed a Python-based calculator to compute semester and cumulative CGPA implementing logical conditions for grade-to-point conversion.",
+      bg: "/images/covers/cover-emerald.jpg",
+      screenshot: "/images/project-screenshots/cli-agent.png",
+      tags: ["Python", "CLI", "Logic"],
+      link: "https://github.com/niraai-madhi"
+    },
+    {
+      id: "ats-resume-checker",
+      title: "Resume Creator & ATS Checker",
+      tagline: "Python Resume Parsing & Scoring",
+      description: "Developed a Python-based Resume Checker to analyze resumes, evaluate overall quality, perform ATS compatibility checks, and provide skill matching suggestions.",
+      bg: "/images/covers/cover-blue.jpg",
+      screenshot: "/images/project-screenshots/desktop-agent.png",
+      tags: ["Python", "ATS Scoring", "NLP"],
       link: "https://github.com/niraai-madhi"
     }
   ],
@@ -136,18 +186,33 @@ export const portfolioData = {
 
   certifications: [
     {
-      name: "Oracle Cloud Infrastructure 2024 Generative AI Certified Professional",
+      name: "Oracle Cloud Infrastructure 2025 Certified AI Foundations Associate",
       issuer: "Oracle",
+      year: "2025"
+    },
+    {
+      name: "Claude 101",
+      issuer: "Anthropic",
+      year: "2025"
+    },
+    {
+      name: "Microsoft Learnathon '25: Learn AI and GenAI Basics",
+      issuer: "Microsoft",
+      year: "2025"
+    },
+    {
+      name: "Big Data – 301",
+      issuer: "Infosys",
       year: "2024"
     },
     {
-      name: "Prompt Design in Vertex AI",
-      issuer: "Google Cloud",
+      name: "Self-Presentation Micro Certificate",
+      issuer: "Wadhwani Foundation",
       year: "2024"
     },
     {
-      name: "Python for Data Science",
-      issuer: "NPTEL",
+      name: "Government Skill Development Program",
+      issuer: "Infosys",
       year: "2024"
     }
   ]
