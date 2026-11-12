@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { 
   Sparkles, 
   Cpu, 
@@ -297,25 +297,30 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
 /**
  * Interactive 3D Skills Tree
  * 
- * - Starts from one single straight line
- * - While scrolling, the 3D cuboids drop down ONLY WHEN reading the Technical Stack section
- * - When scrolling away, the cuboids retract back into the line
- * - Compact footprint, fully rotatable in 3D
+ * - When NOT reading (before reaching or after scrolling past):
+ *   Collapsed into an attached double line (═════════════════)
+ * - ONLY when reading the Technical Stack phase:
+ *   The double line opens, branches drop down, and the small 3D cuboids drop down!
+ * - After passing or scrolling away:
+ *   Retracts back and turns back into the attached double line!
  */
 export default function Interactive3DSkillsTree({ skills }) {
   const containerRef = useRef(null);
-  // Trigger drop-down precisely when reading this phase (amount: 0.25)
-  const isReading = useInView(containerRef, { once: false, amount: 0.25, margin: '-5% 0px -5% 0px' });
+  // Active reading window: when the section occupies the central reading zone of the screen
+  const isReading = useInView(containerRef, { once: false, amount: 0.3, margin: '-8% 0px -8% 0px' });
+  const [manualOpen, setManualOpen] = useState(false);
+
+  const isOpen = isReading || manualOpen;
 
   return (
     <div ref={containerRef} className="w-full flex flex-col items-center">
-      {/* ── THE SINGLE STRAIGHT LINE & DROPPING SMALL 3D CUBOIDS ── */}
+      {/* ── THE DOUBLE LINE & DROPPING SMALL 3D CUBOIDS ── */}
       <div className="w-full relative flex flex-col items-center">
         {/* 1. SINGLE STRAIGHT VERTICAL FEEDER LINE */}
         <div className="relative flex flex-col items-center">
           <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: isReading ? 18 : 8 }}
+            initial={{ height: 8 }}
+            animate={{ height: isOpen ? 18 : 10 }}
             transition={{ duration: 0.35 }}
             className="w-[1.5px] bg-zinc-800"
           />
@@ -323,17 +328,21 @@ export default function Interactive3DSkillsTree({ skills }) {
           <div className="size-2 rounded-full bg-zinc-900 ring-1.5 ring-zinc-300 shadow-xs" />
         </div>
 
-        {/* 2. ONE SINGLE STRAIGHT HORIZONTAL LINE */}
-        <div className="w-full flex items-center justify-center relative py-0.5">
+        {/* 2. TOP HORIZONTAL LINE */}
+        <div 
+          onClick={() => setManualOpen(!manualOpen)}
+          className="w-full flex items-center justify-center relative py-0.5 cursor-pointer"
+          title={isOpen ? "Click to collapse to double line" : "Click to expand skills"}
+        >
           <motion.div
-            initial={{ width: '25%' }}
+            initial={{ width: '40%' }}
             animate={{
-              width: isReading ? '92%' : '25%',
+              width: isOpen ? '92%' : '45%',
             }}
             transition={{ duration: 0.45, ease: 'easeInOut' }}
-            className="h-[1.5px] bg-zinc-800 rounded-full relative"
+            className="h-[2px] bg-zinc-800 rounded-full relative"
           >
-            {/* Animated traveling signal along the single straight line */}
+            {/* Animated traveling signal */}
             <motion.div
               animate={{ left: ['0%', '100%'] }}
               transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
@@ -342,30 +351,49 @@ export default function Interactive3DSkillsTree({ skills }) {
           </motion.div>
         </div>
 
-        {/* 3. ALL 7 SMALL 3D CUBOIDS DROPPING DOWN FROM THE SINGLE STRAIGHT LINE */}
-        <div className="w-full flex items-center justify-center py-2">
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 max-w-4xl">
-            {skills.map((skillGroup, idx) => (
-              <SmallRotatableCuboid3D
-                key={skillGroup.category}
-                category={skillGroup.category}
-                items={skillGroup.items}
-                index={idx}
-                isReading={isReading}
-              />
-            ))}
-          </div>
-        </div>
+        {/* 3. MIDDLE AREA: DROPS DOWN ONLY WHEN READING, TURNS BACK INTO ATTACHED DOUBLE LINE WHEN PASSED */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.4, ease: 'easeInOut' }}
+              className="w-full overflow-hidden flex flex-col items-center"
+            >
+              <div className="w-full flex items-center justify-center py-2">
+                <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 max-w-4xl">
+                  {skills.map((skillGroup, idx) => (
+                    <SmallRotatableCuboid3D
+                      key={skillGroup.category}
+                      category={skillGroup.category}
+                      items={skillGroup.items}
+                      index={idx}
+                      isReading={isOpen}
+                    />
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* 4. ONE SINGLE STRAIGHT HORIZONTAL MERGE LINE */}
-        <div className="w-full flex items-center justify-center relative py-0.5">
+        {/* 4. BOTTOM HORIZONTAL LINE:
+            When NOT reading -> Attached right to the top line (gap 3.5px) forming the ATTACHED DOUBLE LINE!
+            When reading -> Sits below the dropped-down cuboids! */}
+        <div 
+          onClick={() => setManualOpen(!manualOpen)}
+          className="w-full flex items-center justify-center relative py-0.5 cursor-pointer"
+          title={isOpen ? "Click to collapse to double line" : "Click to expand skills"}
+        >
           <motion.div
-            initial={{ width: '25%' }}
+            initial={{ width: '40%' }}
             animate={{
-              width: isReading ? '92%' : '25%',
+              width: isOpen ? '92%' : '45%',
+              marginTop: isOpen ? 0 : 3.5,
             }}
             transition={{ duration: 0.45, ease: 'easeInOut' }}
-            className="h-[1.5px] bg-zinc-800 rounded-full relative"
+            className="h-[2px] bg-zinc-800 rounded-full relative"
           >
             <motion.div
               animate={{ right: ['0%', '100%'] }}
@@ -379,8 +407,8 @@ export default function Interactive3DSkillsTree({ skills }) {
         <div className="relative flex flex-col items-center">
           <div className="size-2 rounded-full bg-zinc-900 ring-1.5 ring-zinc-300 shadow-xs" />
           <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: isReading ? 18 : 8 }}
+            initial={{ height: 8 }}
+            animate={{ height: isOpen ? 18 : 10 }}
             transition={{ duration: 0.35 }}
             className="w-[1.5px] bg-zinc-800"
           />
