@@ -698,18 +698,27 @@ export default function GlassSpheres({
         elapsedSec += dt;
       }
 
-      const totalAngle = currentRot + (variant !== 'field' || motionQuery.matches ? 0 : elapsedSec * ANGULAR_VELOCITY);
+      // Continuous orbital revolution velocity (like Earth revolving around the Sun)
+      const orbitVelocity = variant === 'ring' ? (Math.PI / 16) : (Math.PI / 32);
+      const totalAngle = currentRot + (motionQuery.matches ? 0 : elapsedSec * orbitVelocity);
       const activeHeight = variant === 'field' ? fieldH : clientH;
       const baseRadius = Math.max(24, Math.min(54, 0.06 * Math.min(clientW, activeHeight)));
 
-      // 3D Orbital rotation calculation
+      // 3D Orbital revolution calculation with celestial tilt
       if (totalAngle !== lastAngle) {
         const sinA = Math.sin(totalAngle);
         const cosA = Math.cos(totalAngle);
+        const tilt = variant === 'field' ? Math.sin(0.35 * elapsedSec) * 0.12 : 0;
+        const cosTilt = Math.cos(tilt);
+        const sinTilt = Math.sin(tilt);
+
         baseCoords.forEach((coord, idx) => {
           const rotCoord = rotatedCoords[idx];
-          rotCoord.x = coord.x * cosA + coord.z * sinA;
-          rotCoord.z = -coord.x * sinA + coord.z * cosA;
+          const x1 = coord.x * cosA + coord.z * sinA;
+          const z1 = -coord.x * sinA + coord.z * cosA;
+          rotCoord.x = x1;
+          rotCoord.y = coord.y * cosTilt - z1 * sinTilt;
+          rotCoord.z = coord.y * sinTilt + z1 * cosTilt;
         });
         // Depth-sort Painter's algorithm
         sortedIndices.sort((a, b) => rotatedCoords[a].z - rotatedCoords[b].z);
@@ -746,7 +755,9 @@ export default function GlassSpheres({
 
         const normZ = clamp((rotCoord.z + 1) / 2);
         const depthScale = lerp(0.56, 1.36, normZ);
-        const bobOffset = motionQuery.matches ? 0 : Math.sin(0.45 * elapsedSec + coord.phase) * (1.5 + 1.8 * coord.size);
+
+        // Harmonic up-and-down floating movement (planetary floating wave)
+        const fieldBobOffset = motionQuery.matches ? 0 : Math.sin(0.9 * elapsedSec + coord.phase) * (18 + 14 * coord.size);
 
         const ringPos =
           variant === 'ring'
@@ -757,10 +768,19 @@ export default function GlassSpheres({
           allSettled = false;
         }
 
+        // Distinct vertical & lateral floating bob for ring spheres
+        const ringBobY = motionQuery.matches ? 0 : Math.sin(1.4 * elapsedSec + idx * 0.78) * 16;
+        const ringBobX = motionQuery.matches ? 0 : Math.cos(1.05 * elapsedSec + idx * 0.65) * 6;
+
         const sphereRadius = ringPos?.radius ?? baseRadius * coord.size * depthScale;
-        const sphereX = ringPos?.x ?? clientW / 2 + rotCoord.x * clientW * 0.48;
-        const sphereY = ringPos?.y ?? activeHeight / 2 + rotCoord.y * activeHeight * 0.47 + bobOffset;
+        const sphereX = ringPos ? ringPos.x + ringBobX : clientW / 2 + rotCoord.x * clientW * 0.48;
+        const sphereY = ringPos ? ringPos.y + ringBobY : activeHeight / 2 + rotCoord.y * activeHeight * 0.47 + fieldBobOffset;
         const blurAmount = ringPos ? 0 : smoothstepQuad(clamp((0.5 - normZ) / 0.48));
+
+        // Axial spin on own axis (like Earth's daily 360 rotation)
+        const axialSpinSpeed = 0.42 + (idx % 4) * 0.08;
+        const spinDirection = idx % 2 === 0 ? 1 : -1;
+        const currentAxialRotation = (imgDef.rotation ?? 0) + (motionQuery.matches ? 0 : elapsedSec * axialSpinSpeed * spinDirection);
 
         const state = sphereStateList[idx];
         state.x = sphereX;
@@ -768,7 +788,7 @@ export default function GlassSpheres({
         state.radius = sphereRadius;
         state.blur = 6 * blurAmount;
         state.opacity = ringPos?.opacity ?? 1;
-        state.rotation = (imgDef.rotation ?? 0) + (motionQuery.matches ? 0 : 0.012 * Math.sin(0.25 * elapsedSec + idx));
+        state.rotation = currentAxialRotation;
         state.texture = textures[idx];
         state.aspect = aspectRatios[idx];
 
@@ -800,13 +820,13 @@ export default function GlassSpheres({
         return;
       }
 
-      const ringDone = variant === 'ring' && (motionQuery.matches || elapsedMs >= 2100);
       if (allSettled && !containedFired) {
         containedFired = true;
         onContainedRef.current?.();
       }
 
-      if (!motionQuery.matches && (variant === 'field' || !ringDone)) {
+      // Continuous 60 FPS animation loop (never stops, constantly orbits and spins)
+      if (!motionQuery.matches) {
         animFrameId = requestAnimationFrame(frameLoop);
       }
     };
