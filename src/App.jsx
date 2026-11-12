@@ -141,30 +141,39 @@ export default function App() {
                   >
                     3
                   </span>
-                  Projects &amp; Selected work
+                  Selected Work
                 </h2>
 
-                <div className="grid min-w-0 gap-16 compact:gap-14">
+                <div className="grid min-w-0 gap-12 compact:gap-10">
                   {projects.map((proj) => (
                     <article
                       key={proj.id}
-                      className="flex w-full max-w-content min-w-0 flex-col gap-3 [&>p]:text-muted text-[15px]"
+                      className="flex w-full max-w-content min-w-0 flex-col gap-2.5 [&>p]:text-muted text-[15px]"
                     >
-                      <div>
-                        <h3 className="text-heading text-[15px] font-medium leading-6">
+                      <a
+                        href={proj.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="group flex w-fit items-center gap-2"
+                      >
+                        <h3 className="text-heading text-[15px] font-medium leading-6 group-hover:underline">
                           {proj.title}
                         </h3>
-                        <p className="text-muted text-[13px]">
-                          {proj.tagline}
-                        </p>
-                      </div>
+                        <img
+                          src="/images/external-arrow.svg"
+                          alt=""
+                          className="h-3.5 w-auto opacity-40 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
+                        />
+                        <span className="text-muted text-[13px] font-normal">
+                          · {proj.tagline}
+                        </span>
+                      </a>
 
-                      <p className="leading-relaxed">
+                      <p className="leading-relaxed text-[14px]">
                         {proj.description}
                       </p>
 
-                      {/* Tech stack badges */}
-                      <div className="flex flex-wrap gap-1.5 pt-1">
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
                         {proj.tags.map((tag, tIdx) => (
                           <span
                             key={tIdx}
@@ -175,16 +184,16 @@ export default function App() {
                         ))}
                       </div>
 
-                      {/* Interactive Visual Preview / Mockup */}
+                      {/* Interactive Visual Preview */}
                       <div
-                        className="relative w-content aspect-project shrink-0 snap-start mt-2 compact:w-[calc(100vw-32px)]"
+                        className="relative w-content aspect-project shrink-0 snap-start mt-1 compact:w-[calc(100vw-32px)]"
                         data-project-preview="true"
                       >
                         <button
                           type="button"
                           onClick={() => setActiveModalImage(proj)}
                           aria-label={`Open preview for ${proj.title}`}
-                          className="relative block size-full overflow-hidden rounded-[8px] border-0 bg-preview p-0 shadow-[0_5px_15px_#00000012] cursor-zoom-in appearance-none transition-transform duration-200 hover:scale-[1.01]"
+                          className="relative block size-full overflow-hidden rounded-[8px] border-0 bg-preview p-0 shadow-[0_5px_15px_#00000010] cursor-zoom-in appearance-none transition-transform duration-200 hover:scale-[1.01]"
                         >
                           <img
                             src={proj.bg}
@@ -220,26 +229,24 @@ export default function App() {
                   Experience
                 </h2>
 
-                <div className="space-y-8">
+                <dl
+                  className="grid gap-4 [&>div]:grid [&>div]:grid-cols-[100px_minmax(0,1fr)] [&>div]:gap-[28px] compact:[&>div]:grid-cols-[85px_minmax(0,1fr)] compact:[&>div]:gap-[16px] [&_dt]:whitespace-nowrap [&_dt]:text-muted [&_dd_span]:block [&_dd_span]:text-muted"
+                  data-timeline="true"
+                >
                   {experiences.map((exp, idx) => (
-                    <div key={idx} className="space-y-2">
-                      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
-                        <h3 className="text-heading text-[15px] font-medium">
-                          {exp.role} · <span className="text-muted">{exp.organization}</span>
-                        </h3>
-                        <span className="text-muted text-[13px] font-mono">
-                          {exp.period}
+                    <div key={idx}>
+                      <dt className="text-[13px] font-mono pt-0.5">{exp.period}</dt>
+                      <dd>
+                        <div className="text-heading text-[15px] font-medium leading-6">
+                          {exp.role} <span className="text-muted font-normal">at {exp.organization}</span>
+                        </div>
+                        <span className="text-muted text-[13px] leading-relaxed mt-0.5">
+                          {exp.summary}
                         </span>
-                      </div>
-
-                      <ul className="list-disc list-outside ml-4 space-y-1 text-muted text-[14px] leading-relaxed">
-                        {exp.points.map((point, pIdx) => (
-                          <li key={pIdx}>{point}</li>
-                        ))}
-                      </ul>
+                      </dd>
                     </div>
                   ))}
-                </div>
+                </dl>
               </section>
 
               {/* ── 5. EDUCATION & CERTIFICATIONS ─────────────── */}
@@ -257,54 +264,41 @@ export default function App() {
                   Education &amp; Certifications
                 </h2>
 
-                {/* College Info */}
-                <div className="space-y-4 mb-8">
+                <dl
+                  className="grid gap-4 mb-6 [&>div]:grid [&>div]:grid-cols-[100px_minmax(0,1fr)] [&>div]:gap-[28px] compact:[&>div]:grid-cols-[85px_minmax(0,1fr)] compact:[&>div]:gap-[16px] [&_dt]:whitespace-nowrap [&_dt]:text-muted [&_dd_span]:block [&_dd_span]:text-muted"
+                  data-timeline="true"
+                >
                   {education.map((edu, idx) => (
-                    <div key={idx} className="space-y-1">
-                      <div className="flex justify-between items-baseline">
-                        <span className="font-medium text-heading text-[15px]">
+                    <div key={idx}>
+                      <dt className="text-[13px] font-mono pt-0.5">{edu.period}</dt>
+                      <dd>
+                        <div className="text-heading text-[15px] font-medium leading-6">
                           {edu.degree}
+                        </div>
+                        <span className="text-muted text-[13px] leading-relaxed">
+                          {edu.institution} · {edu.detail}
                         </span>
-                        <span className="text-muted text-[13px] font-mono">
-                          {edu.period}
-                        </span>
-                      </div>
-                      <p className="text-muted text-[14px]">
-                        {edu.institution} · {edu.location}
-                      </p>
-                      <p className="text-heading font-medium text-[13px] font-mono pt-1">
-                        {edu.gpa}
-                      </p>
-                      <div className="flex flex-wrap gap-1.5 pt-2">
-                        {edu.courses.map((course, cIdx) => (
-                          <span
-                            key={cIdx}
-                            className="px-2 py-0.5 text-[11px] font-mono text-muted bg-scene rounded border border-black/[0.04]"
-                          >
-                            {course}
-                          </span>
-                        ))}
-                      </div>
+                      </dd>
                     </div>
                   ))}
-                </div>
+                </dl>
 
-                {/* Certifications List */}
-                <div className="space-y-2.5 pt-2 border-t border-black/[0.06]">
-                  <h3 className="text-muted text-[13px] font-medium uppercase tracking-wider">
+                {/* Certifications Row */}
+                <div className="pt-3 border-t border-black/[0.06]">
+                  <h3 className="text-muted text-[12px] font-mono uppercase tracking-wider mb-2.5">
                     Certifications
                   </h3>
-                  <div className="grid gap-2">
+                  <div className="grid gap-1.5">
                     {certifications.map((cert, cIdx) => (
                       <div
                         key={cIdx}
-                        className="flex items-center justify-between p-2.5 rounded-lg bg-scene/60 border border-black/[0.04] text-[13px]"
+                        className="flex items-baseline justify-between text-[13px] py-1"
                       >
                         <span className="text-heading font-medium">
-                          {cert.title}
+                          {cert.name}
                         </span>
-                        <span className="text-muted text-[12px] font-mono shrink-0 ml-2">
-                          {cert.issuer}
+                        <span className="text-muted text-[12px] font-mono shrink-0 ml-3">
+                          {cert.issuer} · {cert.year}
                         </span>
                       </div>
                     ))}
