@@ -318,7 +318,7 @@ export default function App() {
 
                 {/* Right Experience Grid with Interactive Vinyl Cards */}
                 <div className="lg:col-span-8">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                     {experiences.map((exp, idx) => (
                       <VinylAlbumCard
                         key={idx}
@@ -327,7 +327,7 @@ export default function App() {
                         coverImage={exp.bg}
                         description={exp.summary}
                         tags={exp.tags || [exp.organization]}
-                        size="compact"
+                        size="small"
                       />
                     ))}
                   </div>
