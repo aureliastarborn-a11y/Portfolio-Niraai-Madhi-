@@ -280,7 +280,7 @@ export default function App() {
 
                 {/* Right Projects Grid with Interactive Vinyl Cards */}
                 <div className="lg:col-span-8">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                     {projects.map((proj) => (
                       <VinylAlbumCard
                         key={proj.id}
@@ -289,7 +289,7 @@ export default function App() {
                         coverImage={proj.bg}
                         description={proj.description}
                         tags={proj.tags}
-                        size="compact"
+                        size="small"
                       />
                     ))}
                   </div>
