@@ -137,14 +137,10 @@ export default function App() {
 
             {/* Center Content */}
             <div className="relative z-10 w-[min(360px,calc(var(--ring-radius)*1.3))] text-center select-none" data-hero-copy="true">
-              <h1 id="intro-heading" className="mb-3.5 flex justify-center focus:outline-none">
-                <img
-                  src="/images/signature.svg"
-                  alt={personal.name}
-                  width="180"
-                  height="45"
-                  className="h-10 w-auto object-contain select-none"
-                />
+              <h1 id="intro-heading" className="mb-2.5 flex justify-center items-center focus:outline-none">
+                <span className="font-signature text-4xl sm:text-5xl md:text-[50px] text-zinc-900 tracking-wide select-none leading-tight py-1">
+                  {personal.shortName}
+                </span>
               </h1>
               <p className="text-muted text-[clamp(14px,1.6vw,16px)] leading-[1.55] text-balance font-normal">
                 {personal.role} at Tagore Engineering College.
