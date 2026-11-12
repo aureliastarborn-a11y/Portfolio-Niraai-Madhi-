@@ -173,7 +173,7 @@ export default function App() {
           </div>
 
           {/* ── MIDDLE PHASE: MODERN EDITORIAL ASYMMETRIC / BENTO LAYOUT (Z-10 ON TOP OF BURST) ── */}
-          <div className="relative z-10 w-full py-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
+          <div className="relative z-10 w-full pt-28 sm:pt-40 pb-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
             <div className="flex flex-col gap-32">
 
               {/* ── 01. ABOUT ME ──────────────────────────────────── */}
@@ -372,8 +372,11 @@ export default function App() {
                 </div>
               </section>
 
-              {/* ── EMPTY BUFFER SPACE BETWEEN EDUCATION & CREDENTIALS AND TECHNICAL STACK ── */}
-              <div className="h-32 sm:h-44 w-full select-none pointer-events-none" aria-hidden="true" />
+              {/* ── EMPTY SPACE TO FULLY SHOWCASE BACKGROUND BURST (NO OVERWRITING CONTENT) ── */}
+              <div 
+                className="h-[70vh] sm:h-[80vh] w-full select-none pointer-events-none" 
+                aria-hidden="true" 
+              />
 
               {/* ── 05. TECHNICAL STACK (INTERACTIVE 3D SKILLS TREE) ── */}
               <section id="skills" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
