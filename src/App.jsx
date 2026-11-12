@@ -179,7 +179,7 @@ export default function App() {
 
           {/* ── MIDDLE PHASE: MODERN EDITORIAL ASYMMETRIC / BENTO LAYOUT (Z-10 ON TOP OF BURST) ── */}
           <div className="relative z-10 w-full pt-[72px] pb-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
-            <div className="flex flex-col gap-32">
+            <div className="flex flex-col gap-12 sm:gap-14">
 
               {/* ── 01. ABOUT ME ──────────────────────────────────── */}
               <section id="about" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
