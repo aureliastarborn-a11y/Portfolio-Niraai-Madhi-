@@ -186,47 +186,56 @@ export const portfolioData = {
 
   certifications: [
     {
-      name: "Oracle Cloud Infrastructure 2025 Certified AI Foundations Associate",
+      name: "Oracle Cloud Infrastructure 2025 Certified AI Foundations Associate – Oracle",
+      shortTitle: "Oracle AI Foundations Associate",
       issuer: "Oracle",
       year: "2025"
     },
     {
-      name: "Claude 101",
+      name: "Claude 101 – Anthropic",
+      shortTitle: "Claude 101",
       issuer: "Anthropic",
       year: "2025"
     },
     {
-      name: "Microsoft Learnathon '25: Learn AI and GenAI Basics",
+      name: "Microsoft Learnathon '25: Learn AI and GenAI Basics – Microsoft",
+      shortTitle: "Microsoft Learnathon '25",
       issuer: "Microsoft",
       year: "2025"
     },
     {
-      name: "Salesforce Certification",
+      name: "Salesforce Certification – Salesforce",
+      shortTitle: "Salesforce Certification",
       issuer: "Salesforce",
       year: "2024"
     },
     {
-      name: "Deloitte Data Analytics Certification",
+      name: "Deloitte Data Analytics Certification – Deloitte",
+      shortTitle: "Data Analytics Certification",
       issuer: "Deloitte",
       year: "2024"
     },
     {
-      name: "Java Programming Training Certification",
+      name: "Java Programming Training Certification – Infosys",
+      shortTitle: "Java Programming Training",
       issuer: "Infosys",
       year: "2024"
     },
     {
-      name: "Big Data – 301",
+      name: "Big Data – 301 – Infosys",
+      shortTitle: "Big Data – 301",
       issuer: "Infosys",
       year: "2024"
     },
     {
-      name: "Self-Presentation Micro Certificate",
+      name: "Self-Presentation Micro Certificate – Wadhwani Foundation",
+      shortTitle: "Self-Presentation Certificate",
       issuer: "Wadhwani Foundation",
       year: "2024"
     },
     {
-      name: "Government Skill Development Program",
+      name: "Government Skill Development Program – Infosys",
+      shortTitle: "Skill Development Program",
       issuer: "Infosys",
       year: "2024"
     }

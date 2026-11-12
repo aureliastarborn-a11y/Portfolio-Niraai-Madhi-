@@ -338,6 +338,7 @@ export default function App() {
                         return {
                           image: credentialImages[idx % credentialImages.length],
                           title: cert.name,
+                          issuer: cert.issuer,
                           caption: `${cert.issuer} • Issued ${cert.year}`,
                           alt: `${cert.name} - ${cert.issuer}`,
                         };

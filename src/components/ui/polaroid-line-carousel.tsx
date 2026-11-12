@@ -605,7 +605,16 @@ export default function PolaroidLineCarousel({
                 />
               )}
             </div>
-            <div className="pl-note">{slide.title}</div>
+            <div className="pl-note">
+              <span className="font-serif italic text-zinc-900 text-[9.5px] leading-[1.15] line-clamp-2">
+                {slide.title}
+              </span>
+              {slide.issuer && !slide.title.includes(slide.issuer) && (
+                <span className="text-[7.5px] font-mono font-semibold tracking-wider text-zinc-500 uppercase mt-0.5">
+                  {slide.issuer}
+                </span>
+              )}
+            </div>
           </div>
           <div className="pl-peg" />
         </div>
