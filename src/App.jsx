@@ -326,7 +326,7 @@ export default function App() {
                         artist={exp.organization}
                         coverImage={exp.bg}
                         description={exp.summary}
-                        tags={[exp.organization]}
+                        tags={exp.tags || [exp.organization]}
                         size="compact"
                       />
                     ))}

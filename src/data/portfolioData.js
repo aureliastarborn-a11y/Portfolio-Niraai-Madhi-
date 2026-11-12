@@ -104,7 +104,24 @@ export const portfolioData = {
       role: "Data Warehouse Developer",
       organization: "Academic Projects",
       summary: "Implemented star-schema data models, analytical SQL queries, and multi-source reporting pipelines.",
-      bg: "/images/covers/cover-emerald.jpg"
+      bg: "/images/covers/cover-emerald.jpg",
+      tags: ["SQL", "Star Schema", "ETL"]
+    },
+    {
+      period: "2023 – Present",
+      role: "Web Developer",
+      organization: "Self-Employed",
+      summary: "Designed and developed responsive websites and web applications using HTML, CSS, JavaScript, and API integrations.",
+      bg: "/images/covers/cover-indigo.jpg",
+      tags: ["HTML", "CSS", "JavaScript", "APIs"]
+    },
+    {
+      period: "2023 – Present",
+      role: "Data Analytics and Reporting",
+      organization: "Self-Employed",
+      summary: "Engineered customized data analytics, business reporting workflows, and interactive performance-focused dashboards.",
+      bg: "/images/covers/cover-blue.jpg",
+      tags: ["Data Analytics", "Reporting", "Dashboards"]
     }
   ],
 
