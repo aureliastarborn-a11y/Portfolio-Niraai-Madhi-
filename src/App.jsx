@@ -4,6 +4,7 @@ import SphereFooter from './components/SphereFooter';
 import FolderCard from './components/FolderCard';
 import ImageModal from './components/ImageModal';
 import { LogoBurst } from '@/components/ui/logo-burst';
+import VinylAlbumCard from '@/components/ui/great-ui-vinyl-album-card';
 import { portfolioData } from './data/portfolioData';
 import {
   Sparkles,
@@ -318,7 +319,7 @@ export default function App() {
                 </div>
               </section>
 
-              {/* ── 03. SELECTED WORK / PROJECTS ───────────────── */}
+              {/* ── 03. SELECTED WORK / PROJECTS (VINYL ALBUM CARDS) ── */}
               <section id="projects" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
@@ -334,79 +335,33 @@ export default function App() {
                     Selected Work
                   </h2>
                   <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
-                    Autonomous agents, enterprise data warehousing solutions, and exploratory analytics.
+                    Autonomous agents, enterprise data warehousing solutions, and exploratory analytics. Hover over any album to slide out its vinyl record.
                   </p>
                 </div>
 
-                {/* Right Projects Grid */}
+                {/* Right Projects Grid with Interactive Vinyl Cards */}
                 <div className="lg:col-span-8">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {projects.map((proj) => (
-                      <article
+                      <VinylAlbumCard
                         key={proj.id}
-                        className="group flex flex-col justify-between rounded-2xl bg-white/85 backdrop-blur-sm border border-black/[0.06] hover:bg-white hover:border-black/[0.12] hover:shadow-md transition-all p-5"
-                      >
-                        <div className="space-y-3.5">
-                          {/* Visual Lightbox Preview */}
-                          <div
-                            className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-preview shadow-[0_4px_12px_rgba(0,0,0,0.04)] cursor-zoom-in"
-                            onClick={() => setActiveModalImage(proj)}
-                          >
-                            <img
-                              src={proj.bg}
-                              alt=""
-                              className="object-cover select-none absolute inset-0 size-full transition-transform duration-300 group-hover:scale-105"
-                            />
-                            <span className="absolute inset-[10%] flex items-center justify-center drop-shadow-[0_8px_16px_rgba(0,0,0,0.18)]">
-                              <img
-                                src={proj.screenshot}
-                                alt={proj.title}
-                                className="object-contain size-full"
-                              />
-                            </span>
-                          </div>
-
-                          <div className="space-y-1.5">
-                            <div className="flex items-start justify-between gap-2">
-                              <a
-                                href={proj.link}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1.5 text-zinc-900 font-semibold text-base group/link hover:text-blue-600 transition-colors"
-                              >
-                                <span>{proj.title}</span>
-                                <ArrowUpRight className="size-4 opacity-50 group-hover/link:opacity-100 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-all" />
-                              </a>
-                            </div>
-
-                            <div className="text-xs font-mono text-zinc-500 font-medium">
-                              {proj.tagline}
-                            </div>
-
-                            <p className="text-[13px] leading-relaxed text-zinc-600">
-                              {proj.description}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Tech tags */}
-                        <div className="flex flex-wrap gap-1.5 pt-4 mt-2 border-t border-black/[0.04]">
-                          {proj.tags.map((tag, tIdx) => (
-                            <span
-                              key={tIdx}
-                              className="px-2 py-0.5 text-[11px] font-mono text-zinc-600 bg-white rounded border border-black/[0.06]"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </article>
+                        title={proj.title}
+                        artist={proj.tagline}
+                        releaseType="Engineering Project"
+                        year="2024"
+                        coverImage={proj.bg}
+                        description={proj.description}
+                        tags={proj.tags}
+                        link={proj.link}
+                        size="compact"
+                        onClick={() => setActiveModalImage(proj)}
+                      />
                     ))}
                   </div>
                 </div>
               </section>
 
-              {/* ── 04. EXPERIENCE ─────────────────────────────── */}
+              {/* ── 04. EXPERIENCE (VINYL ALBUM CARDS) ─────────────── */}
               <section id="experience" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
@@ -422,33 +377,31 @@ export default function App() {
                     Experience
                   </h2>
                   <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
-                    Internship tenures, independent engineering, and technical development.
+                    Internship tenures, independent engineering, and technical development showcased as vinyl records.
                   </p>
                 </div>
 
-                {/* Right Timeline Column */}
+                {/* Right Experience Grid with Interactive Vinyl Cards */}
                 <div className="lg:col-span-8">
-                  <div className="relative border-l border-zinc-200 ml-3 pl-6 sm:pl-8 space-y-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {experiences.map((exp, idx) => (
-                      <div key={idx} className="relative group">
-                        {/* Timeline Node Dot */}
-                        <div className="absolute -left-[31px] sm:-left-[39px] top-1.5 size-3 rounded-full bg-white border-2 border-zinc-400 group-hover:border-zinc-900 group-hover:scale-125 transition-all" />
-
-                        <div className="space-y-1">
-                          <span className="text-xs font-mono text-zinc-500 font-medium">
-                            {exp.period}
-                          </span>
-                          <h3 className="text-base font-semibold text-zinc-900">
-                            {exp.role}{' '}
-                            <span className="text-zinc-500 font-normal">
-                              · {exp.organization}
-                            </span>
-                          </h3>
-                          <p className="text-sm text-zinc-600 leading-relaxed max-w-2xl">
-                            {exp.summary}
-                          </p>
-                        </div>
-                      </div>
+                      <VinylAlbumCard
+                        key={idx}
+                        title={exp.role}
+                        artist={exp.organization}
+                        releaseType="Experience Track"
+                        year={exp.period}
+                        coverImage={
+                          idx === 0
+                            ? "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80"
+                            : idx === 1
+                            ? "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80"
+                            : "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80"
+                        }
+                        description={exp.summary}
+                        tags={[exp.organization, exp.period.split('–')[0].trim()]}
+                        size="compact"
+                      />
                     ))}
                   </div>
                 </div>
