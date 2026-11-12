@@ -22,11 +22,36 @@ const CATEGORY_ICONS = {
   'Tools': Wrench,
 };
 
+// Natural two-line wrap for long skills so no words are cut off
+const LINE_SPLITS = {
+  'Basic Statistical Analysis': ['Basic Statistical', 'Analysis'],
+  'Responsive Web Design': ['Responsive', 'Web Design'],
+  'Prompt Engineering': ['Prompt', 'Engineering'],
+  'Data Warehousing': ['Data', 'Warehousing'],
+  'API Integration': ['API', 'Integration'],
+  'Generative AI': ['Generative', 'AI'],
+  'AI Automation': ['AI', 'Automation'],
+  'Data Cleaning': ['Data', 'Cleaning'],
+  'SQL Queries': ['SQL', 'Queries'],
+};
+
+function formatSkillLines(name) {
+  if (LINE_SPLITS[name]) {
+    return LINE_SPLITS[name];
+  }
+  if (name.includes(' ') && name.length > 11) {
+    const words = name.split(' ');
+    const mid = Math.ceil(words.length / 2);
+    return [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+  }
+  return [name];
+}
+
 /**
  * Small 3D Rotatable Cuboid
  * - Drops down from the single straight line ONLY when the user scrolls to read the Technical Stack phase
  * - Fully rotatable in 3D by dragging
- * - Compact dimensions with full word visibility
+ * - Long skill names break cleanly into double lines so no words get cut off
  */
 function SmallRotatableCuboid3D({ category, items, index, isReading }) {
   const Icon = CATEGORY_ICONS[category] || Sparkles;
@@ -71,9 +96,9 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
     setRotY(15);
   };
 
-  // Compact dimensions of the 3D cuboid
-  const W = 142;
-  const H = 128;
+  // Dimensions of the 3D cuboid
+  const W = 146;
+  const H = 140;
   const D = 34;
 
   return (
@@ -137,7 +162,7 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
             transform: `rotateX(${rotX}deg) rotateY(${rotY}deg)`,
           }}
         >
-          {/* 1. FRONT FACE - COMPACT & FULL WORD VISIBILITY */}
+          {/* 1. FRONT FACE - DOUBLE LINE WRAP FOR LONG WORDS, NO CUT OFF */}
           <div
             className="absolute inset-0 rounded-lg bg-gradient-to-b from-white via-zinc-50/95 to-zinc-100/90 border border-zinc-200/90 shadow-xs p-2 flex flex-col justify-between backdrop-blur-xs"
             style={{
@@ -162,16 +187,23 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
               </div>
             </div>
 
-            {/* Skill Badges - All words fully visible without abbreviation */}
-            <div className="flex flex-wrap gap-0.5 py-0.5">
-              {items.map((item, idx) => (
-                <span
-                  key={idx}
-                  className="px-1.5 py-0.2 text-[8px] sm:text-[8.5px] font-medium text-zinc-800 bg-white rounded border border-zinc-200/90 shadow-2xs hover:bg-zinc-900 hover:text-white transition-colors leading-tight"
-                >
-                  {item}
-                </span>
-              ))}
+            {/* Skill Badges - Long names cut and made double line so no words are cut off */}
+            <div className="flex flex-wrap gap-1 py-0.5">
+              {items.map((item, idx) => {
+                const lines = formatSkillLines(item);
+                return (
+                  <span
+                    key={idx}
+                    className="inline-flex flex-col items-center justify-center px-1.5 py-0.5 text-[8px] sm:text-[8.5px] font-medium text-zinc-800 bg-white rounded border border-zinc-200/90 shadow-2xs hover:bg-zinc-900 hover:text-white transition-colors leading-[1.1] text-center"
+                  >
+                    {lines.map((line, lIdx) => (
+                      <span key={lIdx} className="block whitespace-nowrap">
+                        {line}
+                      </span>
+                    ))}
+                  </span>
+                );
+              })}
             </div>
 
             {/* 3D Rotate Hint */}
