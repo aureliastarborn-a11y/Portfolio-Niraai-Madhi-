@@ -8,22 +8,8 @@ import { portfolioData } from './data/portfolioData';
 
 export default function App() {
   const [activeModalImage, setActiveModalImage] = useState(null);
-  const [copiedEmail, setCopiedEmail] = useState(false);
-  const [copiedPhone, setCopiedPhone] = useState(false);
 
   const { personal, skills, projects, experiences, education, certifications } = portfolioData;
-
-  const handleCopyEmail = () => {
-    navigator.clipboard.writeText(personal.email);
-    setCopiedEmail(true);
-    setTimeout(() => setCopiedEmail(false), 2000);
-  };
-
-  const handleCopyPhone = () => {
-    navigator.clipboard.writeText(personal.phone);
-    setCopiedPhone(true);
-    setTimeout(() => setCopiedPhone(false), 2000);
-  };
 
   return (
     <div className="min-h-full flex flex-col font-sans bg-background text-foreground antialiased selection:bg-zinc-200">
@@ -347,7 +333,7 @@ export default function App() {
 
                 {/* 4 Skeuomorphic Folders */}
                 <div
-                  className="grid grid-cols-2 gap-x-6 gap-y-[30px] compact:gap-x-3.5 compact:gap-y-6 mb-8"
+                  className="grid grid-cols-2 gap-x-6 gap-y-[30px] compact:gap-x-3.5 compact:gap-y-6"
                   data-folder-links="true"
                 >
                   <FolderCard
@@ -367,47 +353,9 @@ export default function App() {
                   />
                   <FolderCard
                     label="Phone"
-                    href={`tel:${personal.phone}`}
+                    href={`tel:+91${personal.phone}`}
                     ariaLabel="Call via Phone"
                   />
-                </div>
-
-                {/* Direct Copy Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="p-3.5 rounded-xl bg-scene border border-black/[0.05] flex items-center justify-between">
-                    <div>
-                      <span className="text-muted text-[11px] block uppercase font-medium">Email</span>
-                      <a href={`mailto:${personal.email}`} className="text-heading font-medium text-[13px] hover:underline">
-                        {personal.email}
-                      </a>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleCopyEmail}
-                      className="px-2.5 py-1 text-[11px] font-medium rounded bg-white text-heading border border-black/[0.1] shadow-xs hover:bg-zinc-50 cursor-pointer"
-                    >
-                      {copiedEmail ? 'Copied!' : 'Copy'}
-                    </button>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-scene border border-black/[0.05] flex items-center justify-between">
-                    <div>
-                      <span className="text-muted text-[11px] block uppercase font-medium">Phone &amp; Location</span>
-                      <span className="text-heading font-medium text-[13px] block">
-                        +91 {personal.phone}
-                      </span>
-                      <span className="text-muted text-[11px]">
-                        {personal.location}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleCopyPhone}
-                      className="px-2.5 py-1 text-[11px] font-medium rounded bg-white text-heading border border-black/[0.1] shadow-xs hover:bg-zinc-50 cursor-pointer"
-                    >
-                      {copiedPhone ? 'Copied!' : 'Copy'}
-                    </button>
-                  </div>
                 </div>
               </section>
             </div>

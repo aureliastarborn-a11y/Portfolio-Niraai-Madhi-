@@ -1,13 +1,23 @@
 import React from 'react';
 
 export default function FolderCard({ label, href, ariaLabel }) {
+  const isExternal = href.startsWith('http');
+
+  const handleClick = (e) => {
+    if (!isExternal) {
+      // For mailto: and tel: links, trigger navigation directly without opening a blank tab
+      window.location.href = href;
+    }
+  };
+
   return (
     <a
       href={href}
-      target="_blank"
-      rel="noreferrer"
+      target={isExternal ? '_blank' : undefined}
+      rel={isExternal ? 'noopener noreferrer' : undefined}
+      onClick={!isExternal ? handleClick : undefined}
       aria-label={ariaLabel || label}
-      className="folder-link block min-w-0 rounded-[10px] group focus-visible:outline-2 focus-visible:outline-[#007aff] focus-visible:outline-offset-2"
+      className="folder-link block min-w-0 rounded-[10px] group focus-visible:outline-2 focus-visible:outline-[#007aff] focus-visible:outline-offset-2 cursor-pointer select-none transition-transform active:scale-[0.98]"
     >
       <span className="relative block">
         <span aria-hidden="true" className="folder-shell">
@@ -55,4 +65,3 @@ export default function FolderCard({ label, href, ariaLabel }) {
     </a>
   );
 }
-

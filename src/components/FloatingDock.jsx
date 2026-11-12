@@ -20,7 +20,7 @@ export default function FloatingDock() {
     { label: 'LinkedIn', dest: 'Connect', href: personal.linkedin },
     { label: 'GitHub', dest: 'Code', href: personal.github },
     { label: 'Email', dest: personal.email, href: `mailto:${personal.email}` },
-    { label: 'Phone', dest: personal.phone, href: `tel:${personal.phone}` },
+    { label: 'Phone', dest: `+91 ${personal.phone}`, href: `tel:+91${personal.phone}` },
   ];
 
   useEffect(() => {
