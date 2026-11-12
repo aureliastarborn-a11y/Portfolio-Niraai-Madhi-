@@ -137,8 +137,8 @@ export default function App() {
 
             {/* Center Content */}
             <div className="relative z-10 w-[min(360px,calc(var(--ring-radius)*1.3))] text-center select-none" data-hero-copy="true">
-              <h1 id="intro-heading" className="mb-2.5 flex justify-center items-center focus:outline-none">
-                <span className="font-signature text-4xl sm:text-5xl md:text-[50px] text-zinc-900 tracking-wide select-none leading-tight py-1">
+              <h1 id="intro-heading" className="mb-2 flex justify-center items-center focus:outline-none">
+                <span className="font-signature text-2xl sm:text-3xl md:text-[32px] text-zinc-900 select-none whitespace-nowrap leading-none tracking-normal py-0.5">
                   {personal.shortName}
                 </span>
               </h1>
