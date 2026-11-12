@@ -3,18 +3,14 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { ArrowUpRight } from "lucide-react";
 
 export interface VinylAlbumCardProps {
   title?: string;
   artist?: string;
-  releaseType?: string;
-  year?: string;
   coverImage?: string;
   className?: string;
   description?: string;
   tags?: string[];
-  link?: string;
   onClick?: () => void;
   size?: "default" | "compact";
 }
@@ -22,13 +18,10 @@ export interface VinylAlbumCardProps {
 export default function VinylAlbumCard({
   title = "Crashing Worlds",
   artist = "The Bebos",
-  releaseType,
-  year = "2024",
   coverImage = "https://cdn.21st.dev/assets/mirror/fb/fbd7b45359593786c52ccf8ff939f3a3e14012f6503489611f0d9db5e637a6cd.jpg",
   className,
   description,
   tags,
-  link,
   onClick,
   size = "compact",
 }: VinylAlbumCardProps) {
@@ -114,7 +107,7 @@ export default function VinylAlbumCard({
           <div className="pointer-events-none absolute inset-0 -rotate-45 bg-gradient-to-br from-transparent via-white/50 to-transparent mix-blend-overlay" />
         </motion.div>
 
-        {/* ── ALBUM COVER SLEEVE (CONTAINING PROJECT/EXPERIENCE NAME AT TOP) ── */}
+        {/* ── ALBUM COVER SLEEVE ── */}
         <motion.div
           className={cn(
             "absolute z-20 overflow-hidden rounded-2xl shadow-xl border border-black/10 cursor-pointer bg-zinc-900",
@@ -137,34 +130,14 @@ export default function VinylAlbumCard({
 
           {/* Dark Gradient Overlay for Maximum Text Legibility */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/35 backdrop-blur-[0.5px] p-4 sm:p-5 flex flex-col justify-between text-white select-none">
-            {/* ── TOP BAR: PROJECT / ROLE NAME REPLACES THE OLD GENERIC BADGE ── */}
+            {/* ── TOP BAR: PROJECT / ROLE NAME ONLY (NO TIMING / NO ARROW BUTTON / NO GITHUB LINK) ── */}
             <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-1.5 min-w-0">
-                <span className="text-[13px] sm:text-[14px] font-bold text-white tracking-tight leading-tight drop-shadow-sm truncate">
-                  {title}
-                </span>
-                {year && (
-                  <span className="shrink-0 px-1.5 py-0.5 text-[9px] font-mono font-medium rounded bg-white/20 backdrop-blur-md text-white/90 border border-white/15">
-                    {year}
-                  </span>
-                )}
-              </div>
-
-              {link && (
-                <a
-                  href={link}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="shrink-0 p-1.5 rounded-md bg-white/20 hover:bg-white/35 text-white transition-colors"
-                  title="Open Project"
-                >
-                  <ArrowUpRight className="size-3.5" />
-                </a>
-              )}
+              <span className="text-[14px] sm:text-[15px] font-bold text-white tracking-tight leading-tight drop-shadow-sm truncate">
+                {title}
+              </span>
             </div>
 
-            {/* ── BOTTOM CONTENT: TAGLINE / ORGANIZATION, SUMMARY & TECH PILLS ── */}
+            {/* ── BOTTOM CONTENT: TAGLINE / ORGANIZATION, SUMMARY & TECH PILLS (NO TIMING) ── */}
             <div className="space-y-1.5 pt-3">
               {artist && (
                 <div className="text-xs font-mono text-zinc-200 font-medium line-clamp-1">

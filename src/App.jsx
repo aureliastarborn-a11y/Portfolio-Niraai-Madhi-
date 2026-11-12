@@ -347,12 +347,9 @@ export default function App() {
                         key={proj.id}
                         title={proj.title}
                         artist={proj.tagline}
-                        releaseType="Engineering Project"
-                        year="2024"
                         coverImage={proj.bg}
                         description={proj.description}
                         tags={proj.tags}
-                        link={proj.link}
                         size="compact"
                         onClick={() => setActiveModalImage(proj)}
                       />
@@ -389,11 +386,9 @@ export default function App() {
                         key={idx}
                         title={exp.role}
                         artist={exp.organization}
-                        releaseType="Experience Track"
-                        year={exp.period}
                         coverImage={exp.bg}
                         description={exp.summary}
-                        tags={[exp.organization, exp.period.split('–')[0].trim()]}
+                        tags={[exp.organization]}
                         size="compact"
                       />
                     ))}
