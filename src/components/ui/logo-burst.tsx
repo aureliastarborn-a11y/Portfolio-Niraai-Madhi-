@@ -254,6 +254,51 @@ function createTentacles(
   return tentacles
 }
 
+type Sparkle = {
+  angle: number
+  distanceRatio: number
+  baseSize: number
+  speed: number
+  phase: number
+  orbitSpeed: number
+  hasStarGlint: boolean
+  floatAmp: number
+  floatFreq: number
+  alpha: number
+}
+
+function createSparkles(count = 56, seed = 88): Sparkle[] {
+  const rand = mulberry32(seed)
+  const sparkles: Sparkle[] = []
+  for (let i = 0; i < count; i++) {
+    const angle = rand() * Math.PI * 2
+    // Distribute around the burst: some near tips (0.75-0.95), some just outside halo (0.95-1.18), some inner (0.45-0.75)
+    const distDistr = rand()
+    let distanceRatio = 0.5 + rand() * 0.65
+    if (distDistr < 0.4) {
+      distanceRatio = 0.8 + rand() * 0.35 // around the outer tips
+    } else if (distDistr < 0.75) {
+      distanceRatio = 0.6 + rand() * 0.35 // mid-radius
+    } else {
+      distanceRatio = 0.95 + rand() * 0.22 // outer aura / halo
+    }
+
+    sparkles.push({
+      angle,
+      distanceRatio,
+      baseSize: 0.65 + rand() * 1.05, // 0.65px - 1.7px mini tiny!
+      speed: 1.4 + rand() * 2.6, // natural twinkle frequency
+      phase: rand() * Math.PI * 2,
+      orbitSpeed: (rand() - 0.5) * 0.035, // very gentle, slow organic orbital drift
+      hasStarGlint: rand() < 0.35, // delicate 4-point glint on select sparkles
+      floatAmp: 2 + rand() * 5, // subtle 2-7px radial floating
+      floatFreq: 0.4 + rand() * 0.8,
+      alpha: 0.35 + rand() * 0.45,
+    })
+  }
+  return sparkles
+}
+
 /**
  * Hair-line tentacle burst: filaments explode from the center, then
  * keep a slow inhale. Transparent canvas over `bg-background`.
@@ -283,6 +328,7 @@ export function createLogoBurst(
     seedOf(options.seed),
     particleRatioOf(options.particleRatio)
   )
+  let sparkles = createSparkles(56, seedOf(options.seed) + 99)
   const size = { w: 0, h: 0 }
   let reduce = false
   let raf = 0
@@ -453,6 +499,52 @@ export function createLogoBurst(
       }
     }
 
+    // ── Mini Tiny Natural Sparkles Around the Burst ──
+    for (let s = 0; s < sparkles.length; s++) {
+      const sp = sparkles[s]!
+
+      // Natural twinkle shimmer: harmonic oscillation with sharp peak
+      const rawShimmer = Math.sin(seconds * sp.speed + sp.phase)
+      // Raised power gives a sharp, natural glint rather than a dull pulse
+      const shimmer = Math.pow(Math.max(0, rawShimmer), 2.5)
+
+      if (shimmer < 0.03) continue
+
+      // Dynamic position: subtle orbital drift + breathing + floating drift
+      const currentAngle = sp.angle + seconds * sp.orbitSpeed
+      const breathScale = breathing ? 1 + field * 1.5 : 1
+      const floatDrift = Math.sin(seconds * sp.floatFreq + sp.phase) * sp.floatAmp
+      const currentRadius = (maxR * sp.distanceRatio + floatDrift) * breathScale
+
+      const sx = cx + Math.cos(currentAngle) * currentRadius
+      const sy = cy + Math.sin(currentAngle) * currentRadius
+
+      const currentAlpha = sp.alpha * (0.2 + shimmer * 0.8)
+      const currentSize = sp.baseSize * (0.75 + shimmer * 0.55)
+
+      ctx.beginPath()
+      ctx.arc(sx, sy, currentSize, 0, Math.PI * 2)
+      ctx.fillStyle = rgba(rgb, currentAlpha)
+      ctx.fill()
+
+      // Delicate micro star-glint at peak twinkle
+      if (sp.hasStarGlint && shimmer > 0.62) {
+        const glintLen = sp.baseSize * 1.6 + shimmer * 2.2
+        const glintAlpha = currentAlpha * 0.6
+        ctx.strokeStyle = rgba(rgb, glintAlpha)
+        ctx.lineWidth = 0.5
+
+        ctx.beginPath()
+        // Horizontal micro-glint
+        ctx.moveTo(sx - glintLen, sy)
+        ctx.lineTo(sx + glintLen, sy)
+        // Vertical micro-glint
+        ctx.moveTo(sx, sy - glintLen)
+        ctx.lineTo(sx, sy + glintLen)
+        ctx.stroke()
+      }
+    }
+
     if (!reduce && allDone) settled = true
 
     if (running && !reduce) {
@@ -514,6 +606,7 @@ export function createLogoBurst(
           seedOf(options.seed),
           particleRatioOf(options.particleRatio)
         )
+        sparkles = createSparkles(56, seedOf(options.seed) + 99)
         replay()
       } else {
         paintStill()
