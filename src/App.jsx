@@ -131,22 +131,27 @@ export default function App() {
           {/* ── HERO / ORBITAL SPHERE RING (TOP-MOST PHASE - KEPT INTACT) ── */}
           <header
             id="top"
-            className="sphere-ring relative z-10 grid min-h-screen h-screen place-items-center overflow-visible isolate"
+            className="sphere-ring relative z-10 grid min-h-screen h-screen place-items-center overflow-visible isolate [--hero-height:100svh]"
           >
             {/* The 8 Interactive Refractive Glass Spheres */}
             <SphereRing />
 
             {/* Center Content */}
-            <div className="relative z-10 w-[min(360px,calc(var(--ring-radius)*1.3))] text-center select-none" data-hero-copy="true">
+            <div
+              className="relative z-10 max-w-[260px] sm:max-w-[280px] w-full text-center select-none mx-auto px-2"
+              data-hero-copy="true"
+            >
               <h1 id="intro-heading" className="mb-2 flex justify-center items-center focus:outline-none">
                 <span className="font-signature text-2xl sm:text-3xl md:text-[32px] text-zinc-900 select-none whitespace-nowrap leading-none tracking-normal py-0.5">
                   {personal.shortName}
                 </span>
               </h1>
-              <p className="text-muted text-[clamp(14px,1.6vw,16px)] leading-[1.55] text-balance font-normal">
+              <p className="text-muted text-[13px] sm:text-[14px] leading-[1.5] text-balance font-normal">
                 {personal.role} at Tagore Engineering College.
                 <br />
-                {personal.tagline}
+                <span className="block mt-1 sm:mt-1.5">
+                  {personal.tagline}
+                </span>
               </p>
             </div>
           </header>
@@ -173,7 +178,7 @@ export default function App() {
           </div>
 
           {/* ── MIDDLE PHASE: MODERN EDITORIAL ASYMMETRIC / BENTO LAYOUT (Z-10 ON TOP OF BURST) ── */}
-          <div className="relative z-10 w-full pt-6 sm:pt-8 pb-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
+          <div className="relative z-10 w-full pt-[72px] pb-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
             <div className="flex flex-col gap-32">
 
               {/* ── 01. ABOUT ME ──────────────────────────────────── */}
