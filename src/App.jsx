@@ -5,6 +5,7 @@ import FolderCard from './components/FolderCard';
 import { LogoBurst } from '@/components/ui/logo-burst';
 import VinylAlbumCard from '@/components/ui/great-ui-vinyl-album-card';
 import Interactive3DSkillsTree from './components/Interactive3DSkillsTree';
+import PolaroidLineCarousel from '@/components/ui/polaroid-line-carousel';
 import { portfolioData } from './data/portfolioData';
 import {
   Sparkles,
@@ -334,32 +335,44 @@ export default function App() {
                     </p>
                   </div>
 
-                  {/* Certifications Grid */}
+                  {/* Certifications - POLAROID LINE CAROUSEL (Clothesline & Pegs from 21st.dev) */}
                   <div className="space-y-3">
-                    <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">
-                      Industry Certifications
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                        Industry Certifications
+                      </div>
+                      <div className="text-[11px] font-mono text-zinc-400 hidden sm:block">
+                        Drag or swipe polaroids
+                      </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                      {certifications.map((cert, cIdx) => (
-                        <div
-                          key={cIdx}
-                          className="p-4 rounded-xl bg-white border border-black/[0.08] shadow-[0_1px_2px_rgba(0,0,0,0.03)] space-y-2 flex flex-col justify-between"
-                        >
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-1.5 text-zinc-500 text-xs font-mono">
-                              <Award className="size-3.5 text-zinc-700" />
-                              <span>{cert.issuer}</span>
-                            </div>
-                            <div className="text-[13px] font-medium text-zinc-900 leading-snug">
-                              {cert.name}
-                            </div>
-                          </div>
-                          <div className="text-xs font-mono text-zinc-400">
-                            Issued {cert.year}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    
+                    <PolaroidLineCarousel
+                      slides={certifications.map((cert, idx) => {
+                        const credentialImages = [
+                          "/images/covers/cover-teal.jpg",
+                          "/images/covers/cover-amber.jpg",
+                          "/images/covers/cover-blue.jpg",
+                          "/images/covers/cover-emerald.jpg",
+                          "/images/covers/cover-lavender.jpg",
+                          "/images/covers/cover-rose.jpg",
+                        ];
+                        return {
+                          image: credentialImages[idx % credentialImages.length],
+                          title: cert.name,
+                          caption: `${cert.issuer} • Issued ${cert.year}`,
+                          alt: `${cert.name} - ${cert.issuer}`,
+                        };
+                      })}
+                      height="380px"
+                      cardWidth={240}
+                      sag={34}
+                      swing={1}
+                      autoplay={4200}
+                      string="#71717a"
+                      background="rgba(255, 255, 255, 0.7)"
+                      ink="#18181b"
+                      ariaLabel="Certifications clothesline carousel"
+                    />
                   </div>
                 </div>
               </section>
