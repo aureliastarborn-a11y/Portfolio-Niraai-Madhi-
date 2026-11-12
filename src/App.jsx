@@ -22,6 +22,11 @@ export default function App() {
   const [burstVisible, setBurstVisible] = useState(false);
   const [burstRotation, setBurstRotation] = useState(0);
   const [burstParallax, setBurstParallax] = useState(0);
+  const [burstKey, setBurstKey] = useState(0);
+
+  const handleBurstClick = () => {
+    setBurstKey((k) => k + 1);
+  };
 
   const { personal, skills, projects, experiences, education, certifications } = portfolioData;
 
@@ -158,13 +163,15 @@ export default function App() {
 
           {/* ── DYNAMIC BACKGROUND BURST (PRESENT IN BACKGROUND OF MIDDLE CONTENT) ── */}
           <div
-            aria-hidden="true"
-            className={`pointer-events-none fixed top-1/2 right-[-40px] sm:right-[2%] lg:right-[6%] w-[440px] h-[440px] sm:w-[560px] sm:h-[560px] lg:w-[680px] lg:h-[680px] z-0 select-none overflow-visible transition-opacity duration-200 ease-out ${
-              burstVisible ? 'opacity-35 lg:opacity-45 visible' : 'opacity-0 invisible pointer-events-none'
+            className={`fixed top-1/2 right-[-40px] sm:right-[2%] lg:right-[6%] w-[440px] h-[440px] sm:w-[560px] sm:h-[560px] lg:w-[680px] lg:h-[680px] z-1 select-none overflow-visible transition-opacity duration-200 ease-out ${
+              burstVisible ? 'opacity-35 lg:opacity-45 hover:opacity-75 visible cursor-pointer pointer-events-auto' : 'opacity-0 invisible pointer-events-none'
             }`}
             style={{
               transform: `translate3d(0, calc(-50% + ${burstParallax}px), 0) rotate(${burstRotation}deg)`
             }}
+            onClick={handleBurstClick}
+            title="Click to burst"
+            aria-label="Click to burst"
           >
             <LogoBurst
               color="#18181b"
@@ -173,7 +180,8 @@ export default function App() {
               duration={1.35}
               breathe={true}
               theme="light"
-              replayOnClick={false}
+              replayKey={burstKey}
+              replayOnClick={true}
             />
           </div>
 
@@ -379,8 +387,10 @@ export default function App() {
 
               {/* ── EMPTY SPACE TO FULLY SHOWCASE BACKGROUND BURST (NO OVERWRITING CONTENT) ── */}
               <div 
-                className="h-[70vh] sm:h-[80vh] w-full select-none pointer-events-none" 
-                aria-hidden="true" 
+                className="h-[70vh] sm:h-[80vh] w-full select-none cursor-pointer" 
+                aria-label="Click to burst"
+                title="Click to burst"
+                onClick={handleBurstClick}
               />
 
               {/* ── 05. TECHNICAL STACK (INTERACTIVE 3D SKILLS TREE) ── */}
