@@ -1,177 +1,149 @@
-import React, { useState, useMemo } from 'react';
-import { ExternalLink, Sparkles, Eye, ArrowUpRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { ExternalLink, Layers, ArrowUpRight } from 'lucide-react';
 import { Github } from './Icons';
 import { portfolioData } from '../data/portfolioData';
 import ProjectModal from './ProjectModal';
 
 export default function Projects() {
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [selectedProject, setSelectedProject] = useState(null);
-
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [activeProject, setActiveProject] = useState(null);
   const { projects } = portfolioData;
 
   const categories = ['All', 'Full Stack', 'AI & Full Stack', 'Developer Tools'];
 
-  const filteredProjects = useMemo(() => {
-    if (activeCategory === 'All') return projects;
-    return projects.filter((p) => p.category === activeCategory || p.category.includes(activeCategory));
-  }, [projects, activeCategory]);
+  const filtered = selectedCategory === 'All'
+    ? projects
+    : projects.filter(p => p.category === selectedCategory || p.category.includes(selectedCategory));
 
   return (
-    <section id="projects" className="py-24 relative bg-slate-900/40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-semibold uppercase tracking-wider border border-indigo-500/20">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Featured Portfolio Work</span>
+    <section id="projects" className="py-24 px-6 relative">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Section Label */}
+        <div className="flex items-center gap-2 text-sm text-zinc-500 font-medium">
+          <div className="w-8 h-px bg-gradient-to-r from-violet-500 to-transparent" />
+          Featured Work
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              Selected Projects & Case Studies
+            </h2>
+            <p className="text-sm text-zinc-400 mt-1 max-w-lg">
+              Explore open-source systems, cloud architectures, and full-stack software.
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Projects & Case Studies
-          </h2>
-          <p className="text-slate-400 text-sm sm:text-base">
-            Explore a collection of production-ready applications, open-source utilities, and architectural prototypes.
-          </p>
+
+          {/* Categories */}
+          <div className="flex flex-wrap gap-1.5">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer ${
+                  selectedCategory === cat
+                    ? 'bg-violet-500/15 text-violet-300 border border-violet-500/30'
+                    : 'text-zinc-500 hover:text-zinc-300 bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08]'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Category Filter Pills */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-12">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer ${
-                activeCategory === cat
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                  : 'bg-slate-900/80 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProjects.map((project) => (
-            <div
-              key={project.id}
-              className="group rounded-2xl bg-slate-900/80 border border-slate-800/90 overflow-hidden hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 flex flex-col justify-between"
-            >
-              <div>
-                {/* Project Screenshot / Preview with hover action buttons */}
-                <div className="relative aspect-video overflow-hidden bg-slate-950">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    onError={(e) => {
-                      e.target.src = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1000&q=80';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-xs">
-                    <button
-                      onClick={() => setSelectedProject(project)}
-                      className="p-2.5 rounded-full bg-slate-900/90 text-white hover:bg-indigo-600 transition-colors shadow-lg cursor-pointer"
-                      title="Quick View Details"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2.5 rounded-full bg-slate-900/90 text-white hover:bg-indigo-600 transition-colors shadow-lg"
-                      title="View GitHub Repository"
-                    >
-                      <Github className="w-4 h-4" />
-                    </a>
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2.5 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-colors shadow-lg"
-                      title="Open Live Demo"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
-                  </div>
-
-                  {/* Category Pill on Image */}
-                  <div className="absolute top-3 left-3">
-                    <span className="px-2.5 py-1 text-[10px] font-semibold rounded-md bg-slate-950/80 text-indigo-300 backdrop-blur-md border border-slate-800">
-                      {project.category}
+        {/* Bento / Asymmetric Projects Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filtered.map((proj, idx) => {
+            const isFeatured = idx === 0;
+            return (
+              <div
+                key={proj.id}
+                className={`rounded-2xl glass glass-hover p-5 flex flex-col justify-between group ${
+                  isFeatured ? 'md:col-span-2' : ''
+                }`}
+              >
+                <div>
+                  {/* Thumbnail / Image with subtle glass overlay */}
+                  <div className="relative aspect-video rounded-xl overflow-hidden bg-zinc-900 border border-white/[0.06] mb-5">
+                    <img
+                      src={proj.image}
+                      alt={proj.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      onError={(e) => {
+                        e.target.src = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1000&q=80';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent pointer-events-none" />
+                    
+                    <span className="absolute top-3 left-3 px-2.5 py-1 text-[11px] font-medium rounded-lg glass border border-white/[0.1] text-zinc-200 backdrop-blur-md">
+                      {proj.category}
                     </span>
                   </div>
-                </div>
 
-                {/* Content */}
-                <div className="p-5 space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-base font-bold text-white group-hover:text-indigo-300 transition-colors line-clamp-1">
-                      {project.title}
-                    </h3>
-                  </div>
-
-                  <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
-                    {project.tagline || project.description}
+                  {/* Title & Tagline */}
+                  <h3 className="text-lg font-bold text-white group-hover:text-violet-400 transition-colors">
+                    {proj.title}
+                  </h3>
+                  <p className="text-xs text-zinc-400 mt-2 leading-relaxed line-clamp-2">
+                    {proj.tagline || proj.description}
                   </p>
 
-                  {/* Tech Stack Badges */}
-                  <div className="flex flex-wrap gap-1.5 pt-2">
-                    {project.techStack.map((tech, idx) => (
+                  {/* Tech stack pills */}
+                  <div className="flex flex-wrap gap-1.5 mt-4">
+                    {proj.techStack.map((tech, tIdx) => (
                       <span
-                        key={idx}
-                        className="px-2.5 py-0.5 text-[11px] font-mono rounded-md bg-slate-800/80 text-slate-300 border border-slate-700/60"
+                        key={tIdx}
+                        className="px-2 py-0.5 text-[11px] font-mono text-zinc-400 bg-white/[0.03] border border-white/[0.05] rounded-md"
                       >
                         {tech}
                       </span>
                     ))}
                   </div>
                 </div>
-              </div>
 
-              {/* Card Footer with Direct Links */}
-              <div className="px-5 py-3.5 bg-slate-950/60 border-t border-slate-800/80 flex items-center justify-between">
-                <button
-                  onClick={() => setSelectedProject(project)}
-                  className="text-xs font-medium text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
-                >
-                  <span>Details</span>
-                </button>
-                <div className="flex items-center gap-3">
-                  <a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-xs font-medium text-slate-300 hover:text-white transition-colors"
+                {/* Footer Buttons */}
+                <div className="flex items-center justify-between pt-5 mt-5 border-t border-white/[0.05]">
+                  <button
+                    onClick={() => setActiveProject(proj)}
+                    className="text-xs font-medium text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
                   >
-                    <Github className="w-3.5 h-3.5" />
-                    <span>Code</span>
-                  </a>
-                  <a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
-                  >
-                    <span>Demo</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </a>
+                    <span>View Architecture</span>
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={proj.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white transition-colors border border-white/[0.05]"
+                      title="GitHub"
+                    >
+                      <Github className="w-3.5 h-3.5" />
+                    </a>
+                    <a
+                      href={proj.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-violet-600/80 hover:bg-violet-600 text-white text-xs font-medium shadow-sm transition-all"
+                      title="Live Demo"
+                    >
+                      <span>Demo</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-
       </div>
 
-      {/* Project Details Modal */}
+      {/* Quick View Modal */}
       <ProjectModal
-        project={selectedProject}
-        isOpen={!!selectedProject}
-        onClose={() => setSelectedProject(null)}
+        project={activeProject}
+        isOpen={!!activeProject}
+        onClose={() => setActiveProject(null)}
       />
     </section>
   );

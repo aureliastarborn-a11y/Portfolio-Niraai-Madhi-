@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -15,44 +14,35 @@ export default function App() {
   const [isResumeOpen, setIsResumeOpen] = useState(false);
 
   return (
-    <ThemeProvider>
-      <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white transition-colors duration-300">
-        {/* Navigation Bar */}
-        <Navbar onOpenResume={() => setIsResumeOpen(true)} />
+    <div className="relative min-h-screen bg-zinc-950 text-zinc-50 overflow-x-hidden font-sans selection:bg-violet-500/30 selection:text-white">
+      {/* Background ambient lighting & mesh */}
+      <div className="bg-glow" />
+      <div className="dot-grid" />
+      <div className="noise" />
+      <div className="top-glow" />
 
-        {/* Main Content Sections */}
-        <main>
-          {/* 1. Hero Section */}
-          <Hero onOpenResume={() => setIsResumeOpen(true)} />
+      {/* Floating Glass Navigation */}
+      <Navbar onOpenResume={() => setIsResumeOpen(true)} />
 
-          {/* 2. About Me */}
-          <About />
+      {/* Main Sections */}
+      <main className="relative z-10">
+        <Hero onOpenResume={() => setIsResumeOpen(true)} />
+        <About />
+        <Skills />
+        <Projects />
+        <Experience />
+        <Education />
+        <Contact />
+      </main>
 
-          {/* 3. Technical Skills */}
-          <Skills />
+      {/* Minimal Glass Footer */}
+      <Footer />
 
-          {/* 4. Projects */}
-          <Projects />
-
-          {/* 5. Experience */}
-          <Experience />
-
-          {/* 6. Education & Certifications */}
-          <Education />
-
-          {/* 7. Contact */}
-          <Contact />
-        </main>
-
-        {/* Footer */}
-        <Footer />
-
-        {/* In-Browser Resume Modal (Printable / Downloadable) */}
-        <ResumeModal
-          isOpen={isResumeOpen}
-          onClose={() => setIsResumeOpen(false)}
-        />
-      </div>
-    </ThemeProvider>
+      {/* Glass Resume Modal */}
+      <ResumeModal
+        isOpen={isResumeOpen}
+        onClose={() => setIsResumeOpen(false)}
+      />
+    </div>
   );
 }

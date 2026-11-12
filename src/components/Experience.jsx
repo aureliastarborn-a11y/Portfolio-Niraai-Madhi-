@@ -1,120 +1,88 @@
 import React from 'react';
-import { Briefcase, Calendar, MapPin, Sparkles, CheckCircle2, ChevronRight, Building2 } from 'lucide-react';
+import { Briefcase, Calendar, MapPin, CheckCircle2 } from 'lucide-react';
 import { portfolioData } from '../data/portfolioData';
 
 export default function Experience() {
   const { experiences } = portfolioData;
 
   return (
-    <section id="experience" className="py-24 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-semibold uppercase tracking-wider border border-indigo-500/20">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Professional Journey</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Work Experience & Internships
-          </h2>
-          <p className="text-slate-400 text-sm sm:text-base">
-            Proven track record of shipping production code, optimizing performance, and collaborating in agile teams.
-          </p>
+    <section id="experience" className="py-24 px-6 relative">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Section Label */}
+        <div className="flex items-center gap-2 text-sm text-zinc-500 font-medium">
+          <div className="w-8 h-px bg-gradient-to-r from-violet-500 to-transparent" />
+          Experience & History
         </div>
 
-        {/* Timeline Container */}
-        <div className="max-w-4xl mx-auto relative">
-          {/* Vertical Timeline Rule */}
-          <div className="hidden md:block absolute left-8 top-6 bottom-6 w-0.5 bg-gradient-to-b from-indigo-500 via-violet-500 to-transparent opacity-30" />
+        <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          Professional Milestones & Internships
+        </h2>
 
-          <div className="space-y-8">
-            {experiences.map((exp, index) => (
-              <div
-                key={exp.id}
-                className="relative md:pl-20 group"
-              >
-                {/* Timeline node icon on desktop */}
-                <div className="hidden md:flex absolute left-5 top-6 -translate-x-1/2 w-7 h-7 rounded-full bg-slate-900 border-2 border-indigo-500 text-indigo-400 items-center justify-center shadow-md group-hover:scale-125 group-hover:border-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-                  <Briefcase className="w-3.5 h-3.5" />
+        {/* Timeline Stack */}
+        <div className="space-y-4">
+          {experiences.map((exp) => (
+            <div
+              key={exp.id}
+              className="rounded-2xl glass glass-hover p-6 sm:p-7 space-y-4"
+            >
+              {/* Header row */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.05] pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-violet-500/15 text-violet-300 border border-violet-500/25">
+                      {exp.type}
+                    </span>
+                    <span className="text-xs text-emerald-400 font-mono">
+                      {exp.status}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white mt-2">
+                    {exp.role} <span className="text-zinc-500 font-normal">at</span>{' '}
+                    <span className="text-violet-300">{exp.organization}</span>
+                  </h3>
                 </div>
 
-                {/* Experience Card */}
-                <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500/40 hover:bg-slate-900 transition-all duration-300 shadow-lg">
-                  {/* Card Header: Role & Org */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                          {exp.type}
-                        </span>
-                        <span className="text-xs text-emerald-400 font-medium">
-                          {exp.status}
-                        </span>
-                      </div>
-                      <h3 className="text-lg sm:text-xl font-bold text-white mt-1">
-                        {exp.role}
-                      </h3>
-                      <div className="flex items-center gap-2 text-indigo-400 font-medium text-xs sm:text-sm mt-0.5">
-                        <Building2 className="w-4 h-4 text-indigo-400" />
-                        <span>{exp.organization}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col sm:items-end text-xs text-slate-400 space-y-1">
-                      <div className="flex items-center gap-1.5 font-mono text-slate-300">
-                        <Calendar className="w-3.5 h-3.5 text-indigo-400" />
-                        <span>{exp.duration}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-slate-500" />
-                        <span>{exp.location}</span>
-                      </div>
-                    </div>
+                <div className="text-xs text-zinc-400 font-mono space-y-1 sm:text-right">
+                  <div className="flex items-center sm:justify-end gap-1.5 text-zinc-300">
+                    <Calendar className="w-3.5 h-3.5 text-violet-400" />
+                    <span>{exp.duration}</span>
                   </div>
-
-                  {/* Overview sentence */}
-                  <p className="text-xs sm:text-sm text-slate-300 mt-4 leading-relaxed">
-                    {exp.description}
-                  </p>
-
-                  {/* Bullet Responsibilities */}
-                  <div className="mt-4 space-y-2">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                      Key Responsibilities & Impact:
-                    </h4>
-                    <ul className="space-y-2">
-                      {exp.responsibilities.map((resp, i) => (
-                        <li key={i} className="flex items-start gap-2.5 text-xs text-slate-300 leading-relaxed">
-                          <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-                          <span>{resp}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="flex items-center sm:justify-end gap-1.5 text-zinc-500">
+                    <MapPin className="w-3.5 h-3.5" />
+                    <span>{exp.location}</span>
                   </div>
-
-                  {/* Tech Stack Pills */}
-                  <div className="mt-5 pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-1.5">
-                    <span className="text-[11px] font-semibold text-slate-400 mr-1">
-                      Technologies:
-                    </span>
-                    {exp.techStack.map((tech, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-0.5 text-[11px] font-mono rounded bg-slate-800 text-slate-300 border border-slate-700/60"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-
                 </div>
               </div>
-            ))}
-          </div>
 
+              {/* Description */}
+              <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                {exp.description}
+              </p>
+
+              {/* Responsibilities list */}
+              <div className="space-y-2 pt-1">
+                {exp.responsibilities.map((r, i) => (
+                  <div key={i} className="flex items-start gap-2.5 text-xs text-zinc-300">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-violet-400 mt-0.5 shrink-0" />
+                    <span className="leading-relaxed">{r}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Technologies used */}
+              <div className="pt-3 border-t border-white/[0.04] flex flex-wrap gap-1.5">
+                {exp.techStack.map((tech, tIdx) => (
+                  <span
+                    key={tIdx}
+                    className="px-2 py-0.5 text-[11px] font-mono text-zinc-400 bg-white/[0.03] border border-white/[0.05] rounded-md"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
-
       </div>
     </section>
   );
