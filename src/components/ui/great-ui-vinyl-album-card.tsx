@@ -68,7 +68,7 @@ export default function VinylAlbumCard({
           )}
           initial={{ x: 0, rotate: 0 }}
           animate={{
-            x: isHovered ? (isCompact ? 95 : 140) : 0,
+            x: isHovered ? (isCompact ? 105 : 140) : 0,
             rotate: isHovered ? 180 : 0,
           }}
           transition={{ type: "spring", stiffness: 85, damping: 16, mass: 1 }}
