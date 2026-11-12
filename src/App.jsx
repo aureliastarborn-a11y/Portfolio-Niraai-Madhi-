@@ -5,6 +5,7 @@ import FolderCard from './components/FolderCard';
 import ImageModal from './components/ImageModal';
 import { LogoBurst } from '@/components/ui/logo-burst';
 import VinylAlbumCard from '@/components/ui/great-ui-vinyl-album-card';
+import ImagesScrollingAnimation from '@/components/ui/images-scrolling-animation';
 import { portfolioData } from './data/portfolioData';
 import {
   Sparkles,
@@ -279,36 +280,9 @@ export default function App() {
                   </p>
                 </div>
 
-                {/* Right Compact Skills Grid */}
-                <div className="lg:col-span-8">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-                    {skills.map((grp, idx) => (
-                      <div
-                        key={idx}
-                        className="p-3 sm:p-3.5 rounded-xl bg-white/85 backdrop-blur-sm border border-black/[0.06] hover:border-black/[0.12] hover:bg-white transition-all space-y-1.5"
-                      >
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-xs sm:text-[13px] font-semibold text-zinc-900 tracking-tight flex items-center gap-1.5">
-                            <span className="size-1.5 rounded-full bg-zinc-800" />
-                            {grp.category}
-                          </h3>
-                          <span className="text-[10px] font-mono text-zinc-400">
-                            {grp.items.length}
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap gap-1">
-                          {grp.items.map((item, iIdx) => (
-                            <span
-                              key={iIdx}
-                              className="px-2 py-0.5 text-[11px] font-medium text-zinc-700 bg-zinc-50/90 rounded border border-black/[0.05] hover:bg-white hover:text-zinc-950 transition-colors"
-                            >
-                              {item}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                {/* Right Scrolling Card Box Animation (Video Component) */}
+                <div className="lg:col-span-8 flex flex-col items-start">
+                  <ImagesScrollingAnimation skills={skills} />
                 </div>
               </section>
 
