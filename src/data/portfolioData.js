@@ -186,56 +186,56 @@ export const portfolioData = {
 
   certifications: [
     {
-      name: "Oracle Cloud Infrastructure 2025 Certified AI Foundations Associate – Oracle",
-      shortTitle: "Oracle AI Foundations Associate",
+      name: "Certified AI Foundations Associate",
+      shortTitle: "AI Foundations",
       issuer: "Oracle",
       year: "2025"
     },
     {
-      name: "Claude 101 – Anthropic",
+      name: "Claude 101",
       shortTitle: "Claude 101",
       issuer: "Anthropic",
       year: "2025"
     },
     {
-      name: "Microsoft Learnathon '25: Learn AI and GenAI Basics – Microsoft",
-      shortTitle: "Microsoft Learnathon '25",
+      name: "Learn AI and GenAI Basics",
+      shortTitle: "AI & GenAI Basics",
       issuer: "Microsoft",
       year: "2025"
     },
     {
-      name: "Salesforce Certification – Salesforce",
-      shortTitle: "Salesforce Certification",
+      name: "Certified Associate",
+      shortTitle: "Certified Associate",
       issuer: "Salesforce",
       year: "2024"
     },
     {
-      name: "Deloitte Data Analytics Certification – Deloitte",
-      shortTitle: "Data Analytics Certification",
+      name: "Data Analytics Certification",
+      shortTitle: "Data Analytics",
       issuer: "Deloitte",
       year: "2024"
     },
     {
-      name: "Java Programming Training Certification – Infosys",
-      shortTitle: "Java Programming Training",
+      name: "Java Programming Training",
+      shortTitle: "Java Programming",
       issuer: "Infosys",
       year: "2024"
     },
     {
-      name: "Big Data – 301 – Infosys",
+      name: "Big Data – 301",
       shortTitle: "Big Data – 301",
       issuer: "Infosys",
       year: "2024"
     },
     {
-      name: "Self-Presentation Micro Certificate – Wadhwani Foundation",
-      shortTitle: "Self-Presentation Certificate",
+      name: "Self-Presentation Micro Certificate",
+      shortTitle: "Self-Presentation",
       issuer: "Wadhwani Foundation",
       year: "2024"
     },
     {
-      name: "Government Skill Development Program – Infosys",
-      shortTitle: "Skill Development Program",
+      name: "Government Skill Development Program",
+      shortTitle: "Skill Development",
       issuer: "Infosys",
       year: "2024"
     }

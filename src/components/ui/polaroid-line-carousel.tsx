@@ -604,11 +604,11 @@ export default function PolaroidLineCarousel({
               )}
             </div>
             <div className="pl-note">
-              <span className="font-serif italic text-zinc-900 text-[8px] sm:text-[8.5px] leading-[1.1] line-clamp-1 block">
+              <span className="font-serif italic text-zinc-900 text-[8px] sm:text-[8.5px] leading-[1.15] line-clamp-1 block truncate">
                 {slide.title}
               </span>
               {slide.issuer && (
-                <span className="text-[6.5px] sm:text-[7px] font-mono font-semibold tracking-wider text-zinc-500 uppercase leading-none mt-0.5 block">
+                <span className="text-[7px] sm:text-[7.5px] font-sans font-medium text-zinc-500 leading-none mt-0.5 block truncate">
                   {slide.issuer}
                 </span>
               )}
