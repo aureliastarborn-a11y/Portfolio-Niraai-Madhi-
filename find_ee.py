@@ -6,3 +6,4 @@ pos = code.find('ee=')
 if pos != -1:
     print('ee definition:')
     print(code[pos-50:pos+1500])
+

@@ -4,45 +4,26 @@ import SphereFooter from './components/SphereFooter';
 import FolderCard from './components/FolderCard';
 import FloatingDock from './components/FloatingDock';
 import ImageModal from './components/ImageModal';
+import { portfolioData } from './data/portfolioData';
 
 export default function App() {
   const [activeModalImage, setActiveModalImage] = useState(null);
+  const [copiedEmail, setCopiedEmail] = useState(false);
+  const [copiedPhone, setCopiedPhone] = useState(false);
 
-  const primeIntellectCards = [
-    {
-      title: 'Desktop agent workspace',
-      bg: '/images/landscapes/stream-in-the-mountains.jpg',
-      screenshot: '/images/project-screenshots/desktop-agent.png',
-      inset: 'inset-[5%]',
-    },
-    {
-      title: 'Command line research agent',
-      bg: '/images/landscapes/the-coming-storm.jpg',
-      screenshot: '/images/project-screenshots/cli-agent.png',
-      inset: 'inset-y-[12%] inset-x-[21%]',
-    },
-    {
-      title: 'Agent automation setup',
-      bg: '/images/landscapes/home-by-the-lake.jpg',
-      screenshot: '/images/project-screenshots/automation-neutral.png',
-      inset: 'inset-y-[11%] inset-x-[22%]',
-    },
-  ];
+  const { personal, skills, projects, experiences, education, certifications } = portfolioData;
 
-  const huggingFaceCards = [
-    {
-      title: 'Editor and planning interface',
-      bg: '/images/nature-photos/soft-dunes.webp',
-      screenshot: '/images/project-screenshots/editor-plan.png',
-      inset: 'inset-y-[6%] inset-x-[12%]',
-    },
-    {
-      title: 'Automation configuration window',
-      bg: '/images/nature-photos/sunlit-leaves.webp',
-      screenshot: '/images/project-screenshots/automation.png',
-      inset: 'inset-y-[11%] inset-x-[22%]',
-    },
-  ];
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText(personal.email);
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2000);
+  };
+
+  const handleCopyPhone = () => {
+    navigator.clipboard.writeText(personal.phone);
+    setCopiedPhone(true);
+    setTimeout(() => setCopiedPhone(false), 2000);
+  };
 
   return (
     <div className="min-h-full flex flex-col font-sans bg-background text-foreground antialiased selection:bg-zinc-200">
@@ -55,34 +36,34 @@ export default function App() {
       </a>
 
       <main className="relative isolate min-h-svh bg-scene [--footer-height:50svh]" data-personal-site="true">
-        {/* White Content Shell */}
+        {/* Main Content White Container */}
         <div
           className="relative z-1 overflow-clip bg-background origin-bottom shadow-[0_1px_0_#00000006]"
           style={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}
         >
-          {/* ── HERO / SPHERE RING ────────────────────────────── */}
+          {/* ── HERO / ORBITAL SPHERE RING ─────────────────────── */}
           <header
             id="top"
             className="sphere-ring relative z-1 grid h-[var(--hero-height)] place-items-center overflow-visible isolate [--hero-height:75svh] compact:[--hero-height:62svh]"
           >
-            {/* The 8 Interactive Glass Spheres */}
+            {/* The 8 Interactive Refractive Glass Spheres */}
             <SphereRing />
 
             {/* Center Content */}
-            <div className="relative z-1 w-[min(340px,calc(var(--ring-radius)*1.24))] text-center select-none" data-hero-copy="true">
-              <h1 id="intro-heading" className="mb-4 flex justify-center focus:outline-none compact:mb-3.5">
+            <div className="relative z-1 w-[min(360px,calc(var(--ring-radius)*1.3))] text-center select-none" data-hero-copy="true">
+              <h1 id="intro-heading" className="mb-3.5 flex justify-center focus:outline-none">
                 <img
                   src="/images/signature.svg"
-                  alt="Matthew"
-                  width="122"
-                  height="33"
-                  className="h-8 w-auto object-contain select-none"
+                  alt={personal.name}
+                  width="180"
+                  height="45"
+                  className="h-10 w-auto object-contain select-none"
                 />
               </h1>
               <p className="text-muted text-[clamp(14px,1.6vw,16px)] leading-[1.55] text-balance font-normal">
-                Applied researcher at Prime Intellect.
+                {personal.role} at Tagore Engineering College.
                 <br />
-                Exploring how language models reason, act, and learn.
+                {personal.tagline}
               </p>
             </div>
           </header>
@@ -107,20 +88,29 @@ export default function App() {
                   </span>
                   About
                 </h2>
-                <div className="grid gap-6 text-muted text-[15px] leading-relaxed">
-                  <p>
-                    I’m an applied researcher at Prime Intellect, working on reinforcement learning and language model agents.
-                  </p>
-                  <p>
-                    I build environments, design evaluations, and run experiments to understand how models reason, use tools, and learn from feedback.
-                  </p>
+                <div className="grid gap-4 text-muted text-[15px] leading-relaxed">
+                  {personal.bio.map((paragraph, idx) => (
+                    <p key={idx}>{paragraph}</p>
+                  ))}
+
+                  {/* Soft skills pill row */}
+                  <div className="pt-2 flex flex-wrap gap-1.5">
+                    {personal.softSkills.map((skill, sIdx) => (
+                      <span
+                        key={sIdx}
+                        className="px-2.5 py-1 text-[12px] font-medium text-heading bg-scene rounded-full border border-black/[0.04]"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </section>
 
-              {/* ── 2. SELECTED WORK ──────────────────────────── */}
-              <section id="work" aria-labelledby="work-heading">
+              {/* ── 2. TECHNICAL SKILLS ────────────────────────── */}
+              <section id="skills" aria-labelledby="skills-heading">
                 <h2
-                  id="work-heading"
+                  id="skills-heading"
                   className="relative text-heading text-[15px] font-medium leading-6 mb-4"
                 >
                   <span
@@ -129,159 +119,107 @@ export default function App() {
                   >
                     2
                   </span>
-                  Selected work
+                  Technical skills
                 </h2>
 
-                <div className="grid min-w-0 gap-20 compact:gap-16">
-                  {/* Work 1: Prime Intellect */}
-                  <article className="flex w-full max-w-content min-w-0 flex-col gap-3 [&>p]:text-muted text-[15px]">
-                    <a
-                      href="https://www.primeintellect.ai"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="group flex w-fit items-center gap-3 [&_h3]:text-[15px] [&_h3]:font-medium [&_h3]:leading-6 [&_p]:text-muted"
-                      data-project-heading="true"
-                    >
-                      <img
-                        src="/images/prime-intellect.svg"
-                        alt=""
-                        width="40"
-                        height="40"
-                        className="size-10 shrink-0 object-contain"
-                      />
-                      <div>
-                        <h3 className="text-heading flex items-center">
-                          Prime Intellect
-                          <img
-                            src="/images/external-arrow.svg"
-                            alt=""
-                            className="inline-block ml-1 h-3.5 w-auto transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 opacity-0 group-hover:opacity-100"
-                          />
-                        </h3>
-                        <p className="text-muted text-[14px]">
-                          Reinforcement learning &amp; environments
-                        </p>
-                      </div>
-                    </a>
-
-                    <p className="leading-relaxed">
-                      Build training environments for language model agents, with verifiers that check reasoning and tool use. Run post-training experiments, inspect rollouts, and refine reward signals to help models complete longer tasks and recover when a step goes wrong.
-                    </p>
-
-                    {/* Screenshot Gallery Horizontal Scroll */}
-                    <div
-                      className="no-scrollbar scroll-fade-x w-screen max-w-none ml-[calc(224px-50vw)] overflow-x-auto overscroll-x-contain scroll-ps-[calc(50vw-224px)] snap-x snap-mandatory compact:-ml-4 compact:scroll-ps-4 pt-2"
-                      data-project-gallery="true"
-                    >
-                      <div className="flex w-max items-start gap-3.5 pl-[calc(50vw-224px)] compact:pl-4">
-                        {primeIntellectCards.map((card, idx) => (
-                          <div
-                            key={idx}
-                            className="relative w-content aspect-project shrink-0 snap-start snap-always compact:w-[calc(100vw-32px)]"
-                            data-project-preview="true"
+                <div className="grid gap-6">
+                  {skills.map((grp, idx) => (
+                    <div key={idx} className="space-y-2">
+                      <h3 className="text-[14px] font-medium text-heading">
+                        {grp.category}
+                      </h3>
+                      <div className="flex flex-wrap gap-1.5">
+                        {grp.items.map((item, iIdx) => (
+                          <span
+                            key={iIdx}
+                            className="px-2.5 py-1 text-[13px] text-muted hover:text-heading bg-white rounded-lg border border-black/[0.08] shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-colors"
                           >
-                            <button
-                              type="button"
-                              onClick={() => setActiveModalImage(card)}
-                              aria-label={`Open ${card.title}`}
-                              className="relative block size-full overflow-hidden rounded-[8px] border-0 bg-preview p-0 shadow-[0_5px_15px_#00000012] cursor-zoom-in appearance-none transition-transform duration-200 hover:scale-[1.01]"
-                            >
-                              <img
-                                src={card.bg}
-                                alt=""
-                                className="object-cover select-none absolute inset-0 size-full"
-                              />
-                              <span className={`absolute drop-shadow-[0_8px_14px_#18160f2e] ${card.inset} flex items-center justify-center`}>
-                                <img
-                                  src={card.screenshot}
-                                  alt={card.title}
-                                  className="object-contain size-full"
-                                />
-                              </span>
-                            </button>
-                          </div>
+                            {item}
+                          </span>
                         ))}
-                        <span aria-hidden="true" className="w-[calc(50vw-84px)] shrink-0" />
                       </div>
                     </div>
-                  </article>
-
-                  {/* Work 2: Hugging Face */}
-                  <article className="flex w-full max-w-content min-w-0 flex-col gap-3 [&>p]:text-muted text-[15px]">
-                    <a
-                      href="https://huggingface.co"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="group flex w-fit items-center gap-3 [&_h3]:text-[15px] [&_h3]:font-medium [&_h3]:leading-6 [&_p]:text-muted"
-                      data-project-heading="true"
-                    >
-                      <img
-                        src="/images/hugging-face.svg"
-                        alt=""
-                        width="40"
-                        height="40"
-                        className="size-10 shrink-0 object-contain"
-                      />
-                      <div>
-                        <h3 className="text-heading flex items-center">
-                          Hugging Face
-                          <img
-                            src="/images/external-arrow.svg"
-                            alt=""
-                            className="inline-block ml-1 h-3.5 w-auto transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 opacity-0 group-hover:opacity-100"
-                          />
-                        </h3>
-                        <p className="text-muted text-[14px]">
-                          Open models &amp; evaluation
-                        </p>
-                      </div>
-                    </a>
-
-                    <p className="leading-relaxed">
-                      Worked on evaluation tools for open language models, from dataset preparation to reproducible benchmark runs. Compared fine-tuning approaches, investigated model failures, and shared examples that helped developers adapt models to their own tasks.
-                    </p>
-
-                    {/* Screenshot Gallery Horizontal Scroll */}
-                    <div
-                      className="no-scrollbar scroll-fade-x w-screen max-w-none ml-[calc(224px-50vw)] overflow-x-auto overscroll-x-contain scroll-ps-[calc(50vw-224px)] snap-x snap-mandatory compact:-ml-4 compact:scroll-ps-4 pt-2"
-                      data-project-gallery="true"
-                    >
-                      <div className="flex w-max items-start gap-3.5 pl-[calc(50vw-224px)] compact:pl-4">
-                        {huggingFaceCards.map((card, idx) => (
-                          <div
-                            key={idx}
-                            className="relative w-content aspect-project shrink-0 snap-start snap-always compact:w-[calc(100vw-32px)]"
-                            data-project-preview="true"
-                          >
-                            <button
-                              type="button"
-                              onClick={() => setActiveModalImage(card)}
-                              aria-label={`Open ${card.title}`}
-                              className="relative block size-full overflow-hidden rounded-[8px] border-0 bg-preview p-0 shadow-[0_5px_15px_#00000012] cursor-zoom-in appearance-none transition-transform duration-200 hover:scale-[1.01]"
-                            >
-                              <img
-                                src={card.bg}
-                                alt=""
-                                className="object-cover select-none absolute inset-0 size-full"
-                              />
-                              <span className={`absolute drop-shadow-[0_8px_14px_#18160f2e] ${card.inset} flex items-center justify-center`}>
-                                <img
-                                  src={card.screenshot}
-                                  alt={card.title}
-                                  className="object-contain size-full"
-                                />
-                              </span>
-                            </button>
-                          </div>
-                        ))}
-                        <span aria-hidden="true" className="w-[calc(50vw-84px)] shrink-0" />
-                      </div>
-                    </div>
-                  </article>
+                  ))}
                 </div>
               </section>
 
-              {/* ── 3. EXPERIENCE ─────────────────────────────── */}
+              {/* ── 3. PROJECTS / SELECTED WORK ───────────────── */}
+              <section id="projects" aria-labelledby="projects-heading">
+                <h2
+                  id="projects-heading"
+                  className="relative text-heading text-[15px] font-medium leading-6 mb-4"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-0 right-[calc(100%+4px)] w-4 text-muted font-normal tabular-nums compact:static compact:mr-2 compact:inline-block"
+                  >
+                    3
+                  </span>
+                  Projects &amp; Selected work
+                </h2>
+
+                <div className="grid min-w-0 gap-16 compact:gap-14">
+                  {projects.map((proj) => (
+                    <article
+                      key={proj.id}
+                      className="flex w-full max-w-content min-w-0 flex-col gap-3 [&>p]:text-muted text-[15px]"
+                    >
+                      <div>
+                        <h3 className="text-heading text-[15px] font-medium leading-6">
+                          {proj.title}
+                        </h3>
+                        <p className="text-muted text-[13px]">
+                          {proj.tagline}
+                        </p>
+                      </div>
+
+                      <p className="leading-relaxed">
+                        {proj.description}
+                      </p>
+
+                      {/* Tech stack badges */}
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {proj.tags.map((tag, tIdx) => (
+                          <span
+                            key={tIdx}
+                            className="px-2 py-0.5 text-[11px] font-mono text-muted bg-scene rounded border border-black/[0.04]"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Interactive Visual Preview / Mockup */}
+                      <div
+                        className="relative w-content aspect-project shrink-0 snap-start mt-2 compact:w-[calc(100vw-32px)]"
+                        data-project-preview="true"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => setActiveModalImage(proj)}
+                          aria-label={`Open preview for ${proj.title}`}
+                          className="relative block size-full overflow-hidden rounded-[8px] border-0 bg-preview p-0 shadow-[0_5px_15px_#00000012] cursor-zoom-in appearance-none transition-transform duration-200 hover:scale-[1.01]"
+                        >
+                          <img
+                            src={proj.bg}
+                            alt=""
+                            className="object-cover select-none absolute inset-0 size-full"
+                          />
+                          <span className="absolute inset-[8%] flex items-center justify-center drop-shadow-[0_8px_14px_#18160f2e]">
+                            <img
+                              src={proj.screenshot}
+                              alt={proj.title}
+                              className="object-contain size-full"
+                            />
+                          </span>
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+
+              {/* ── 4. EXPERIENCE ─────────────────────────────── */}
               <section id="experience" aria-labelledby="experience-heading">
                 <h2
                   id="experience-heading"
@@ -291,108 +229,34 @@ export default function App() {
                     aria-hidden="true"
                     className="absolute top-0 right-[calc(100%+4px)] w-4 text-muted font-normal tabular-nums compact:static compact:mr-2 compact:inline-block"
                   >
-                    3
+                    4
                   </span>
                   Experience
                 </h2>
 
-                <dl
-                  className="grid gap-3 text-[15px] [&>div]:grid [&>div]:grid-cols-[89px_minmax(0,1fr)] [&>div]:gap-[35px] compact:[&>div]:grid-cols-[85px_minmax(0,1fr)] compact:[&>div]:gap-[18px] [&_dt]:whitespace-nowrap [&_dt]:text-muted [&_dd_span]:block [&_dd_span]:text-muted [&_a]:hover:text-heading"
-                  data-timeline="true"
-                >
-                  <div>
-                    <dt>2025 – Now</dt>
-                    <dd>
-                      <a
-                        href="https://www.primeintellect.ai"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="group inline-flex items-center text-heading font-medium"
-                      >
-                        Applied Researcher at Prime Intellect
-                        <img
-                          src="/images/external-arrow.svg"
-                          alt=""
-                          className="inline-block ml-1 h-3.5 w-auto transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                        />
-                      </a>
-                      <span className="text-[14px]">San Francisco, CA</span>
-                    </dd>
-                  </div>
+                <div className="space-y-8">
+                  {experiences.map((exp, idx) => (
+                    <div key={idx} className="space-y-2">
+                      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+                        <h3 className="text-heading text-[15px] font-medium">
+                          {exp.role} · <span className="text-muted">{exp.organization}</span>
+                        </h3>
+                        <span className="text-muted text-[13px] font-mono">
+                          {exp.period}
+                        </span>
+                      </div>
 
-                  <div>
-                    <dt>2022 – 2025</dt>
-                    <dd>
-                      <a
-                        href="https://huggingface.co"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="group inline-flex items-center text-heading font-medium"
-                      >
-                        Research Engineer at Hugging Face
-                        <img
-                          src="/images/external-arrow.svg"
-                          alt=""
-                          className="inline-block ml-1 h-3.5 w-auto transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                        />
-                      </a>
-                      <span className="text-[14px]">Remote</span>
-                    </dd>
-                  </div>
-
-                  <div>
-                    <dt>2020 – 2022</dt>
-                    <dd>
-                      <a
-                        href="https://www.zalando.com"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="group inline-flex items-center text-heading font-medium"
-                      >
-                        Machine Learning Engineer at Zalando
-                        <img
-                          src="/images/external-arrow.svg"
-                          alt=""
-                          className="inline-block ml-1 h-3.5 w-auto transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                        />
-                      </a>
-                      <span className="text-[14px]">Berlin, DE</span>
-                    </dd>
-                  </div>
-                </dl>
-              </section>
-
-              {/* ── 4. ELSEWHERE ──────────────────────────────── */}
-              <section id="elsewhere" aria-labelledby="elsewhere-heading">
-                <h2
-                  id="elsewhere-heading"
-                  className="relative text-heading text-[15px] font-medium leading-6 mb-4"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-0 right-[calc(100%+4px)] w-4 text-muted font-normal tabular-nums compact:static compact:mr-2 compact:inline-block"
-                  >
-                    4
-                  </span>
-                  Elsewhere
-                </h2>
-
-                <p className="mb-8 max-w-[360px] text-muted text-[15px]">
-                  A few other places I keep things on the internet.
-                </p>
-
-                <div
-                  className="grid grid-cols-2 gap-x-6 gap-y-[30px] compact:gap-x-3.5 compact:gap-y-6"
-                  data-folder-links="true"
-                >
-                  <FolderCard label="X" href="https://x.com" ariaLabel="Posts on X" />
-                  <FolderCard label="GitHub" href="https://github.com" ariaLabel="Code on GitHub" />
-                  <FolderCard label="Spotify" href="https://open.spotify.com" ariaLabel="Music on Spotify" />
-                  <FolderCard label="Are.na" href="https://www.are.na" ariaLabel="Bookmarks on Are.na" />
+                      <ul className="list-disc list-outside ml-4 space-y-1 text-muted text-[14px] leading-relaxed">
+                        {exp.points.map((point, pIdx) => (
+                          <li key={pIdx}>{point}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
                 </div>
               </section>
 
-              {/* ── 5. EDUCATION ──────────────────────────────── */}
+              {/* ── 5. EDUCATION & CERTIFICATIONS ─────────────── */}
               <section id="education" aria-labelledby="education-heading">
                 <h2
                   id="education-heading"
@@ -404,29 +268,147 @@ export default function App() {
                   >
                     5
                   </span>
-                  Education
+                  Education &amp; Certifications
                 </h2>
 
-                <dl
-                  className="grid gap-3 text-[15px] [&>div]:grid [&>div]:grid-cols-[89px_minmax(0,1fr)] [&>div]:gap-[35px] compact:[&>div]:grid-cols-[85px_minmax(0,1fr)] compact:[&>div]:gap-[18px] [&_dt]:whitespace-nowrap [&_dt]:text-muted [&_dd_span]:block [&_dd_span]:text-muted"
-                  data-timeline="true"
+                {/* College Info */}
+                <div className="space-y-4 mb-8">
+                  {education.map((edu, idx) => (
+                    <div key={idx} className="space-y-1">
+                      <div className="flex justify-between items-baseline">
+                        <span className="font-medium text-heading text-[15px]">
+                          {edu.degree}
+                        </span>
+                        <span className="text-muted text-[13px] font-mono">
+                          {edu.period}
+                        </span>
+                      </div>
+                      <p className="text-muted text-[14px]">
+                        {edu.institution} · {edu.location}
+                      </p>
+                      <p className="text-heading font-medium text-[13px] font-mono pt-1">
+                        {edu.gpa}
+                      </p>
+                      <div className="flex flex-wrap gap-1.5 pt-2">
+                        {edu.courses.map((course, cIdx) => (
+                          <span
+                            key={cIdx}
+                            className="px-2 py-0.5 text-[11px] font-mono text-muted bg-scene rounded border border-black/[0.04]"
+                          >
+                            {course}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Certifications List */}
+                <div className="space-y-2.5 pt-2 border-t border-black/[0.06]">
+                  <h3 className="text-muted text-[13px] font-medium uppercase tracking-wider">
+                    Certifications
+                  </h3>
+                  <div className="grid gap-2">
+                    {certifications.map((cert, cIdx) => (
+                      <div
+                        key={cIdx}
+                        className="flex items-center justify-between p-2.5 rounded-lg bg-scene/60 border border-black/[0.04] text-[13px]"
+                      >
+                        <span className="text-heading font-medium">
+                          {cert.title}
+                        </span>
+                        <span className="text-muted text-[12px] font-mono shrink-0 ml-2">
+                          {cert.issuer}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              {/* ── 6. ELSEWHERE & CONTACT ────────────────────── */}
+              <section id="contact" aria-labelledby="contact-heading">
+                <h2
+                  id="contact-heading"
+                  className="relative text-heading text-[15px] font-medium leading-6 mb-4"
                 >
-                  <div>
-                    <dt>2018 – 2020</dt>
-                    <dd>
-                      <span className="font-medium text-heading">Master’s in Computer Science</span>
-                      <span className="text-[14px]">Machine Learning · Munich, DE</span>
-                    </dd>
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-0 right-[calc(100%+4px)] w-4 text-muted font-normal tabular-nums compact:static compact:mr-2 compact:inline-block"
+                  >
+                    6
+                  </span>
+                  Contact &amp; Elsewhere
+                </h2>
+
+                <p className="mb-6 max-w-[360px] text-muted text-[15px]">
+                  Connect with me across platforms or reach out directly.
+                </p>
+
+                {/* 4 Skeuomorphic Folders */}
+                <div
+                  className="grid grid-cols-2 gap-x-6 gap-y-[30px] compact:gap-x-3.5 compact:gap-y-6 mb-8"
+                  data-folder-links="true"
+                >
+                  <FolderCard
+                    label="LinkedIn"
+                    href={personal.linkedin}
+                    ariaLabel="Connect on LinkedIn"
+                  />
+                  <FolderCard
+                    label="GitHub"
+                    href={personal.github}
+                    ariaLabel="Code on GitHub"
+                  />
+                  <FolderCard
+                    label="Email"
+                    href={`mailto:${personal.email}`}
+                    ariaLabel="Send an Email"
+                  />
+                  <FolderCard
+                    label="Phone"
+                    href={`tel:${personal.phone}`}
+                    ariaLabel="Call via Phone"
+                  />
+                </div>
+
+                {/* Direct Copy Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div className="p-3.5 rounded-xl bg-scene border border-black/[0.05] flex items-center justify-between">
+                    <div>
+                      <span className="text-muted text-[11px] block uppercase font-medium">Email</span>
+                      <a href={`mailto:${personal.email}`} className="text-heading font-medium text-[13px] hover:underline">
+                        {personal.email}
+                      </a>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCopyEmail}
+                      className="px-2.5 py-1 text-[11px] font-medium rounded bg-white text-heading border border-black/[0.1] shadow-xs hover:bg-zinc-50 cursor-pointer"
+                    >
+                      {copiedEmail ? 'Copied!' : 'Copy'}
+                    </button>
                   </div>
 
-                  <div>
-                    <dt>2015 – 2018</dt>
-                    <dd>
-                      <span className="font-medium text-heading">Bachelor’s in Computer Science at LMU</span>
-                      <span className="text-[14px]">Munich, DE</span>
-                    </dd>
+                  <div className="p-3.5 rounded-xl bg-scene border border-black/[0.05] flex items-center justify-between">
+                    <div>
+                      <span className="text-muted text-[11px] block uppercase font-medium">Phone &amp; Location</span>
+                      <span className="text-heading font-medium text-[13px] block">
+                        +91 {personal.phone}
+                      </span>
+                      <span className="text-muted text-[11px]">
+                        {personal.location}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCopyPhone}
+                      className="px-2.5 py-1 text-[11px] font-medium rounded bg-white text-heading border border-black/[0.1] shadow-xs hover:bg-zinc-50 cursor-pointer"
+                    >
+                      {copiedPhone ? 'Copied!' : 'Copy'}
+                    </button>
                   </div>
-                </dl>
+                </div>
               </section>
             </div>
           </div>

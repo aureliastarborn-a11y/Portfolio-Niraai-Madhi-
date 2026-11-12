@@ -18,3 +18,4 @@ for font in fonts:
         print(f'Downloaded {font} ({len(data)} bytes)')
     except Exception as e:
         print(f'Error {font}: {e}')
+

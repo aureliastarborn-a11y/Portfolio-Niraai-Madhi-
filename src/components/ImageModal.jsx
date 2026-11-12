@@ -44,3 +44,4 @@ export default function ImageModal({ image, isOpen, onClose }) {
     </div>
   );
 }
+

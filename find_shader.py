@@ -10,3 +10,4 @@ else:
     if pos != -1:
         print('createShader found:')
         print(code[pos-100:pos+1500])
+

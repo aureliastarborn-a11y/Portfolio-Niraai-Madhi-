@@ -23,3 +23,4 @@ for js in chunks:
             print(f'Found "sphere" in {js}')
     except Exception as e:
         print(f'Error {js}: {e}')
+

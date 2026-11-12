@@ -39,3 +39,4 @@ for img in set(img_matches):
         print(f'Downloaded {img} ({len(img_data)} bytes)')
     except Exception as e:
         print(f'Error downloading {img}: {e}')
+

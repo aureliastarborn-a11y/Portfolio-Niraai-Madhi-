@@ -36,3 +36,4 @@ for img in set(all_textures):
         print(f'Downloaded {img} ({len(img_data)} bytes)')
     except Exception as e:
         print(f'Error downloading {img}: {e}')
+

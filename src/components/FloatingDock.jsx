@@ -1,27 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { portfolioData } from '../data/portfolioData';
 
 const DOCK_SECTIONS = [
   { id: 'about', num: '1', label: 'About' },
-  { id: 'work', num: '2', label: 'Work' },
-  { id: 'experience', num: '3', label: 'Experience' },
-  { id: 'elsewhere', num: '4', label: 'Elsewhere' },
+  { id: 'skills', num: '2', label: 'Technical skills' },
+  { id: 'projects', num: '3', label: 'Projects' },
+  { id: 'experience', num: '4', label: 'Experience' },
   { id: 'education', num: '5', label: 'Education' },
-];
-
-const DOCK_SOCIALS = [
-  { label: 'Posts', dest: 'X', href: 'https://x.com' },
-  { label: 'Code', dest: 'GitHub', href: 'https://github.com' },
-  { label: 'Music', dest: 'Spotify', href: 'https://open.spotify.com' },
-  { label: 'Bookmarks', dest: 'Are.na', href: 'https://www.are.na' },
-  { label: 'Email', dest: 'hello@example.com', href: 'mailto:hello@example.com' },
+  { id: 'contact', num: '6', label: 'Contact' },
 ];
 
 export default function FloatingDock() {
   const [mode, setMode] = useState('dock'); // 'dock' | 'sections' | 'contact'
   const [hoveredBtn, setHoveredBtn] = useState(null);
   const dockRef = useRef(null);
+  const { personal } = portfolioData;
 
-  // Close when clicking outside or pressing Escape
+  const DOCK_SOCIALS = [
+    { label: 'LinkedIn', dest: 'Connect', href: personal.linkedin },
+    { label: 'GitHub', dest: 'Code', href: personal.github },
+    { label: 'Email', dest: personal.email, href: `mailto:${personal.email}` },
+    { label: 'Phone', dest: personal.phone, href: `tel:${personal.phone}` },
+  ];
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dockRef.current && !dockRef.current.contains(e.target)) {
@@ -84,7 +85,6 @@ export default function FloatingDock() {
                   />
                 </svg>
               </button>
-              {/* Tooltip */}
               {hoveredBtn === 'home' && (
                 <div className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 rounded-[9px] bg-black px-2.5 py-1 text-[11px] text-white shadow-[0_0_0_1px_#ffffff1f,0_6px_20px_#00000040] pointer-events-none whitespace-nowrap">
                   Home
@@ -108,7 +108,6 @@ export default function FloatingDock() {
                   <path d="M4 18L20 18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
                 </svg>
               </button>
-              {/* Tooltip */}
               {hoveredBtn === 'sections' && (
                 <div className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 rounded-[9px] bg-black px-2.5 py-1 text-[11px] text-white shadow-[0_0_0_1px_#ffffff1f,0_6px_20px_#00000040] pointer-events-none whitespace-nowrap">
                   Sections
@@ -135,10 +134,9 @@ export default function FloatingDock() {
                   />
                 </svg>
               </button>
-              {/* Tooltip */}
               {hoveredBtn === 'contact' && (
                 <div className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 rounded-[9px] bg-black px-2.5 py-1 text-[11px] text-white shadow-[0_0_0_1px_#ffffff1f,0_6px_20px_#00000040] pointer-events-none whitespace-nowrap">
-                  Socials & email
+                  Socials &amp; email
                 </div>
               )}
             </div>
@@ -184,12 +182,12 @@ export default function FloatingDock() {
               <a
                 key={idx}
                 href={soc.href}
-                target={soc.href.startsWith('mailto') ? '_self' : '_blank'}
+                target={soc.href.startsWith('mailto') || soc.href.startsWith('tel') ? '_self' : '_blank'}
                 rel="noreferrer"
                 className="w-full h-10 px-3.5 rounded-[16px] flex items-center justify-between text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/12 transition-colors"
               >
                 <span>{soc.label}</span>
-                <span className="text-zinc-500 text-[12px]">{soc.dest}</span>
+                <span className="text-zinc-500 text-[12px] truncate max-w-[140px] text-right">{soc.dest}</span>
               </a>
             ))}
 
