@@ -150,9 +150,9 @@ export default function VinylAlbumCard({
             isSmall ? "p-3 sm:p-3.5" : "p-4 sm:p-5",
           )}>
             {/* ── TOP BAR: PROJECT / ROLE NAME ONLY (NO TIMING / NO ARROW BUTTON / NO GITHUB LINK) ── */}
-            <div className="relative z-10 flex items-center justify-between gap-2">
+            <div className="relative z-10 flex items-start justify-between gap-2">
               <span className={cn(
-                "font-bold text-white tracking-tight leading-tight drop-shadow-sm truncate",
+                "font-bold text-white tracking-tight leading-snug drop-shadow-sm whitespace-pre-line line-clamp-2",
                 isSmall ? "text-xs sm:text-[13px]" : "text-[14px] sm:text-[15px]",
               )}>
                 {title}

@@ -124,7 +124,7 @@ export const portfolioData = {
     },
     {
       id: "ats-resume-checker",
-      title: "Resume Creator & ATS Checker",
+      title: "Resume Creator &\nATS Score Checker",
       tagline: "Python Resume Parsing & Scoring",
       description: "Developed a Python-based Resume Checker to analyze resumes, evaluate overall quality, perform ATS compatibility checks, and provide skill matching suggestions.",
       bg: "/images/covers/cover-blue.jpg",
