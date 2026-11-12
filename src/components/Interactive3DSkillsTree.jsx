@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { 
   Sparkles, 
   Cpu, 
@@ -8,9 +8,7 @@ import {
   BarChart3, 
   Globe2, 
   Wrench, 
-  Rotate3d, 
-  ChevronRight, 
-  ChevronLeft
+  Rotate3d
 } from 'lucide-react';
 
 // Category icon map
@@ -278,139 +276,25 @@ function SmallRotatableCuboid3D({ category, items, index }) {
  * Interactive 3D Skills Tree
  * 
  * - One Single Straight Horizontal Line at the top
- * - Branches drop vertically straight down into multiple small 3D cuboids
- * - The small 3D cuboids drop down when the Technical Skills phase is active
- * - The small cuboids are fully rotatable in 3D by dragging
+ * - Branches drop vertically straight down into all 7 small 3D rotatable cuboids
+ * - The small 3D cuboids drop down when the Technical Skills section is in view
+ * - Each cuboid is fully rotatable in 3D by dragging
  * - At the bottom, lines drop and merge back into a single straight line
- * - When transitioning from one skill phase to the next, it merges back into a single line
+ * - Shows all skills directly without separate phases
  */
 export default function Interactive3DSkillsTree({ skills }) {
   const containerRef = useRef(null);
   const isInView = useInView(containerRef, { once: false, amount: 0.15 });
 
-  // 3 Skill Phases
-  const PHASES = [
-    {
-      id: 'phase-1',
-      number: '01',
-      name: 'Intelligent Core',
-      categories: ['Programming', 'AI & GenAI'],
-    },
-    {
-      id: 'phase-2',
-      number: '02',
-      name: 'Data & Systems',
-      categories: ['Data Analysis', 'Data & Visualization', 'Database'],
-    },
-    {
-      id: 'phase-3',
-      number: '03',
-      name: 'Web & Tools',
-      categories: ['Web Development', 'Tools'],
-    },
-    {
-      id: 'phase-all',
-      number: 'ALL',
-      name: 'All Skills',
-      categories: skills.map((s) => s.category),
-    },
-  ];
-
-  const [activePhaseIndex, setActivePhaseIndex] = useState(0);
-  const [isMerging, setIsMerging] = useState(false);
-
-  // Transition between skill phases: merges back into single line first, then branches out!
-  const handlePhaseChange = (nextIndex) => {
-    if (nextIndex === activePhaseIndex || isMerging) return;
-    setIsMerging(true);
-    // 1. Cuboids pull up, lines merge back into single straight line
-    setTimeout(() => {
-      setActivePhaseIndex(nextIndex);
-      // 2. Pause on single straight line, then drop down the new small cuboids
-      setTimeout(() => {
-        setIsMerging(false);
-      }, 140);
-    }, 280);
-  };
-
-  const currentPhase = PHASES[activePhaseIndex];
-  const activeSkills = skills.filter((s) =>
-    currentPhase.categories.includes(s.category),
-  );
-
   return (
     <div ref={containerRef} className="w-full flex flex-col items-center">
-      {/* ── PHASE SWITCHER HEADER ───────────────────────────── */}
-      <div className="w-full flex flex-wrap items-center justify-between gap-3 mb-6 pb-3 border-b border-zinc-200/80">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs font-bold uppercase tracking-wider text-zinc-600">
-            Phase
-          </span>
-          <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-md bg-zinc-900 text-white">
-            {currentPhase.number} / 03
-          </span>
-          <span className="text-xs font-semibold text-zinc-800 hidden sm:inline">
-            {currentPhase.name}
-          </span>
-        </div>
-
-        {/* Phase Buttons */}
-        <div className="flex items-center gap-1.5 p-1 bg-zinc-100 rounded-xl border border-zinc-200/70">
-          {PHASES.map((p, idx) => (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => handlePhaseChange(idx)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-lg transition-all ${
-                activePhaseIndex === idx
-                  ? 'bg-zinc-900 text-white shadow-xs font-semibold'
-                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-white/80'
-              }`}
-            >
-              <span className="font-mono text-[10px] mr-1 opacity-70">
-                {p.number}.
-              </span>
-              {p.name}
-            </button>
-          ))}
-        </div>
-
-        {/* Prev / Next arrows */}
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() =>
-              handlePhaseChange(
-                activePhaseIndex === 0 ? PHASES.length - 1 : activePhaseIndex - 1,
-              )
-            }
-            className="p-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-700"
-            title="Previous Phase"
-          >
-            <ChevronLeft className="size-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              handlePhaseChange(
-                activePhaseIndex === PHASES.length - 1 ? 0 : activePhaseIndex + 1,
-              )
-            }
-            className="p-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-700"
-            title="Next Phase"
-          >
-            <ChevronRight className="size-3.5" />
-          </button>
-        </div>
-      </div>
-
       {/* ── THE SINGLE STRAIGHT LINE & DROPPING SMALL 3D CUBOIDS ── */}
       <div className="w-full relative flex flex-col items-center">
         {/* 1. SINGLE STRAIGHT VERTICAL FEEDER LINE */}
         <div className="relative flex flex-col items-center">
           <motion.div
             initial={{ height: 0 }}
-            animate={{ height: isInView ? 32 : 12 }}
+            animate={{ height: isInView ? 36 : 14 }}
             transition={{ duration: 0.4 }}
             className="w-[1.5px] bg-zinc-800"
           />
@@ -419,63 +303,51 @@ export default function Interactive3DSkillsTree({ skills }) {
         </div>
 
         {/* 2. ONE SINGLE STRAIGHT HORIZONTAL LINE */}
-        {/* When merging, the line contracts into a single point/center line */}
         <div className="w-full flex items-center justify-center relative py-1">
           <motion.div
             initial={{ width: 0 }}
             animate={{
-              width: isMerging ? '20%' : isInView ? '86%' : '30%',
+              width: isInView ? '94%' : '30%',
             }}
-            transition={{ duration: 0.35, ease: 'easeInOut' }}
+            transition={{ duration: 0.45, ease: 'easeInOut' }}
             className="h-[2px] bg-zinc-800 rounded-full relative"
           >
             {/* Animated traveling signal along the single straight line */}
             <motion.div
               animate={{ left: ['0%', '100%'] }}
-              transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
+              transition={{ repeat: Infinity, duration: 2.4, ease: 'easeInOut' }}
               className="absolute top-1/2 -translate-y-1/2 size-2 rounded-full bg-zinc-900 shadow-[0_0_6px_rgba(0,0,0,0.5)]"
             />
           </motion.div>
         </div>
 
-        {/* 3. SMALL 3D CUBOIDS DROPPING DOWN FROM THE SINGLE STRAIGHT LINE */}
-        <div className="w-full flex items-center justify-center min-h-[235px]">
-          <AnimatePresence mode="wait">
-            {!isMerging && isInView && (
-              <motion.div
-                key={currentPhase.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, transition: { duration: 0.15 } }}
-                className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 max-w-4xl"
-              >
-                {activeSkills.map((skillGroup, idx) => (
-                  <SmallRotatableCuboid3D
-                    key={skillGroup.category}
-                    category={skillGroup.category}
-                    items={skillGroup.items}
-                    index={idx}
-                  />
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+        {/* 3. ALL 7 SMALL 3D CUBOIDS DROPPING DOWN FROM THE SINGLE STRAIGHT LINE */}
+        <div className="w-full flex items-center justify-center py-4">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 max-w-5xl">
+            {skills.map((skillGroup, idx) => (
+              <SmallRotatableCuboid3D
+                key={skillGroup.category}
+                category={skillGroup.category}
+                items={skillGroup.items}
+                index={idx}
+              />
+            ))}
+          </div>
         </div>
 
         {/* 4. ONE SINGLE STRAIGHT HORIZONTAL MERGE LINE */}
-        {/* Merging back into a single straight line */}
         <div className="w-full flex items-center justify-center relative py-1">
           <motion.div
             initial={{ width: 0 }}
             animate={{
-              width: isMerging ? '20%' : isInView ? '86%' : '30%',
+              width: isInView ? '94%' : '30%',
             }}
-            transition={{ duration: 0.35, ease: 'easeInOut' }}
+            transition={{ duration: 0.45, ease: 'easeInOut' }}
             className="h-[2px] bg-zinc-800 rounded-full relative"
           >
             <motion.div
               animate={{ right: ['0%', '100%'] }}
-              transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut', delay: 1.1 }}
+              transition={{ repeat: Infinity, duration: 2.4, ease: 'easeInOut', delay: 1.2 }}
               className="absolute top-1/2 -translate-y-1/2 size-2 rounded-full bg-zinc-900 shadow-[0_0_6px_rgba(0,0,0,0.5)]"
             />
           </motion.div>
@@ -486,7 +358,7 @@ export default function Interactive3DSkillsTree({ skills }) {
           <div className="size-2.5 rounded-full bg-zinc-900 ring-2 ring-zinc-300 shadow-sm" />
           <motion.div
             initial={{ height: 0 }}
-            animate={{ height: isInView ? 36 : 12 }}
+            animate={{ height: isInView ? 36 : 14 }}
             transition={{ duration: 0.4 }}
             className="w-[1.5px] bg-zinc-800"
           />
