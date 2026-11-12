@@ -273,7 +273,7 @@ const HALF_PI = Math.PI / 2;
 const THIRD_PI = Math.PI / 3;
 const ringPhaseOffset = (len) => ((len - 1) / len) * Math.PI * 2 + THIRD_PI + Math.PI / 24;
 
-export function calcRingPosition(idx, total, width, height, timeMs, prefersReduced, parentHeight = height, scrollRot = 0) {
+export function calcRingPosition(idx, total, width, height, timeMs, prefersReduced, parentHeight = height, scrollRot = 0, pitch = 0) {
   const ringRadius = Math.min(320, 0.37 * width, 0.38 * height);
   const baseSphereRadius = Math.max(28, Math.min(64, 0.27 * ringRadius));
   const progress = prefersReduced ? 1 : clamp(timeMs / 2100);
@@ -281,10 +281,21 @@ export function calcRingPosition(idx, total, width, height, timeMs, prefersReduc
   const smoothAngle = clamp(angleSpread / THIRD_PI);
   const ease = smoothAngle * smoothAngle * (3 - 2 * smoothAngle);
   const angle = HALF_PI + angleSpread + (prefersReduced ? 0 : scrollRot);
+
+  const cosAngle = Math.cos(angle);
+  const sinAngle = Math.sin(angle);
+
+  // 3D perspective pitch tilt when cursor moves up and down
+  const pitchCos = Math.cos(pitch);
+  const pitchSin = Math.sin(pitch);
+  const ringY = sinAngle * ringRadius * pitchCos;
+  const ringZ = sinAngle * ringRadius * pitchSin;
+  const pitchDepthScale = 1 + (ringZ / ringRadius) * 0.25;
+
   return {
-    x: width / 2 + Math.cos(angle) * ringRadius,
-    y: height / 2 + Math.sin(angle) * ringRadius + (parentHeight - height / 2 + 2 * baseSphereRadius - ringRadius) * (1 - ease),
-    radius: baseSphereRadius * (0.72 + 0.28 * ease),
+    x: width / 2 + cosAngle * ringRadius,
+    y: height / 2 + ringY + (parentHeight - height / 2 + 2 * baseSphereRadius - ringRadius) * (1 - ease),
+    radius: baseSphereRadius * (0.72 + 0.28 * ease) * pitchDepthScale,
     opacity: clamp(4 * angleSpread)
   };
 }
@@ -308,7 +319,7 @@ export default function GlassSpheres({
 }) {
   const canvasRef = useRef(null);
   const activeRef = useRef(active);
-  const scrollRotRef = useRef(0);
+  const scrollRotRef = useRef({ yaw: 0, pitch: 0 });
   const requestFrameFn = useRef(() => {});
   const fallbackAnimateFn = useRef(() => {});
   const onContainedRef = useRef(onContained);
@@ -330,12 +341,19 @@ export default function GlassSpheres({
   useEffect(() => {
     if (scrollRotation === undefined || scrollRotation === null) return;
     const updateRot = (val) => {
-      scrollRotRef.current = val;
+      if (typeof val === 'number') {
+        scrollRotRef.current = { yaw: val, pitch: 0 };
+      } else if (typeof val === 'object' && val !== null) {
+        scrollRotRef.current = {
+          yaw: val.yaw ?? val.x ?? 0,
+          pitch: val.pitch ?? val.y ?? 0,
+        };
+      }
       requestFrameFn.current();
       fallbackAnimateFn.current();
     };
 
-    if (typeof scrollRotation === 'number') {
+    if (typeof scrollRotation === 'number' || (typeof scrollRotation === 'object' && scrollRotation !== null && !scrollRotation.get)) {
       updateRot(scrollRotation);
     } else if (scrollRotation && typeof scrollRotation.get === 'function') {
       updateRot(scrollRotation.get());
@@ -388,7 +406,8 @@ export default function GlassSpheres({
     let clientH = 0;
     let fieldH = 0;
     let parentH = 0;
-    let currentRot = 0;
+    let currentYaw = 0;
+    let currentPitch = 0;
     let elapsedMs = 0;
     let containedFired = false;
     let lastTime = 0;
@@ -400,6 +419,7 @@ export default function GlassSpheres({
     const rotatedCoords = baseCoords.map(({ x, y, z }) => ({ x, y, z }));
     const sortedIndices = images.map((_, i) => i);
     let lastAngle = NaN;
+    let lastPitch = NaN;
 
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const textures = [];
@@ -686,12 +706,10 @@ export default function GlassSpheres({
       lastTime = timestamp;
 
       const rotLerpFactor = 1 - Math.exp(-10 * dt);
-      const targetRot = motionQuery.matches ? 0 : scrollRotRef.current;
-      const lerpedRot = lerp(currentRot, targetRot, rotLerpFactor);
-      currentRot =
-        motionQuery.matches || variant === 'ring' || Math.abs(lerpedRot - targetRot) < 0.001
-          ? targetRot
-          : lerpedRot;
+      const targetYaw = motionQuery.matches ? 0 : (scrollRotRef.current?.yaw ?? 0);
+      const targetPitch = motionQuery.matches ? 0 : (scrollRotRef.current?.pitch ?? 0);
+      currentYaw = lerp(currentYaw, targetYaw, rotLerpFactor);
+      currentPitch = lerp(currentPitch, targetPitch, rotLerpFactor);
 
       elapsedMs += dt * 1000;
       if (!motionQuery.matches) {
@@ -700,29 +718,36 @@ export default function GlassSpheres({
 
       // Continuous orbital revolution velocity (like Earth revolving around the Sun)
       const orbitVelocity = variant === 'ring' ? (Math.PI / 16) : (Math.PI / 32);
-      const totalAngle = currentRot + (motionQuery.matches ? 0 : elapsedSec * orbitVelocity);
+      const totalYaw = currentYaw + (motionQuery.matches ? 0 : elapsedSec * orbitVelocity);
+      const totalPitch = currentPitch + (variant === 'field' ? Math.sin(0.35 * elapsedSec) * 0.12 : 0);
       const activeHeight = variant === 'field' ? fieldH : clientH;
       const baseRadius = Math.max(24, Math.min(54, 0.06 * Math.min(clientW, activeHeight)));
 
-      // 3D Orbital revolution calculation with celestial tilt
-      if (totalAngle !== lastAngle) {
-        const sinA = Math.sin(totalAngle);
-        const cosA = Math.cos(totalAngle);
-        const tilt = variant === 'field' ? Math.sin(0.35 * elapsedSec) * 0.12 : 0;
-        const cosTilt = Math.cos(tilt);
-        const sinTilt = Math.sin(tilt);
+      // 3D Orbital rotation calculation with both Horizontal (Yaw) and Vertical (Pitch) movement like a true sphere!
+      if (totalYaw !== lastAngle || totalPitch !== lastPitch) {
+        const cosY = Math.cos(totalYaw);
+        const sinY = Math.sin(totalYaw);
+        const cosP = Math.cos(totalPitch);
+        const sinP = Math.sin(totalPitch);
 
         baseCoords.forEach((coord, idx) => {
           const rotCoord = rotatedCoords[idx];
-          const x1 = coord.x * cosA + coord.z * sinA;
-          const z1 = -coord.x * sinA + coord.z * cosA;
+          // 1. Horizontal rotation (Yaw) from Left/Right cursor
+          const x1 = coord.x * cosY + coord.z * sinY;
+          const z1 = -coord.x * sinY + coord.z * cosY;
+
+          // 2. Vertical rotation (Pitch) from Up/Down cursor
+          const y2 = coord.y * cosP - z1 * sinP;
+          const z2 = coord.y * sinP + z1 * cosP;
+
           rotCoord.x = x1;
-          rotCoord.y = coord.y * cosTilt - z1 * sinTilt;
-          rotCoord.z = coord.y * sinTilt + z1 * cosTilt;
+          rotCoord.y = y2;
+          rotCoord.z = z2;
         });
         // Depth-sort Painter's algorithm
         sortedIndices.sort((a, b) => rotatedCoords[a].z - rotatedCoords[b].z);
-        lastAngle = totalAngle;
+        lastAngle = totalYaw;
+        lastPitch = totalPitch;
       }
 
       let scissorTop = 0;
@@ -761,7 +786,7 @@ export default function GlassSpheres({
 
         const ringPos =
           variant === 'ring'
-            ? calcRingPosition(idx, images.length, clientW, parentH, elapsedMs, motionQuery.matches, clientH, totalAngle)
+            ? calcRingPosition(idx, images.length, clientW, parentH, elapsedMs, motionQuery.matches, clientH, totalYaw, currentPitch)
             : null;
 
         if (ringPos && !isFullyVisible(ringPos, clientW, parentH)) {

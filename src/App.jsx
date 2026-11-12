@@ -14,25 +14,66 @@ export default function App() {
   const { personal, skills, projects, experiences, education, certifications } = portfolioData;
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
+    const updateVisibility = () => {
       const windowHeight = window.innerHeight;
-      // Not in first phase (where "NIRAAI MADHI" and rotatory spheres are)
-      const heroThreshold = windowHeight * 0.45;
-      const totalScrollHeight = document.documentElement.scrollHeight;
-      // Not in last phase (where bottom sphere rotation is)
-      const footerThreshold = totalScrollHeight - windowHeight - 480;
+      const heroEl = document.getElementById('top');
+      const footerEl = document.querySelector('[data-footer-reveal]');
 
-      const isMiddlePhase = scrollY > heroThreshold && scrollY < footerThreshold;
-      setBurstVisible(isMiddlePhase);
+      // 1. Not in first phase (where "NIRAAI MADHI" and rotatory images are)
+      let inHeroPhase = false;
+      if (heroEl) {
+        const heroRect = heroEl.getBoundingClientRect();
+        // As long as any part of the hero header is on screen or within 20px
+        if (heroRect.bottom > 20) {
+          inHeroPhase = true;
+        }
+      } else {
+        inHeroPhase = window.scrollY < windowHeight * 0.7;
+      }
+
+      // 2. Not in last phase (where bottom sphere rotation is) - must hide instantly even on fast scroll
+      let inFooterPhase = false;
+      if (footerEl) {
+        const footerRect = footerEl.getBoundingClientRect();
+        // Hide well before the sphere rotation footer reveals (150px buffer)
+        if (footerRect.top <= windowHeight + 150) {
+          inFooterPhase = true;
+        }
+      } else {
+        const totalScrollHeight = document.documentElement.scrollHeight;
+        if (window.scrollY > totalScrollHeight - windowHeight - 450) {
+          inFooterPhase = true;
+        }
+      }
+
+      setBurstVisible(!inHeroPhase && !inFooterPhase);
     };
 
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll);
+    updateVisibility();
+    window.addEventListener('scroll', updateVisibility, { passive: true });
+    window.addEventListener('resize', updateVisibility);
+
+    // Fast-scroll guarantee: IntersectionObserver cuts off burst instantly before footer sphere rotation
+    let footerObserver;
+    const footerEl = document.querySelector('[data-footer-reveal]');
+    if (footerEl && 'IntersectionObserver' in window) {
+      footerObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              setBurstVisible(false);
+            }
+          }
+        },
+        { rootMargin: '200px 0px 0px 0px' }
+      );
+      footerObserver.observe(footerEl);
+    }
+
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
+      window.removeEventListener('scroll', updateVisibility);
+      window.removeEventListener('resize', updateVisibility);
+      if (footerObserver) footerObserver.disconnect();
     };
   }, []);
 
@@ -49,14 +90,14 @@ export default function App() {
       {/* ── FIXED RIGHT-SIDE BACKGROUND BURST (ACTIVE IN MIDDLE PHASES ONLY) ── */}
       <div
         aria-hidden="true"
-        className={`pointer-events-none fixed top-1/2 -translate-y-1/2 right-2 sm:right-6 lg:right-10 w-[240px] h-[240px] sm:w-[300px] sm:h-[300px] lg:w-[380px] lg:h-[380px] z-10 select-none overflow-visible transition-all duration-700 ease-out ${
-          burstVisible ? 'opacity-80 scale-100' : 'opacity-0 scale-90 pointer-events-none'
+        className={`pointer-events-none fixed top-1/2 -translate-y-1/2 right-2 sm:right-6 lg:right-10 w-[160px] h-[160px] sm:w-[220px] sm:h-[220px] lg:w-[280px] lg:h-[280px] z-10 select-none overflow-visible transition-opacity duration-150 ease-out ${
+          burstVisible ? 'opacity-70 visible' : 'opacity-0 invisible pointer-events-none'
         }`}
       >
         <LogoBurst
-          color="#27272a"
-          tentacleCount={220}
-          radius={0.44}
+          color="#3f3f46"
+          tentacleCount={160}
+          radius={0.38}
           duration={1.35}
           breathe={true}
           theme="light"

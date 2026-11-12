@@ -580,7 +580,7 @@ export function LogoBurst({
   theme = "auto",
   breathe = true,
   replayKey = 0,
-  replayOnClick = true,
+  replayOnClick = false,
   label = "Logo burst",
 }: LogoBurstProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)

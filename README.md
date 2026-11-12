@@ -29,7 +29,7 @@ A high-performance, responsive portfolio website built with **React 19**, **Tail
    - Real-time search filter bar & category tab switcher
    - Skill icons with proficiency percentage bars and level badges (`Expert`, `Advanced`, `Proficient`)
 
-4. **Projects & Case Studies**
+<video controls src="20261112-0953-44.3514956.mp4" title="Title"></video>4. **Projects & Case Studies**
    - Responsive project cards with high-definition screenshots & hover previews
    - Technology stack badges for every project
    - Direct links to **GitHub Repository** and **Live Demo**
