@@ -183,14 +183,6 @@ export default function App() {
               <section id="about" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-                  <div className="flex items-center gap-2.5">
-                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-500 font-semibold px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200/80">
-                      01
-                    </span>
-                    <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
-                      Overview
-                    </span>
-                  </div>
                   <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
                     About Me
                   </h2>
@@ -262,14 +254,6 @@ export default function App() {
               <section id="projects" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-                  <div className="flex items-center gap-2.5">
-                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-500 font-semibold px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200/80">
-                      02
-                    </span>
-                    <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
-                      Portfolio
-                    </span>
-                  </div>
                   <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
                     Selected Work
                   </h2>
@@ -300,14 +284,6 @@ export default function App() {
               <section id="experience" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-                  <div className="flex items-center gap-2.5">
-                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-500 font-semibold px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200/80">
-                      03
-                    </span>
-                    <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
-                      Timeline
-                    </span>
-                  </div>
                   <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
                     Experience
                   </h2>
@@ -338,14 +314,6 @@ export default function App() {
               <section id="education" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-                  <div className="flex items-center gap-2.5">
-                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-500 font-semibold px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200/80">
-                      04
-                    </span>
-                    <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
-                      Academics
-                    </span>
-                  </div>
                   <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
                     Education &amp; Credentials
                   </h2>
@@ -404,14 +372,6 @@ export default function App() {
               <section id="skills" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-                  <div className="flex items-center gap-2.5">
-                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-500 font-semibold px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200/80">
-                      05
-                    </span>
-                    <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
-                      Expertise
-                    </span>
-                  </div>
                   <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
                     Technical Stack
                   </h2>
@@ -430,14 +390,6 @@ export default function App() {
               <section id="contact" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-                  <div className="flex items-center gap-2.5">
-                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-500 font-semibold px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200/80">
-                      06
-                    </span>
-                    <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
-                      Connect
-                    </span>
-                  </div>
                   <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
                     Get in Touch
                   </h2>
