@@ -22,6 +22,22 @@ export default function App() {
         Skip to content
       </a>
 
+      {/* ── FIXED RIGHT-SIDE BACKGROUND BURST (PERSISTS & SPARKLES ACROSS ENTIRE PAGE SCROLL) ── */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed top-1/2 -translate-y-1/2 -right-8 sm:right-2 lg:right-8 w-[320px] h-[320px] sm:w-[440px] sm:h-[440px] lg:w-[540px] lg:h-[540px] z-10 select-none overflow-visible"
+      >
+        <LogoBurst
+          color="#27272a"
+          tentacleCount={280}
+          radius={0.48}
+          duration={1.35}
+          breathe={true}
+          theme="light"
+          replayOnClick={false}
+        />
+      </div>
+
       <main className="relative isolate min-h-svh bg-scene [--footer-height:50svh]" data-personal-site="true">
         {/* Main Content White Container */}
         <div
@@ -33,22 +49,6 @@ export default function App() {
             id="top"
             className="sphere-ring relative z-1 grid h-[var(--hero-height)] place-items-center overflow-visible isolate [--hero-height:75svh] compact:[--hero-height:62svh]"
           >
-            {/* ── BACKGROUND LOGO BURST (RIGHT SIDE) ────────────── */}
-            <div
-              className="pointer-events-auto absolute right-2 sm:right-6 lg:right-12 top-1/2 -translate-y-1/2 w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] lg:w-[460px] lg:h-[460px] z-1 select-none cursor-pointer"
-              title="Click to replay Logo Burst"
-            >
-              <LogoBurst
-                color="#27272a"
-                tentacleCount={260}
-                radius={0.48}
-                duration={1.4}
-                breathe={true}
-                theme="light"
-                replayOnClick={true}
-              />
-            </div>
-
             {/* The 8 Interactive Refractive Glass Spheres */}
             <SphereRing />
 
