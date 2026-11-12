@@ -57,7 +57,7 @@ export const portfolioData = {
       title: "AI LinkedIn Job Finder",
       tagline: "Autonomous Agent & LLM Pipelines",
       description: "Automated candidate assessment and job-matching system using prompt engineering, LLM reasoning, and personalized cover-letter generation.",
-      bg: "/images/landscapes/stream-in-the-mountains.jpg",
+      bg: "/images/covers/cover-original.jpg",
       screenshot: "/images/project-screenshots/desktop-agent.png",
       tags: ["Python", "LLMs", "Prompt Engineering"],
       link: "https://github.com/niraai-madhi"
@@ -67,7 +67,7 @@ export const portfolioData = {
       title: "Enterprise Data Warehouse Solution",
       tagline: "Multi-Source Analytics & ETL",
       description: "Designed a consolidated data warehouse architecture featuring star-schema data modeling, automated SQL transformations, and analytical reporting.",
-      bg: "/images/landscapes/the-coming-storm.jpg",
+      bg: "/images/covers/cover-teal.jpg",
       screenshot: "/images/project-screenshots/cli-agent.png",
       tags: ["SQL", "Data Warehousing", "ETL"],
       link: "https://github.com/niraai-madhi"
@@ -77,7 +77,7 @@ export const portfolioData = {
       title: "NYC Airbnb Revenue Analysis",
       tagline: "10,000+ Records EDA & Modeling",
       description: "Conducted exploratory data analysis across 10,000+ listing records to evaluate location-based pricing dynamics and revenue drivers.",
-      bg: "/images/nature-photos/soft-dunes.webp",
+      bg: "/images/covers/cover-amber.jpg",
       screenshot: "/images/project-screenshots/editor-plan.png",
       tags: ["Python", "Pandas", "NumPy"],
       link: "https://github.com/niraai-madhi"
@@ -90,21 +90,21 @@ export const portfolioData = {
       role: "Machine Learning Intern",
       organization: "Sparwix",
       summary: "Data preprocessing, exploratory data analysis (EDA), and interactive Power BI dashboards for business insights.",
-      bg: "/images/landscapes/home-by-the-lake.jpg"
+      bg: "/images/covers/cover-rose.jpg"
     },
     {
       period: "2024",
       role: "AI Agent Developer",
       organization: "Independent",
       summary: "Constructed autonomous LLM agents, prompt engineering pipelines, and automated resume analysis tools.",
-      bg: "/images/nature-photos/sunlit-leaves.webp"
+      bg: "/images/covers/cover-lavender.jpg"
     },
     {
       period: "2023 – 2024",
       role: "Data Warehouse Developer",
       organization: "Academic Projects",
       summary: "Implemented star-schema data models, analytical SQL queries, and multi-source reporting pipelines.",
-      bg: "/images/sphere-textures/alpine-basin.webp"
+      bg: "/images/covers/cover-emerald.jpg"
     }
   ],
 

@@ -85,16 +85,20 @@ export default function VinylAlbumCard({
           <div className="absolute inset-18 rounded-full border border-[#D8D2C8]/70" />
           <div className="absolute inset-22 rounded-full border border-[#B3AAA0]/60" />
 
-          {/* Center Album Label - Metallic Champagne Silver disc core (no image) */}
+          {/* Center Album Label - Golden ring watercolor artwork matching sleeve */}
           <div
             className={cn(
-              "relative flex items-center justify-center overflow-hidden rounded-full shadow-md border border-[#B8B0A2] bg-gradient-to-tr from-[#C9C2B6] via-[#D8D2C8] to-[#BCB4A7]",
+              "relative flex items-center justify-center overflow-hidden rounded-full shadow-md border border-[#B8B0A2] bg-[#FAF8F5]",
               isCompact ? "h-20 w-20" : "h-24 w-24",
             )}
           >
+            <img
+              src={coverImage}
+              alt="label"
+              className="absolute inset-0 h-full w-full scale-[1.08] object-cover"
+            />
             {/* Center Spindle Hole with Champagne Silver Rim */}
             <div className="z-10 h-3.5 w-3.5 rounded-full bg-[#A89F92] shadow-inner ring-1 ring-[#8A8174]" />
-            <div className="absolute inset-1.5 rounded-full border border-[#B8B0A2]/60" />
             <div className="absolute inset-0 rounded-full ring-2 inset-ring ring-[#D8D2C8]/70" />
           </div>
 
@@ -103,10 +107,10 @@ export default function VinylAlbumCard({
           <div className="pointer-events-none absolute inset-0 -rotate-45 bg-gradient-to-br from-transparent via-white/45 to-transparent mix-blend-overlay" />
         </motion.div>
 
-        {/* ── ALBUM COVER SLEEVE (IMAGE REMOVED - CLEAN EDITORIAL FINISH) ── */}
+        {/* ── ALBUM COVER SLEEVE (GOLDEN RING & WATERCOLOR FINE ART DESIGN) ── */}
         <motion.div
           className={cn(
-            "absolute z-20 overflow-hidden rounded-2xl shadow-xl border border-zinc-800/80 cursor-default bg-gradient-to-b from-zinc-900 via-zinc-900 to-black p-4 sm:p-5 flex flex-col justify-between text-white select-none",
+            "absolute z-20 overflow-hidden rounded-2xl shadow-xl border border-black/10 cursor-default bg-[#FAF8F5]",
             isCompact ? "h-60 w-60 sm:h-64 sm:w-64" : "h-72 w-72",
           )}
           initial={{ rotate: 0, scale: 1, x: 0 }}
@@ -117,42 +121,49 @@ export default function VinylAlbumCard({
           }}
           transition={{ type: "spring", stiffness: 150, damping: 20 }}
         >
-          {/* Subtle Ambient Radial Sheen */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-white/5 via-transparent to-white/5" />
+          {/* Golden Ring & Watercolor Artwork */}
+          <img
+            src={coverImage}
+            alt={title}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
 
-          {/* ── TOP BAR: PROJECT / ROLE NAME ONLY (NO TIMING / NO ARROW BUTTON / NO GITHUB LINK) ── */}
-          <div className="relative z-10 flex items-center justify-between gap-2">
-            <span className="text-[14px] sm:text-[15px] font-bold text-white tracking-tight leading-tight drop-shadow-sm truncate">
-              {title}
-            </span>
-          </div>
+          {/* Dark Gradient Overlay for Maximum Text Contrast */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/55 to-black/25 backdrop-blur-[0.5px] p-4 sm:p-5 flex flex-col justify-between text-white select-none">
+            {/* ── TOP BAR: PROJECT / ROLE NAME ONLY (NO TIMING / NO ARROW BUTTON / NO GITHUB LINK) ── */}
+            <div className="relative z-10 flex items-center justify-between gap-2">
+              <span className="text-[14px] sm:text-[15px] font-bold text-white tracking-tight leading-tight drop-shadow-sm truncate">
+                {title}
+              </span>
+            </div>
 
-          {/* ── BOTTOM CONTENT: TAGLINE / ORGANIZATION, SUMMARY & TECH PILLS (NO TIMING) ── */}
-          <div className="relative z-10 space-y-1.5 pt-3">
-            {artist && (
-              <div className="text-xs font-mono text-zinc-300 font-medium line-clamp-1">
-                {artist}
-              </div>
-            )}
+            {/* ── BOTTOM CONTENT: TAGLINE / ORGANIZATION, SUMMARY & TECH PILLS (NO TIMING) ── */}
+            <div className="relative z-10 space-y-1.5 pt-3">
+              {artist && (
+                <div className="text-xs font-mono text-zinc-200 font-medium line-clamp-1 drop-shadow-xs">
+                  {artist}
+                </div>
+              )}
 
-            {description && (
-              <p className="text-[11px] text-zinc-400 leading-tight line-clamp-2">
-                {description}
-              </p>
-            )}
+              {description && (
+                <p className="text-[11px] text-zinc-300 leading-tight line-clamp-2 drop-shadow-xs">
+                  {description}
+                </p>
+              )}
 
-            {tags && tags.length > 0 && (
-              <div className="flex flex-wrap gap-1 pt-1">
-                {tags.slice(0, 3).map((tag, idx) => (
-                  <span
-                    key={idx}
-                    className="px-1.5 py-0.5 text-[9px] font-mono text-zinc-200 bg-white/10 rounded border border-white/10 backdrop-blur-sm"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
+              {tags && tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {tags.slice(0, 3).map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="px-1.5 py-0.5 text-[9px] font-mono text-white bg-white/20 rounded border border-white/20 backdrop-blur-md"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </motion.div>
       </div>
