@@ -250,12 +250,12 @@ export default function App() {
                 </div>
               </section>
 
-              {/* ── 02. SELECTED WORK / PROJECTS (VINYL ALBUM CARDS) ── */}
+              {/* ── 02. PROJECTS (VINYL ALBUM CARDS) ── */}
               <section id="projects" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
                   <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
-                    Selected Work
+                    Projects
                   </h2>
                   <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
                     Autonomous agents, enterprise data warehousing solutions, and exploratory analytics. Hover over any album to slide out its vinyl record.
