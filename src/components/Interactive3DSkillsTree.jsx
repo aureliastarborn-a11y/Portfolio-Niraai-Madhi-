@@ -35,6 +35,11 @@ const LINE_SPLITS = {
   'SQL Queries': ['SQL', 'Queries'],
 };
 
+// Category headers formatted onto double line when requested
+const CATEGORY_LINE_SPLITS = {
+  'Data & Visualization': ['Data &', 'Visualization'],
+};
+
 function formatSkillLines(name) {
   if (LINE_SPLITS[name]) {
     return LINE_SPLITS[name];
@@ -174,11 +179,18 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
             <div>
               <div className="flex items-center justify-between gap-1 pb-0.5 border-b border-zinc-200/60">
                 <div className="flex items-center gap-1 min-w-0">
-                  <div className="p-0.5 rounded bg-zinc-900 text-white shrink-0">
+                  <div className="p-0.5 rounded bg-zinc-900 text-white shrink-0 self-center">
                     <Icon className="size-2.5" />
                   </div>
-                  <h4 className="text-[10px] font-bold text-zinc-900 tracking-tight truncate">
-                    {category}
+                  <h4 className="text-[9.5px] font-bold text-zinc-900 tracking-tight leading-[1.15]">
+                    {CATEGORY_LINE_SPLITS[category] ? (
+                      <>
+                        <span className="block whitespace-nowrap">{CATEGORY_LINE_SPLITS[category][0]}</span>
+                        <span className="block whitespace-nowrap">{CATEGORY_LINE_SPLITS[category][1]}</span>
+                      </>
+                    ) : (
+                      <span className="truncate block">{category}</span>
+                    )}
                   </h4>
                 </div>
                 <span className="font-mono text-[8px] font-semibold px-1 py-0.2 rounded-full bg-zinc-200/80 text-zinc-700 shrink-0">
@@ -232,8 +244,17 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
           >
             <div>
               <div className="flex items-center gap-1 pb-0.5 border-b border-zinc-800">
-                <Icon className="size-2 text-zinc-300" />
-                <span className="text-[9.5px] font-bold text-zinc-100 truncate">{category}</span>
+                <Icon className="size-2 text-zinc-300 shrink-0 self-center" />
+                <span className="text-[9px] font-bold text-zinc-100 leading-[1.15]">
+                  {CATEGORY_LINE_SPLITS[category] ? (
+                    <>
+                      <span className="block whitespace-nowrap">{CATEGORY_LINE_SPLITS[category][0]}</span>
+                      <span className="block whitespace-nowrap">{CATEGORY_LINE_SPLITS[category][1]}</span>
+                    </>
+                  ) : (
+                    <span className="truncate block">{category}</span>
+                  )}
+                </span>
               </div>
               <p className="text-[7.5px] text-zinc-300 font-mono mt-0.5 leading-tight line-clamp-2">
                 Production-ready technical skills & tooling.
