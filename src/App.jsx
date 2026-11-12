@@ -5,7 +5,6 @@ import FolderCard from './components/FolderCard';
 import ImageModal from './components/ImageModal';
 import { LogoBurst } from '@/components/ui/logo-burst';
 import VinylAlbumCard from '@/components/ui/great-ui-vinyl-album-card';
-import ImagesScrollingAnimation from '@/components/ui/images-scrolling-animation';
 import { portfolioData } from './data/portfolioData';
 import {
   Sparkles,
@@ -280,9 +279,41 @@ export default function App() {
                   </p>
                 </div>
 
-                {/* Right Scrolling Card Box Animation (Video Component) */}
-                <div className="lg:col-span-8 flex flex-col items-start">
-                  <ImagesScrollingAnimation skills={skills} />
+                {/* Right Cube Cards Grid (Cubes instead of Rectangles) */}
+                <div className="lg:col-span-8">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-3.5">
+                    {skills.map((grp, idx) => (
+                      <div
+                        key={idx}
+                        className="aspect-square p-3.5 sm:p-4 rounded-2xl bg-white/85 backdrop-blur-sm border border-black/[0.08] hover:border-black/[0.18] hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col justify-between select-none"
+                      >
+                        {/* Top: Bullet dot, Category Title, Count */}
+                        <div className="flex items-start justify-between gap-1">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="size-1.5 rounded-full bg-zinc-900 shrink-0" />
+                            <h3 className="text-xs sm:text-[13px] font-bold text-zinc-900 truncate">
+                              {grp.category}
+                            </h3>
+                          </div>
+                          <span className="text-[11px] font-mono text-zinc-400 shrink-0 ml-1">
+                            {grp.items.length}
+                          </span>
+                        </div>
+
+                        {/* Bottom: Skill Pills inside the cube */}
+                        <div className="flex flex-wrap gap-1 pt-2">
+                          {grp.items.map((item, iIdx) => (
+                            <span
+                              key={iIdx}
+                              className="px-2 py-0.5 text-[10.5px] sm:text-[11px] font-medium text-zinc-700 bg-zinc-50 hover:bg-white rounded-md border border-black/[0.06] shadow-[0_1px_1px_rgba(0,0,0,0.02)] transition-colors"
+                            >
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </section>
 
