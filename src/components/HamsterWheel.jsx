@@ -40,13 +40,13 @@ export default function HamsterWheel({ className = '', size = '8px', style = {} 
             el.classList.add('is-running');
           }
 
-          // Dynamic speed mapping according to scrolling speed:
-          // Slow scroll (~50px/s) -> 1.35s duration (relaxed stroll)
-          // Normal scroll (~500px/s) -> 0.70s duration (steady jog)
-          // Fast scroll (~2000px/s+) -> 0.25s duration (turbo sprint)
-          const minDur = 0.22;
-          const maxDur = 1.4;
-          const duration = minDur + (maxDur - minDur) / (1 + Math.pow(currentVelocity / 450, 1.15));
+          // Calibrated calm & pleasant running speed:
+          // Slow scroll -> ~1.8s (gentle trot)
+          // Normal scroll -> ~1.3s - 1.4s (relaxed, cute jog)
+          // Fast scroll -> ~0.70s - 0.75s (spirited run, no frantic blur)
+          const minDur = 0.65;
+          const maxDur = 2.0;
+          const duration = minDur + (maxDur - minDur) / (1 + Math.pow(currentVelocity / 600, 1.1));
 
           el.style.setProperty('--dur', `${duration.toFixed(3)}s`);
         } else {
