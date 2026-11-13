@@ -51,7 +51,7 @@ export default function SphereFooter() {
   }, []);
 
   return (
-    <footer className="relative h-[65svh] w-full overflow-hidden bg-scene select-none" data-footer-reveal="true">
+    <footer className="relative h-[65svh] w-full overflow-hidden bg-transparent select-none" data-footer-reveal="true">
       <div className="absolute inset-0 size-full pointer-events-none overflow-visible" data-sphere-footer="true">
         <GlassSpheres
           images={ALL_SPHERE_IMAGES}

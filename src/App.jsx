@@ -6,7 +6,8 @@ import LoadingScreen from './components/LoadingScreen';
 import VinylAlbumCard from '@/components/ui/great-ui-vinyl-album-card';
 import Interactive3DSkillsTree from './components/Interactive3DSkillsTree';
 import PolaroidLineCarousel from '@/components/ui/polaroid-line-carousel';
-import TracingArtExperience from './components/TracingArtExperience';
+import TracingArtGlobe from './components/TracingArtGlobe';
+import MosaicShaderBackground from '@/components/ui/mosaic-shader-background';
 import { portfolioData } from './data/portfolioData';
 import {
   Sparkles,
@@ -23,22 +24,36 @@ export default function App() {
   const { personal, skills, projects, experiences, education, certifications } = portfolioData;
 
   return (
-    <div className="min-h-full flex flex-col font-sans bg-background text-foreground antialiased selection:bg-zinc-200">
+    <div className="min-h-full flex flex-col font-sans bg-transparent text-foreground antialiased selection:bg-zinc-200">
+      {/* ── WHOLE PORTFOLIO BACKGROUND: MOSAIC SHADER BACKGROUND ── */}
+      <div
+        className="fixed inset-0 -z-10 pointer-events-none select-none overflow-hidden"
+        aria-hidden="true"
+      >
+        <MosaicShaderBackground
+          scene="mosaic"
+          accent="ice"
+          className="size-full"
+          height="100%"
+          interactive={true}
+        />
+      </div>
+
       {/* ── PRELOADER / LOADING PAGE WITH HAMSTER WHEEL ── */}
       <LoadingScreen />
 
       {/* Accessibility Skip Link */}
       <a
         href="#about"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-background focus:p-3"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-white focus:text-zinc-900 focus:p-3"
       >
         Skip to content
       </a>
 
-      <main className="relative isolate min-h-svh bg-scene [--footer-height:50svh]" data-personal-site="true">
-        {/* Main Content White Container */}
+      <main className="relative isolate min-h-svh bg-transparent [--footer-height:50svh]" data-personal-site="true">
+        {/* Main Content Frosted Glass Container */}
         <div
-          className="relative z-1 overflow-clip bg-background origin-bottom shadow-[0_1px_0_#00000006]"
+          className="relative z-1 overflow-clip bg-white/75 backdrop-blur-xl origin-bottom shadow-[0_1px_0_#00000006]"
           style={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}
         >
           {/* ── HERO / ORBITAL SPHERE RING (TOP-MOST PHASE - KEPT INTACT) ── */}
@@ -269,8 +284,8 @@ export default function App() {
                 </div>
               </section>
 
-              {/* ── GETTY PROVENANCE INDEX: TRACING ART SCROLLYTELLING EXPERIENCE ── */}
-              <TracingArtExperience />
+              {/* ── INTERACTIVE 3D ARTWORK GLOBE (CENTERED IN EMPTY SPACE) ── */}
+              <TracingArtGlobe />
 
               {/* ── 05. TECHNICAL STACK (INTERACTIVE 3D SKILLS TREE) ── */}
               <section id="skills" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
