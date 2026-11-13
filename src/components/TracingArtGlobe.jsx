@@ -1,130 +1,166 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
+import * as THREE from 'three';
 
-// Miniature Architectural City Globe (inspired by Alex Shuper's full circular building planet)
-// Features:
-// 1. Full complete 360° circular miniature city globe planet with hundreds of buildings
-// 2. Interactive 3D drag rotation (yaw & pitch) with inertia & smooth cursor following
-// 3. Scroll-driven scatter physics: while scrolling it scatters/opens up into 3D architectural building clusters,
-//    and as scrolling stops, it pulls back together and closes down into the normal solid sphere.
-// 4. Photorealistic ambient depth lighting, ground shadow, and architectural blueprint accents.
+// 3D Miniature Architectural City Globe (Alex Shuper style)
+// Authentic 3D building skyscraper planet where the actual 3D buildings scatter outward on scroll and reassemble into the sphere
 
-const GLOBE_IMAGE_SRC = '/images/miniature-city-globe.png';
+// Alex Shuper Architectural Palette (Terracotta, Brick, Sandstone, Limestone, Copper)
+const BUILDING_COLORS = [
+  0xb85d43, // Terracotta Red
+  0xc76c52, // Warm Coral Terracotta
+  0xa84e36, // Deep Rust Brick
+  0xd8c4af, // Cream Sandstone
+  0xe8d7c5, // Pale Limestone
+  0xc4ae9b, // Warm Beige
+  0xf0eae1, // Modern Off-white Skyscraper
+  0x7d493b, // Weathered Brownstone
+  0x634b42, // Dark Bronze Granite
+  0x8f5945, // Clay Ochre
+  0xe0cebd, // Ivory Facade
+  0x995341, // Burnt Sienna
+  0xd47a5b, // Sunset Terracotta
+  0xbaa390, // Antique Sandstone
+  0x524039, // Slate Foundation
+  0xad614d, // Roman Brick
+];
+
+function createFacadeTexture() {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  // Base building facade
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, 128, 256);
+
+  // Architectural window grid
+  const rows = 18;
+  const cols = 6;
+  const padX = 5;
+  const padY = 4;
+  const winW = (128 - padX * (cols + 1)) / cols;
+  const winH = (256 - padY * (rows + 1)) / rows;
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const x = padX + c * (winW + padX);
+      const y = padY + r * (winH + padY);
+
+      // Subtle variation in window illumination
+      const isLit = (r * 7 + c * 13) % 9 === 0;
+      ctx.fillStyle = isLit ? '#ffeaa7' : '#221a17';
+      ctx.fillRect(x, y, winW, winH);
+    }
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  return texture;
+}
 
 export default function TracingArtGlobe() {
   const containerRef = useRef(null);
-  const canvasRef = useRef(null);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const imageRef = useRef(null);
+  const mountRef = useRef(null);
 
-  // Dynamic state: drag, rotation, scroll scatter physics
   const stateRef = useRef({
     isDown: false,
     prevX: 0,
     prevY: 0,
-    dragVelX: 0,
-    dragVelY: 0,
-    ambientRotY: 0.15,
-    ambientRotX: -0.05,
+    rotY: 0.25,
+    rotX: -0.06,
+    velY: 0,
+    velX: 0,
     mouseTargetY: 0,
     mouseTargetX: 0,
-    mouseNormX: 0,
-    mouseNormY: 0,
-    currentRotY: 0.15,
-    currentRotX: -0.05,
-
-    // Scroll-driven scatter physics
-    scatterAmount: 0.0, // 0 = completely closed solid globe, 1 = fully scattered
+    curRotY: 0.25,
+    curRotX: -0.06,
+    scatterAmount: 0.0,
     scrollScatterVelocity: 0.0,
     lastScrollY: typeof window !== 'undefined' ? window.scrollY : 0,
   });
 
-  // Load the full miniature city globe image
-  useEffect(() => {
-    const img = new Image();
-    img.src = GLOBE_IMAGE_SRC;
-    img.onload = () => {
-      imageRef.current = img;
-      setImageLoaded(true);
-    };
-    if (img.complete) {
-      imageRef.current = img;
-      setImageLoaded(true);
-    }
-  }, []);
-
-  // Generate 220 architectural building clusters distributed across the sphere
-  const buildingClusters = useMemo(() => {
-    const COUNT = 220;
+  // Generate 860 dense architectural 3D building skyscrapers across the sphere
+  const buildingsData = useMemo(() => {
+    const COUNT = 860;
     const items = [];
-    const phi = Math.PI * (3 - Math.sqrt(5)); // Golden angle
+    const phi = Math.PI * (3 - Math.sqrt(5)); // Golden ratio angle
+    const baseRadius = 2.45;
 
     for (let i = 0; i < COUNT; i++) {
-      // Fibonacci sphere distribution
-      const y = 1 - (i / (COUNT - 1)) * 2; // -1 to 1
+      const y = 1 - (i / (COUNT - 1)) * 2;
       const radiusAtY = Math.sqrt(Math.max(0, 1 - y * y));
       const theta = phi * i;
 
       const nx = Math.cos(theta) * radiusAtY;
       const ny = y;
       const nz = Math.sin(theta) * radiusAtY;
+      const normal = new THREE.Vector3(nx, ny, nz).normalize();
 
-      // Sample texture coordinates corresponding to the building cluster on the globe
-      const sampleU = 0.5 + (nx * 0.44);
-      const sampleV = 0.5 + (ny * 0.44);
+      // Building dimensions: varied heights, widths, and depths
+      const isSpire = i % 17 === 0;
+      const isTower = i % 7 === 0;
+      let height = 0.28 + (i % 6) * 0.08 + Math.sin(i * 1.9) * 0.12;
+      if (isSpire) height = 1.05 + (i % 5) * 0.12; // Landmark skyscraper spires
+      else if (isTower) height = 0.65 + (i % 4) * 0.10; // High-rise towers
 
-      // Slice dimensions on the source 908x908 texture
-      const sliceSize = 76 + (i % 6) * 16;
-      const sx = Math.max(0, Math.min(908 - sliceSize, (sampleU * 908) - sliceSize * 0.5));
-      const sy = Math.max(0, Math.min(908 - sliceSize, (sampleV * 908) - sliceSize * 0.5));
+      const width = 0.10 + (i % 5) * 0.022;
+      const depth = 0.10 + ((i + 2) % 5) * 0.022;
 
-      // 3D scatter trajectory when scrolling: outward radial explosion + organic turbulence
-      const scatterDist = 260 + (i % 8) * 36;
-      const scatterAngle = (i * 0.78) + Math.sin(i * 1.8) * 1.5;
-      const scatterX = nx * scatterDist + Math.cos(scatterAngle) * 55;
-      const scatterY = ny * scatterDist + Math.sin(scatterAngle) * 55;
-      const scatterZ = nz * scatterDist + ((i % 7) - 3) * 45;
+      // Resting position on sphere surface
+      const restPos = normal.clone().multiplyScalar(baseRadius + height * 0.5);
 
-      // Random tumble spin angles during scatter
-      const tumbleSpeedX = ((i % 5) - 2) * 1.6;
-      const tumbleSpeedY = ((i % 7) - 3) * 1.6;
+      // Orientation quaternion: aligns (0, 1, 0) with normal
+      const quat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
+
+      // Alignment to street grid
+      const streetAngle = (i % 4) * (Math.PI / 2);
+      const streetQuat = new THREE.Quaternion().setFromAxisAngle(normal, streetAngle);
+      quat.premultiply(streetQuat);
+
+      // Scatter trajectory: outward along normal with organic dispersion & tumble
+      const scatterDistance = 1.6 + (i % 8) * 0.35 + Math.sin(i * 1.5) * 0.3;
+      const lateralAngle = i * 0.85;
+      const tangent = new THREE.Vector3(
+        -normal.z * Math.cos(lateralAngle),
+        Math.sin(lateralAngle) * 0.45,
+        normal.x * Math.cos(lateralAngle)
+      ).normalize().multiplyScalar(0.35);
+
+      const scatterDir = normal.clone().multiplyScalar(scatterDistance).add(tangent);
+
+      // Random tumble axis for 3D flight
+      const tumbleAxis = new THREE.Vector3(
+        (i % 5) - 2,
+        (i % 7) - 3,
+        (i % 3) - 1
+      ).normalize();
+      const tumbleSpeed = 1.1 + (i % 5) * 0.35;
+
+      const colorHex = BUILDING_COLORS[i % BUILDING_COLORS.length];
 
       items.push({
         id: i,
-        nx,
-        ny,
-        nz,
-        sx,
-        sy,
-        sliceSize,
-        scatterX,
-        scatterY,
-        scatterZ,
-        tumbleSpeedX,
-        tumbleSpeedY,
-        wobble: Math.random() * Math.PI * 2,
-        wobbleSpeed: 0.6 + Math.random() * 0.8,
+        normal,
+        restPos,
+        quat,
+        width,
+        height,
+        depth,
+        scatterDir,
+        tumbleAxis,
+        tumbleSpeed,
+        color: new THREE.Color(colorHex),
       });
     }
 
     return items;
   }, []);
 
-  // Background subtle architectural blueprint grid marks & floating nodes
-  const architecturalMarks = useMemo(() => {
-    const marks = [];
-    for (let i = 0; i < 24; i++) {
-      marks.push({
-        u: ((i * 137.5) % 100) / 100,
-        v: ((i * 73.1) % 100) / 100,
-        size: 14 + (i % 4) * 8,
-        type: i % 3, // 0 = crosshair, 1 = dimension box, 2 = coordinate dot
-        depth: 0.3 + (i % 5) * 0.18,
-      });
-    }
-    return marks;
-  }, []);
-
-  // Scroll listener: scatter while scrolling, smoothly close back down when scroll stops
+  // Scroll listener: scatter buildings while scrolling, smoothly close back down
   useEffect(() => {
     stateRef.current.lastScrollY = window.scrollY;
 
@@ -133,16 +169,14 @@ export default function TracingArtGlobe() {
       const deltaY = Math.abs(currentY - stateRef.current.lastScrollY);
       stateRef.current.lastScrollY = currentY;
 
-      // Check if container is near viewport
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         const vh = window.innerHeight;
-        // Only react to scroll if near viewport (-vh to 2*vh)
+        // React to scroll when near this section
         if (rect.bottom > -vh * 0.5 && rect.top < vh * 1.5) {
-          // Velocity-driven scatter: scrolling adds scatter burst
           stateRef.current.scrollScatterVelocity = Math.min(
             1.25,
-            stateRef.current.scrollScatterVelocity + Math.min(0.75, deltaY * 0.024)
+            stateRef.current.scrollScatterVelocity + Math.min(0.75, deltaY * 0.022)
           );
         }
       }
@@ -152,32 +186,119 @@ export default function TracingArtGlobe() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // 3D Canvas render loop & mouse/touch dragging
+  // Three.js 3D Scene Setup & Render Loop
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const mount = mountRef.current;
+    if (!mount) return;
 
-    let animId;
-    let time = 0;
+    const width = mount.clientWidth || 800;
+    const height = mount.clientHeight || 700;
 
-    const handleWindowMouseMove = (e) => {
+    // 1. Scene, Camera, WebGL Renderer
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
+    camera.position.set(0, 0, 10.2);
+
+    const renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: true,
+      powerPreference: 'high-performance',
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(width, height);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+    mount.appendChild(renderer.domElement);
+
+    // 2. Lighting (Rich directional sunlight + ambient fill)
+    const sunLight = new THREE.DirectionalLight(0xfff6ec, 2.9);
+    sunLight.position.set(6, 8, 6);
+    scene.add(sunLight);
+
+    const skyLight = new THREE.DirectionalLight(0xdde8ff, 1.2);
+    skyLight.position.set(-6, -2, -5);
+    scene.add(skyLight);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    scene.add(ambientLight);
+
+    // 3. Central Pivot Group for interactive rotation
+    const globeGroup = new THREE.Group();
+    scene.add(globeGroup);
+
+    // 4. Planet Core Sphere (warm city street / bedrock foundation)
+    const coreGeo = new THREE.SphereGeometry(2.44, 48, 48);
+    const coreMat = new THREE.MeshStandardMaterial({
+      color: 0x8a624a,
+      roughness: 0.85,
+      metalness: 0.1,
+    });
+    const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+    globeGroup.add(coreMesh);
+
+    // 5. Instanced 3D Building Skyscrapers (860 towers)
+    const facadeTex = createFacadeTexture();
+    const buildingGeo = new THREE.BoxGeometry(1, 1, 1);
+    const buildingMat = new THREE.MeshStandardMaterial({
+      map: facadeTex || undefined,
+      roughness: 0.55,
+      metalness: 0.12,
+    });
+
+    const instancedMesh = new THREE.InstancedMesh(buildingGeo, buildingMat, buildingsData.length);
+    instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+
+    // Set individual colors for each building
+    for (let i = 0; i < buildingsData.length; i++) {
+      instancedMesh.setColorAt(i, buildingsData[i].color);
+    }
+    if (instancedMesh.instanceColor) {
+      instancedMesh.instanceColor.needsUpdate = true;
+    }
+    globeGroup.add(instancedMesh);
+
+    // 6. Ground Ambient Shadow underneath the planet
+    const shadowCanvas = document.createElement('canvas');
+    shadowCanvas.width = 256;
+    shadowCanvas.height = 256;
+    const sCtx = shadowCanvas.getContext('2d');
+    if (sCtx) {
+      const grad = sCtx.createRadialGradient(128, 128, 15, 128, 128, 120);
+      grad.addColorStop(0, 'rgba(40, 26, 18, 0.28)');
+      grad.addColorStop(0.5, 'rgba(50, 32, 22, 0.09)');
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      sCtx.fillStyle = grad;
+      sCtx.fillRect(0, 0, 256, 256);
+    }
+    const shadowTex = new THREE.CanvasTexture(shadowCanvas);
+    const shadowPlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(6.5, 6.5),
+      new THREE.MeshBasicMaterial({
+        map: shadowTex,
+        transparent: true,
+        opacity: 0.75,
+        depthWrite: false,
+      })
+    );
+    shadowPlane.rotation.x = -Math.PI / 2;
+    shadowPlane.position.y = -3.25;
+    scene.add(shadowPlane);
+
+    // 7. Mouse & Touch Drag Interaction
+    const handleMouseMove = (e) => {
       const normX = (e.clientX / window.innerWidth) * 2 - 1;
       const normY = (e.clientY / window.innerHeight) * 2 - 1;
 
-      stateRef.current.mouseNormX = normX;
-      stateRef.current.mouseNormY = normY;
-      stateRef.current.mouseTargetY = normX * 0.45;
-      stateRef.current.mouseTargetX = -normY * 0.35;
+      stateRef.current.mouseTargetY = normX * 0.35;
+      stateRef.current.mouseTargetX = -normY * 0.25;
 
       if (stateRef.current.isDown) {
         const deltaX = e.clientX - stateRef.current.prevX;
         const deltaY = e.clientY - stateRef.current.prevY;
-        stateRef.current.dragVelX = deltaX * 0.0035;
-        stateRef.current.dragVelY = deltaY * 0.0035;
-        stateRef.current.ambientRotY += stateRef.current.dragVelX;
-        stateRef.current.ambientRotX -= stateRef.current.dragVelY;
+        stateRef.current.velY = deltaX * 0.004;
+        stateRef.current.velX = deltaY * 0.004;
+        stateRef.current.rotY += stateRef.current.velY;
+        stateRef.current.rotX += stateRef.current.velX;
         stateRef.current.prevX = e.clientX;
         stateRef.current.prevY = e.clientY;
       }
@@ -193,7 +314,6 @@ export default function TracingArtGlobe() {
       stateRef.current.isDown = false;
     };
 
-    // Touch support for mobile devices
     const handleTouchStart = (e) => {
       if (e.touches.length === 1) {
         stateRef.current.isDown = true;
@@ -206,10 +326,10 @@ export default function TracingArtGlobe() {
       if (stateRef.current.isDown && e.touches.length === 1) {
         const deltaX = e.touches[0].clientX - stateRef.current.prevX;
         const deltaY = e.touches[0].clientY - stateRef.current.prevY;
-        stateRef.current.dragVelX = deltaX * 0.004;
-        stateRef.current.dragVelY = deltaY * 0.004;
-        stateRef.current.ambientRotY += stateRef.current.dragVelX;
-        stateRef.current.ambientRotX -= stateRef.current.dragVelY;
+        stateRef.current.velY = deltaX * 0.005;
+        stateRef.current.velX = deltaY * 0.005;
+        stateRef.current.rotY += stateRef.current.velY;
+        stateRef.current.rotX += stateRef.current.velX;
         stateRef.current.prevX = e.touches[0].clientX;
         stateRef.current.prevY = e.touches[0].clientY;
       }
@@ -219,280 +339,121 @@ export default function TracingArtGlobe() {
       stateRef.current.isDown = false;
     };
 
-    window.addEventListener('mousemove', handleWindowMouseMove, { passive: true });
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
-    canvas.addEventListener('touchstart', handleTouchStart, { passive: true });
+    renderer.domElement.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
     window.addEventListener('touchend', handleTouchEnd);
 
-    // Main 3D Animation Loop
-    const render = () => {
-      time += 0.016;
+    // Resize Handler
+    const handleResize = () => {
+      if (!mount) return;
+      const w = mount.clientWidth;
+      const h = mount.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    };
+    window.addEventListener('resize', handleResize);
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
+    // 8. Animation & Render Loop
+    let animId;
+    const dummyMatrix = new THREE.Matrix4();
+    const dummyPos = new THREE.Vector3();
+    const dummyScale = new THREE.Vector3();
+    const dummyQuat = new THREE.Quaternion();
+    const tumbleRot = new THREE.Quaternion();
 
-      if (width <= 0 || height <= 0) {
-        animId = requestAnimationFrame(render);
-        return;
-      }
+    const animate = () => {
+      animId = requestAnimationFrame(animate);
 
-      if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-      }
-
-      ctx.save();
-      ctx.scale(dpr, dpr);
-      ctx.clearRect(0, 0, width, height);
-
-      // Continuous ambient rotation + mouse following
-      stateRef.current.ambientRotY += 0.0016;
+      // Continuous ambient rotation + inertia damping
+      stateRef.current.rotY += 0.0016;
 
       if (!stateRef.current.isDown) {
-        stateRef.current.dragVelX *= 0.94;
-        stateRef.current.dragVelY *= 0.94;
-        stateRef.current.ambientRotY += stateRef.current.dragVelX;
-        stateRef.current.ambientRotX += stateRef.current.dragVelY;
+        stateRef.current.velY *= 0.94;
+        stateRef.current.velX *= 0.94;
+        stateRef.current.rotY += stateRef.current.velY;
+        stateRef.current.rotX += stateRef.current.velX;
       }
 
-      // Smooth interpolation towards mouse target orientation
-      const targetY = stateRef.current.ambientRotY + stateRef.current.mouseTargetY;
-      const targetX = Math.max(-0.55, Math.min(0.55, stateRef.current.ambientRotX + stateRef.current.mouseTargetX));
+      // Smooth interpolation towards mouse tilt
+      const targetY = stateRef.current.rotY + stateRef.current.mouseTargetY;
+      const targetX = Math.max(-0.6, Math.min(0.6, stateRef.current.rotX + stateRef.current.mouseTargetX));
 
-      stateRef.current.currentRotY += (targetY - stateRef.current.currentRotY) * 0.055;
-      stateRef.current.currentRotX += (targetX - stateRef.current.currentRotX) * 0.055;
+      stateRef.current.curRotY += (targetY - stateRef.current.curRotY) * 0.06;
+      stateRef.current.curRotX += (targetX - stateRef.current.curRotX) * 0.06;
 
-      const curRotY = stateRef.current.currentRotY;
-      const curRotX = stateRef.current.currentRotX;
+      globeGroup.rotation.y = stateRef.current.curRotY;
+      globeGroup.rotation.x = stateRef.current.curRotX;
 
-      const cosY = Math.cos(curRotY);
-      const sinY = Math.sin(curRotY);
-      const cosX = Math.cos(curRotX);
-      const sinX = Math.sin(curRotX);
-
-      const centerX = width * 0.5;
-      const centerY = height * 0.5;
-
-      // ── SCATTER PHYSICS: OPEN UP WHILE SCROLLING, CLOSE DOWN WHEN STOPPED ──
-      // Rapid decay of scroll scatter velocity when scrolling slows/stops
+      // ── SCATTER PHYSICS: 3D BUILDINGS SCATTER OUTWARD WHILE SCROLLING ──
+      // Velocity decay
       stateRef.current.scrollScatterVelocity *= 0.88;
 
-      // Interpolate scatterAmount towards scrollScatterVelocity
+      // Spring scatterAmount towards velocity
       stateRef.current.scatterAmount += (stateRef.current.scrollScatterVelocity - stateRef.current.scatterAmount) * 0.095;
-
       let scatter = stateRef.current.scatterAmount;
-      if (scatter < 0.005) scatter = 0;
+      if (scatter < 0.002) scatter = 0;
 
-      // ── 1. RENDER BACKGROUND ARCHITECTURAL MARKS (PARALLAX DEPTH) ──
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
-      ctx.lineWidth = 1;
+      // Update each 3D building's position & orientation in the InstancedMesh
+      for (let i = 0; i < buildingsData.length; i++) {
+        const b = buildingsData[i];
 
-      for (let i = 0; i < architecturalMarks.length; i++) {
-        const mark = architecturalMarks[i];
-        const parallaxX = (curRotY * 60 + stateRef.current.mouseNormX * 25) * mark.depth;
-        const parallaxY = (curRotX * 50 + stateRef.current.mouseNormY * 20) * mark.depth;
+        // Building moves outward radially along its normal vector when scrolling
+        dummyPos.copy(b.restPos).addScaledVector(b.scatterDir, scatter);
 
-        let sx = (mark.u * width - parallaxX) % width;
-        let sy = (mark.v * height - parallaxY) % height;
-        if (sx < 0) sx += width;
-        if (sy < 0) sy += height;
-
-        if (mark.type === 0) {
-          // Blueprint crosshair
-          const len = mark.size * 0.5;
-          ctx.beginPath();
-          ctx.moveTo(sx - len, sy);
-          ctx.lineTo(sx + len, sy);
-          ctx.moveTo(sx, sy - len);
-          ctx.lineTo(sx, sy + len);
-          ctx.stroke();
-        } else if (mark.type === 1) {
-          // Dimension box
-          ctx.strokeRect(sx - mark.size * 0.5, sy - mark.size * 0.5, mark.size, mark.size);
-        } else {
-          // Coordinate dot
-          ctx.beginPath();
-          ctx.arc(sx, sy, 1.8, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-
-      // ── 2. PHOTOREALISTIC GROUND AMBIENT SHADOW ──
-      const globeRadius = Math.min(270, Math.min(width, height) * 0.38);
-      const shadowY = centerY + globeRadius * 1.0;
-      const shadowRadius = Math.max(10, globeRadius * 1.15);
-      const shadowGrad = ctx.createRadialGradient(
-        centerX, shadowY, 15,
-        centerX, shadowY, shadowRadius
-      );
-      shadowGrad.addColorStop(0, 'rgba(40, 25, 18, 0.15)');
-      shadowGrad.addColorStop(0.5, 'rgba(50, 35, 25, 0.05)');
-      shadowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-      ctx.save();
-      ctx.translate(centerX, shadowY);
-      ctx.scale(1, 0.22);
-      ctx.fillStyle = shadowGrad;
-      ctx.beginPath();
-      ctx.arc(0, 0, shadowRadius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-
-      const img = imageRef.current;
-
-      // ── 3. RENDER THE FULL MINIATURE CITY SPHERE (SOLID NORMAL STATE) ──
-      // When scrolling stops (scatter = 0), render the full high-res 3D architectural city sphere
-      // As user scrolls, it smoothly opens up into building clusters
-      const solidOpacity = Math.max(0, 1 - scatter * 2.8);
-
-      if (img && solidOpacity > 0.001) {
-        ctx.save();
-        ctx.globalAlpha = solidOpacity;
-
-        // Interactive 3D tilt & pitch for the solid globe
-        ctx.translate(centerX, centerY);
-        ctx.rotate(curRotY * 0.35);
-
-        // Subtle 3D perspective distortion (skew & scale with pitch)
-        const pitchScale = 1 - Math.abs(curRotX) * 0.06;
-        ctx.scale(pitchScale, pitchScale);
-
-        // Draw the complete 360° circular miniature city globe planet
-        const drawDiameter = globeRadius * 2;
-        ctx.drawImage(img, -drawDiameter * 0.5, -drawDiameter * 0.5, drawDiameter, drawDiameter);
-
-        ctx.restore();
-      }
-
-      // ── 4. RENDER SCATTERED 3D ARCHITECTURAL BUILDING CLUSTERS (SCATTER STATE) ──
-      // When scatter > 0 (during scroll), the buildings disperse radially outward in true 3D perspective!
-      if (img && scatter > 0.015) {
-        const clusterOpacity = Math.min(1.0, scatter * 2.5);
-        const fov = 680;
-        const projected = [];
-
-        for (let i = 0; i < buildingClusters.length; i++) {
-          const c = buildingClusters[i];
-
-          // Micro flutter
-          const flutter = Math.sin(time * c.wobbleSpeed + c.wobble) * 1.5;
-
-          // Resting sphere surface position
-          const normalX = c.nx * globeRadius;
-          const normalY = c.ny * globeRadius;
-          const normalZ = c.nz * globeRadius;
-
-          // Outward radial scatter trajectory
-          const px = normalX + c.scatterX * scatter;
-          const py = normalY + flutter + c.scatterY * scatter;
-          const pz = normalZ + c.scatterZ * scatter;
-
-          // 3D Rotation (yaw around Y axis)
-          const x1 = px * cosY + pz * sinY;
-          const z1 = -px * sinY + pz * cosY;
-
-          // 3D Rotation (pitch around X axis)
-          const y2 = py * cosX - z1 * sinX;
-          const z2 = py * sinX + z1 * cosX;
-
-          // Behind camera clipping check (guarantees fov + z2 > 20 and scale > 0)
-          if (fov + z2 <= 20) continue;
-
-          // Perspective projection
-          const scale = Math.max(0.05, fov / (fov + z2));
-          const projX = centerX + x1 * scale;
-          const projY = centerY + y2 * scale;
-
-          projected.push({
-            c,
-            projX,
-            projY,
-            projZ: z2,
-            scale,
-          });
+        // Building tumbles slightly during flight
+        dummyQuat.copy(b.quat);
+        if (scatter > 0.001) {
+          tumbleRot.setFromAxisAngle(b.tumbleAxis, scatter * b.tumbleSpeed);
+          dummyQuat.multiply(tumbleRot);
         }
 
-        // Depth sort back-to-front for realistic stereoscopic layering
-        projected.sort((a, b) => a.projZ - b.projZ);
+        // Scale box to individual skyscraper dimensions
+        dummyScale.set(b.width, b.height, b.depth);
 
-        for (let i = 0; i < projected.length; i++) {
-          const item = projected[i];
-          const { c, projX, projY, projZ, scale } = item;
-
-          const size = Math.max(2, c.sliceSize * scale * 0.44);
-          const arcRadius = Math.max(1, size * 0.45);
-
-          // Depth cueing: distant clusters soft, foreground clusters crisp & vibrant
-          const depthNorm = (projZ + globeRadius * 1.5) / (globeRadius * 3);
-          const alpha = clusterOpacity * Math.min(1.0, Math.max(0.35, 0.3 + depthNorm * 0.7));
-
-          ctx.save();
-          ctx.globalAlpha = alpha;
-
-          // Foreground cluster drop shadow
-          if (projZ > -10) {
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.18)';
-            ctx.shadowBlur = 6 * scale;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 3 * scale;
-          }
-
-          // Individual building cluster tumble during scatter
-          ctx.translate(projX, projY);
-          ctx.rotate((c.tumbleSpeedX * curRotY + c.tumbleSpeedY * curRotX) * scatter);
-
-          // Clip with rounded organic building cluster boundary (eliminates harsh square edges)
-          ctx.beginPath();
-          ctx.arc(0, 0, arcRadius, 0, Math.PI * 2);
-          ctx.clip();
-
-          // Draw the sampled architectural building cluster
-          ctx.drawImage(
-            img,
-            c.sx, c.sy, c.sliceSize, c.sliceSize,
-            -size * 0.5, -size * 0.5, size, size
-          );
-
-          ctx.restore();
-        }
+        dummyMatrix.compose(dummyPos, dummyQuat, dummyScale);
+        instancedMesh.setMatrixAt(i, dummyMatrix);
       }
 
-      ctx.restore();
-      animId = requestAnimationFrame(render);
+      instancedMesh.instanceMatrix.needsUpdate = true;
+
+      // Render 3D Scene
+      renderer.render(scene, camera);
     };
 
-    animId = requestAnimationFrame(render);
+    animate();
 
     return () => {
-      window.removeEventListener('mousemove', handleWindowMouseMove);
+      cancelAnimationFrame(animId);
+      window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
-      canvas.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('resize', handleResize);
+      renderer.domElement.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
-      if (animId) cancelAnimationFrame(animId);
+      if (mount && renderer.domElement.parentNode === mount) {
+        mount.removeChild(renderer.domElement);
+      }
+      renderer.dispose();
     };
-  }, [buildingClusters, architecturalMarks, imageLoaded]);
+  }, [buildingsData]);
 
   return (
     <div
       ref={containerRef}
       className="relative z-10 w-full flex items-center justify-center my-8 sm:my-12 select-none overflow-hidden"
-      aria-label="Interactive 3D Miniature City Globe with Scroll Scatter and Re-assembly Physics"
+      aria-label="Interactive 3D Miniature City Globe with Real 3D Building Scatter Physics"
     >
       {/* ── 3D MINIATURE CITY GLOBE (CENTERED IN EMPTY SPACE) ── */}
-      <div className="relative w-full h-[620px] sm:h-[720px] lg:h-[800px] flex items-center justify-center">
-        <canvas
-          ref={canvasRef}
-          className="size-full block cursor-grab active:cursor-grabbing touch-none select-none"
-          title="Scroll to scatter buildings or drag to rotate the miniature city globe"
-          style={{ width: '100%', height: '100%' }}
-        />
-
+      <div
+        ref={mountRef}
+        className="relative w-full h-[620px] sm:h-[720px] lg:h-[800px] flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none"
+        title="Scroll to scatter 3D buildings outward or drag to rotate the miniature city globe"
+      >
         {/* Ambient subtle center glow behind globe */}
         <div
           className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center"
