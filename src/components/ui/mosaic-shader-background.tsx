@@ -7,14 +7,17 @@ import * as React from "react"
  * "mosaic" is soft light quantised into rounded tiles, "prism" is diagonal
  * spectral facets on slate, "waves" is flowing silk on plum. Switching the
  * `scene` prop does not crossfade: the sky re-tiles into the next scene cell
- * by cell, from the bottom up. Children sit on top. Without WebGL a painted
- * CSS gradient stays in place.
+ * by cell, from the bottom up. Children sit on top. Supports "light" (for light
+ * themed portfolios) and "dark" mode.
  */
 
 export type MosaicScene = "mosaic" | "prism" | "waves"
 export type MosaicAccent = "ice" | "ember" | "lime"
+export type MosaicTheme = "light" | "dark"
 
 export interface MosaicShaderBackgroundProps {
+  /** "light" (matches light portfolio theme) or "dark". Defaults to "light". */
+  theme?: MosaicTheme
   /** Which scene is showing. Changing it re-tiles the sky into the new one. */
   scene?: MosaicScene
   /** Tints the light: `ice` (cool), `ember` (warm) or `lime`. */
@@ -46,6 +49,7 @@ uniform float uMix;
 uniform vec2 uPtr;
 uniform float uPtrOn;
 uniform vec3 uAccent;
+uniform float uTheme;
 
 float hash(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
 float noise(vec2 p){
@@ -75,6 +79,20 @@ vec3 mosaic(vec2 frag){
   L = floor(L * 8.0 + h * 0.6) / 8.0;
   vec2 q = abs(f - 0.5);
   float tile = smoothstep(0.47, 0.41, max(q.x, q.y));
+
+  if (uTheme > 0.5) {
+    // Light shaded theme: luminous porcelain tiles with subtle ice / pearlescent accents
+    vec3 tileBase = mix(vec3(0.935, 0.94, 0.955), vec3(0.985, 0.988, 0.995), tile);
+    vec3 coolTint = vec3(0.88, 0.93, 0.99);
+    vec3 warmTint = vec3(0.99, 0.965, 0.935);
+    vec3 lightTint = mix(coolTint, warmTint, smoothstep(0.2, 0.8, n));
+    vec3 col = mix(tileBase, lightTint, L * 0.45);
+    col = mix(col, mix(tileBase, uAccent, 0.22), 0.20 * L);
+    col *= (0.96 + 0.04 * f.y) * (0.95 + 0.05 * tile);
+    return col;
+  }
+
+  // Dark shaded theme (original)
   vec3 cool = vec3(0.60, 0.70, 0.86);
   vec3 warm = vec3(0.96, 0.88, 0.78);
   vec3 col = mix(cool, warm, smoothstep(0.25, 0.75, n)) * L * 0.6;
@@ -86,7 +104,6 @@ vec3 mosaic(vec2 frag){
 vec3 prism(vec2 frag){
   vec2 p = frag / uRes.y;
   float t = uTime * 0.05;
-  vec3 col = mix(vec3(0.06, 0.08, 0.13), vec3(0.17, 0.22, 0.31), smoothstep(-0.2, 1.3, p.y + p.x * 0.15));
   float d = dot(p, normalize(vec2(1.0, -0.58)));
   float warp = fbm(vec2(d * 1.2 - t, p.y * 0.8 + t)) * 0.7;
   float bands = d * 2.6 + warp - t * 1.6;
@@ -94,6 +111,19 @@ vec3 prism(vec2 frag){
   float facet = smoothstep(0.0, 0.03, s) * (1.0 - smoothstep(0.03, 0.6, s));
   vec3 spec = spectrum(bands * 0.31 + p.y * 0.25 + t * 0.5);
   float beam = exp(-pow((d - (0.55 + 0.35 * sin(t * 2.0))) * 2.4, 2.0));
+
+  if (uTheme > 0.5) {
+    // Light shaded theme: crystal facets on alabaster
+    vec3 col = mix(vec3(0.94, 0.945, 0.965), vec3(0.985, 0.988, 0.995), smoothstep(-0.2, 1.3, p.y + p.x * 0.15));
+    col = mix(col, spec, facet * beam * 0.18 + beam * 0.08);
+    float glint = pow(max(0.0, 1.0 - abs(s - 0.02) * 30.0), 3.0) * beam;
+    col += vec3(0.04, 0.06, 0.10) * glint;
+    col = mix(col, uAccent, 0.03);
+    return col;
+  }
+
+  // Dark shaded theme (original)
+  vec3 col = mix(vec3(0.06, 0.08, 0.13), vec3(0.17, 0.22, 0.31), smoothstep(-0.2, 1.3, p.y + p.x * 0.15));
   col += spec * facet * (0.09 + 0.3 * beam);
   col += spec * beam * 0.06;
   float glint = pow(max(0.0, 1.0 - abs(s - 0.02) * 30.0), 3.0) * beam;
@@ -105,6 +135,24 @@ vec3 prism(vec2 frag){
 vec3 waves(vec2 frag){
   vec2 p = frag / uRes.y;
   float t = uTime * 0.11;
+
+  if (uTheme > 0.5) {
+    // Light shaded theme: soft ribbons over airy off-white
+    vec3 col = mix(vec3(0.95, 0.945, 0.965), vec3(0.985, 0.98, 0.995), smoothstep(0.0, 1.1, p.y));
+    for (int i = 0; i < 5; i++){
+      float fi = float(i);
+      float y = 0.52 + (fi - 2.0) * 0.055
+        + 0.16 * sin(p.x * (1.5 + fi * 0.3) + t * (1.0 + fi * 0.22) + fi * 1.7)
+        + 0.05 * sin(p.x * 3.7 - t * 1.4 + fi * 2.3);
+      float dist = abs(p.y - y);
+      vec3 c = spectrum(fi * 0.16 + p.x * 0.12 - t * 0.25);
+      col = mix(col, c, (exp(-dist * 42.0) * 0.12 + exp(-dist * 7.0) * 0.03));
+    }
+    col *= 0.98 + 0.03 * fbm(p * 2.2 + t);
+    return col;
+  }
+
+  // Dark shaded theme (original)
   vec3 col = mix(vec3(0.07, 0.04, 0.08), vec3(0.20, 0.11, 0.19), smoothstep(0.0, 1.1, p.y));
   for (int i = 0; i < 5; i++){
     float fi = float(i);
@@ -130,9 +178,15 @@ void main(){
   float w = smoothstep(thr - 0.06, thr + 0.06, k * 1.12 - 0.06);
   vec3 col = mix(a, b, w);
   vec2 uv = frag / uRes;
-  float vig = smoothstep(1.25, 0.25, length((uv - 0.5) * vec2(1.0, 1.15)));
-  col *= 0.55 + 0.45 * vig;
-  col += (hash(frag + fract(uTime)) - 0.5) / 255.0;
+
+  if (uTheme > 0.5) {
+    float vig = smoothstep(1.3, 0.25, length((uv - 0.5) * vec2(1.0, 1.15)));
+    col = mix(vec3(0.975, 0.98, 0.99), col, 0.90 + 0.10 * vig);
+  } else {
+    float vig = smoothstep(1.25, 0.25, length((uv - 0.5) * vec2(1.0, 1.15)));
+    col *= 0.55 + 0.45 * vig;
+    col += (hash(frag + fract(uTime)) - 0.5) / 255.0;
+  }
   gl_FragColor = vec4(col, 1.0);
 }`
 
@@ -166,6 +220,7 @@ function useReducedMotion() {
 }
 
 export default function MosaicShaderBackground({
+  theme = "light",
   scene = "mosaic",
   accent = "ice",
   interactive = true,
@@ -236,8 +291,10 @@ export default function MosaicShaderBackground({
       ptr: gl.getUniformLocation(prog, "uPtr"),
       ptrOn: gl.getUniformLocation(prog, "uPtrOn"),
       accent: gl.getUniformLocation(prog, "uAccent"),
+      theme: gl.getUniformLocation(prog, "uTheme"),
     }
     gl.uniform3f(U.accent, tint[0], tint[1], tint[2])
+    gl.uniform1f(U.theme, theme === "light" ? 1.0 : 0.0)
     root.dataset.sky = "webgl"
 
     const s = state.current
@@ -249,41 +306,44 @@ export default function MosaicShaderBackground({
       const scale = Math.min(window.devicePixelRatio || 1, 1.5) * 0.75
       w = Math.max(1, Math.round(r.width * scale))
       h = Math.max(1, Math.round(r.height * scale))
-      canvas.width = w
-      canvas.height = h
-      gl.viewport(0, 0, w, h)
-      s.dirty = true
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w
+        canvas.height = h
+        gl.viewport(0, 0, w, h)
+        gl.uniform2f(U.res, w, h)
+        s.dirty = true
+      }
     }
-    size()
     const ro = new ResizeObserver(size)
     ro.observe(root)
+    size()
 
     let visible = true
-    const io = new IntersectionObserver(([e]) => {
-      visible = e.isIntersecting
+    const io = new IntersectionObserver(([entry]) => {
+      visible = entry ? entry.isIntersecting : true
+      if (visible) s.dirty = true
     })
     io.observe(root)
 
-    const t0 = performance.now()
     let raf = 0
-    let ptrOn = 0
-    const frame = (now: number) => {
+    const frame = (t: number) => {
       raf = requestAnimationFrame(frame)
       if (!visible) return
-      const moving = s.mix !== s.to
-      if (moving) {
-        s.mix = reduced ? s.to : mixAt(s.from, s.to, (now - s.start) / 1000, transition)
-        if (Math.abs(s.mix - s.to) < 0.0005) s.mix = s.to
+      // retile progress
+      if (s.mix !== s.to) {
+        const dur = Math.max(0.001, transition) * 1000
+        const el = t - s.start
+        s.mix = mixAt(s.from, s.to, el, dur)
+        s.dirty = true
+        if (el >= dur) s.mix = s.to
       }
-      if (reduced && !s.dirty && !moving) return
-      s.dirty = false
-      ptrOn += (s.ptrOn - ptrOn) * 0.08
-      gl.uniform2f(U.res, w, h)
-      gl.uniform1f(U.time, reduced ? 12.0 : (now - t0) / 1000)
+      // continuous shimmer when idle, fast update on motion
+      gl.uniform1f(U.time, t * 0.001)
       gl.uniform1f(U.mix, s.mix)
       gl.uniform2f(U.ptr, s.ptr[0], s.ptr[1])
-      gl.uniform1f(U.ptrOn, reduced ? 0 : ptrOn)
+      gl.uniform1f(U.ptrOn, s.ptrOn)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
+      s.dirty = false
     }
     raf = requestAnimationFrame(frame)
 
@@ -313,7 +373,7 @@ export default function MosaicShaderBackground({
       gl.getExtension("WEBGL_lose_context")?.loseContext()
       canvas.remove()
     }
-  }, [reduced, accent, interactive, transition])
+  }, [reduced, accent, interactive, transition, theme])
 
   return (
     <div
@@ -321,6 +381,7 @@ export default function MosaicShaderBackground({
       className={"msb-root" + (className ? " " + className : "")}
       style={{ ["--msb-h" as string]: height } as React.CSSProperties}
       data-scene={scene}
+      data-theme={theme}
     >
       <style>{MSB_CSS}</style>
       <div className="msb-shade" aria-hidden="true" />
@@ -338,6 +399,13 @@ const MSB_CSS = `
 .msb-root[data-sky="webgl"] .msb-canvas{opacity:1}
 .msb-shade{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(5,5,6,.45),transparent 22%,transparent 72%,rgba(5,5,6,.55))}
 .msb-content{position:absolute;inset:0;z-index:1}
+
+/* Light theme overrides for portfolio light mode */
+.msb-root[data-theme="light"]{color:#18181b;background:radial-gradient(60% 50% at 50% 55%,#f2f4f8,transparent 70%),#fafafc}
+.msb-root[data-theme="light"][data-scene="prism"]{background:linear-gradient(120deg,#f3f5f9,#e5eaf2 50%,#f3f5f9)}
+.msb-root[data-theme="light"][data-scene="waves"]{background:radial-gradient(80% 60% at 50% 60%,#f7f0f6,transparent 70%),#fbf7fa}
+.msb-root[data-theme="light"] .msb-shade{background:linear-gradient(180deg,rgba(255,255,255,.25),transparent 25%,transparent 65%,rgba(255,255,255,.92))}
+
 @media (prefers-reduced-motion:reduce){
 .msb-root,.msb-canvas{transition:none}
 }

@@ -24,43 +24,46 @@ export default function App() {
   const { personal, skills, projects, experiences, education, certifications } = portfolioData;
 
   return (
-    <div className="min-h-full flex flex-col font-sans bg-transparent text-foreground antialiased selection:bg-zinc-200">
-      {/* ── WHOLE PORTFOLIO BACKGROUND: MOSAIC SHADER BACKGROUND ── */}
-      <div
-        className="fixed inset-0 -z-10 pointer-events-none select-none overflow-hidden"
-        aria-hidden="true"
-      >
-        <MosaicShaderBackground
-          scene="mosaic"
-          accent="ice"
-          className="size-full"
-          height="100%"
-          interactive={true}
-        />
-      </div>
-
+    <div className="min-h-full flex flex-col font-sans bg-background text-foreground antialiased selection:bg-zinc-200">
       {/* ── PRELOADER / LOADING PAGE WITH HAMSTER WHEEL ── */}
       <LoadingScreen />
 
       {/* Accessibility Skip Link */}
       <a
         href="#about"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-white focus:text-zinc-900 focus:p-3"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-background focus:p-3"
       >
         Skip to content
       </a>
 
-      <main className="relative isolate min-h-svh bg-transparent [--footer-height:50svh]" data-personal-site="true">
-        {/* Main Content Frosted Glass Container */}
+      <main className="relative isolate min-h-svh bg-scene [--footer-height:50svh]" data-personal-site="true">
+        {/* Main Content White Container */}
         <div
-          className="relative z-1 overflow-clip bg-white/75 backdrop-blur-xl origin-bottom shadow-[0_1px_0_#00000006]"
+          className="relative z-1 overflow-clip bg-background origin-bottom shadow-[0_1px_0_#00000006]"
           style={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}
         >
           {/* ── HERO / ORBITAL SPHERE RING (TOP-MOST PHASE - KEPT INTACT) ── */}
           <header
             id="top"
-            className="sphere-ring relative z-10 grid min-h-screen h-screen place-items-center overflow-visible isolate [--hero-height:100svh]"
+            className="sphere-ring relative z-10 grid min-h-screen h-screen place-items-center overflow-hidden isolate [--hero-height:100svh]"
           >
+            {/* ── TOP LIGHT-SHADED MOSAIC SHADER BACKGROUND (HERO BACKDROP) ── */}
+            <div
+              className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden"
+              aria-hidden="true"
+            >
+              <MosaicShaderBackground
+                theme="light"
+                scene="mosaic"
+                accent="ice"
+                className="size-full"
+                height="100%"
+                interactive={true}
+              />
+              {/* Bottom Soft Dissolve into Clean Portfolio Canvas */}
+              <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background via-background/40 to-transparent pointer-events-none" />
+            </div>
+
             {/* The 8 Interactive Refractive Glass Spheres */}
             <SphereRing />
 
