@@ -94,6 +94,9 @@ export default function TracingArtExperience() {
     currentRotX: -0.04,
     targetStep: 0,
     stepTransition: 0, // 0 to 2 continuous interpolation
+    rawScrollProgress: 0,
+    smoothScrollProgress: 0,
+    globeSpread: 1.0, // 1.0 = closed, up to 2.5 = spread open
   });
 
   // 1. Generate high-resolution pre-rendered miniature artwork sprites
@@ -230,9 +233,12 @@ export default function TracingArtExperience() {
       const theta = phi * i;
       const isInner = i % 5 === 0;
       const sphereR = isInner ? (210 + (i % 7) * 4) : (255 + ((i % 5) - 2) * 4);
-      const target2X = Math.cos(theta) * radiusAtY * sphereR;
-      const target2Y = y * sphereR;
-      const target2Z = Math.sin(theta) * radiusAtY * sphereR;
+      const nx = Math.cos(theta) * radiusAtY;
+      const ny = y;
+      const nz = Math.sin(theta) * radiusAtY;
+      const target2X = nx * sphereR;
+      const target2Y = ny * sphereR;
+      const target2Z = nz * sphereR;
 
       items.push({
         id: i,
@@ -240,6 +246,9 @@ export default function TracingArtExperience() {
         x: target0X,
         y: target0Y,
         z: target0Z,
+        nx,
+        ny,
+        nz,
         target0: { x: target0X, y: target0Y, z: target0Z },
         target1: { x: target1X, y: target1Y, z: target1Z },
         target2: { x: target2X, y: target2Y, z: target2Z },
@@ -307,6 +316,7 @@ export default function TracingArtExperience() {
       const currentScroll = -rect.top;
       const rawProgress = Math.min(1, Math.max(0, currentScroll / totalScrollable));
       setScrollProgress(rawProgress);
+      stateRef.current.rawScrollProgress = rawProgress;
 
       let step = 0;
       if (rawProgress < 0.35) {
@@ -390,6 +400,22 @@ export default function TracingArtExperience() {
       stateRef.current.stepTransition += (stateRef.current.targetStep - stateRef.current.stepTransition) * 0.075;
       const st = stateRef.current.stepTransition;
 
+      // Smoothly interpolate scroll progress for globe spread & close physics
+      stateRef.current.smoothScrollProgress += (stateRef.current.rawScrollProgress - stateRef.current.smoothScrollProgress) * 0.085;
+      const sp = stateRef.current.smoothScrollProgress;
+
+      // ── SPREAD OPEN ON SCROLL TO GLOBE, CLOSE AFTER FULL SCROLL ──
+      // While scrolling into Phase 2 (Globe, sp: 0.60 to 0.85): Globe blooms and spreads open!
+      // After full scroll (sp: 0.85 to 1.00): Globe contracts and closes tight!
+      let targetSpread = 1.0;
+      if (sp > 0.60) {
+        const globeT = Math.min(1, Math.max(0, (sp - 0.60) / 0.40));
+        // Sine bell: peaks at t ~ 0.5 (halfway into globe scroll), returns to 0 at t = 1.0 (full scroll)
+        targetSpread = 1.0 + Math.sin(globeT * Math.PI) * 1.55;
+      }
+      stateRef.current.globeSpread += (targetSpread - stateRef.current.globeSpread) * 0.085;
+      const spread = stateRef.current.globeSpread;
+
       const curRotY = stateRef.current.currentRotY;
       const curRotX = stateRef.current.currentRotX;
 
@@ -398,10 +424,12 @@ export default function TracingArtExperience() {
       const cosX = Math.cos(curRotX);
       const sinX = Math.sin(curRotX);
 
-      // Center of constellation: positioned to allow editorial text on the left
-      // On desktop: shifted to the right (x: 58% - 60%); on small screens: centered (x: 50%)
+      // Center of constellation:
+      // In Phase 0 & 1: width * 0.58 (leaves room for left editorial text)
+      // In Phase 2: smoothly centers to width * 0.50!
       const isMobile = width < 900;
-      const centerX = isMobile ? width * 0.5 : width * 0.58;
+      const centerRatio = isMobile ? 0.5 : (st <= 1.0 ? 0.58 : 0.58 - (st - 1.0) * 0.08);
+      const centerX = width * centerRatio;
       const centerY = height * 0.5;
 
       // ── 1. RENDER BACKGROUND HOLLOW PICTURE FRAMES (3D PARALLAX FIELD) ──
@@ -449,9 +477,17 @@ export default function TracingArtExperience() {
         } else {
           // Transition between Middlemen (1) and Globe (2)
           const t = Math.max(0, Math.min(1, st - 1.0));
-          tx = p.target1.x + (p.target2.x - p.target1.x) * t;
-          ty = p.target1.y + (p.target2.y - p.target1.y) * t;
-          tz = p.target1.z + (p.target2.z - p.target1.z) * t;
+
+          // When spread > 1.0: globe spreads open organically along radial unit vectors (nx, ny, nz)
+          // When spread = 1.0 (after full scroll): globe closes tightly into solid sphere
+          const spreadDist = (spread - 1.0) * (260 + (p.id % 5) * 20);
+          const spreadTarget2X = p.target2.x + p.nx * spreadDist;
+          const spreadTarget2Y = p.target2.y + p.ny * spreadDist;
+          const spreadTarget2Z = p.target2.z + p.nz * spreadDist;
+
+          tx = p.target1.x + (spreadTarget2X - p.target1.x) * t;
+          ty = p.target1.y + (spreadTarget2Y - p.target1.y) * t;
+          tz = p.target1.z + (spreadTarget2Z - p.target1.z) * t;
         }
 
         // Micro-flutter
@@ -645,8 +681,12 @@ export default function TracingArtExperience() {
         </div>
 
         {/* Ambient bottom scroll invitation */}
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 text-[11px] font-mono text-zinc-400 select-none pointer-events-none">
-          {activeStep < 2 ? 'Scroll to explore provenance trajectories ↓' : 'Global Provenance Sphere'}
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 text-[11px] font-mono text-zinc-400 select-none pointer-events-none transition-all duration-300">
+          {activeStep < 2 
+            ? 'Scroll to explore provenance trajectories ↓' 
+            : (scrollProgress > 0.92 
+                ? 'Global Provenance Sphere • Unified & Closed' 
+                : 'Scroll to full completion to close globe ↓')}
         </div>
 
       </div>
