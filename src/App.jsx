@@ -6,7 +6,7 @@ import LoadingScreen from './components/LoadingScreen';
 import VinylAlbumCard from '@/components/ui/great-ui-vinyl-album-card';
 import Interactive3DSkillsTree from './components/Interactive3DSkillsTree';
 import PolaroidLineCarousel from '@/components/ui/polaroid-line-carousel';
-import TracingArtProvenance from './components/TracingArtProvenance';
+import TracingArtGlobe from './components/TracingArtGlobe';
 import { portfolioData } from './data/portfolioData';
 import {
   Sparkles,
@@ -269,8 +269,8 @@ export default function App() {
                 </div>
               </section>
 
-              {/* ── GETTY PROVENANCE INDEX: TRACING ART 3D CONSTELLATION ── */}
-              <TracingArtProvenance />
+              {/* ── INTERACTIVE 3D ARTWORK GLOBE (CENTERED IN EMPTY SPACE) ── */}
+              <TracingArtGlobe />
 
               {/* ── 05. TECHNICAL STACK (INTERACTIVE 3D SKILLS TREE) ── */}
               <section id="skills" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
