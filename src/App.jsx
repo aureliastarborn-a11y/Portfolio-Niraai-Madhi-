@@ -3,7 +3,6 @@ import SphereRing from './components/SphereRing';
 import SphereFooter from './components/SphereFooter';
 import FolderCard from './components/FolderCard';
 import LoadingScreen from './components/LoadingScreen';
-import { ShaderBackground } from '@/components/ui/neuro-noise-sensation';
 import { LogoBurst } from '@/components/ui/logo-burst';
 import VinylAlbumCard from '@/components/ui/great-ui-vinyl-album-card';
 import Interactive3DSkillsTree from './components/Interactive3DSkillsTree';
@@ -144,30 +143,22 @@ export default function App() {
   }, [burstVisible]);
 
   return (
-    <div className="min-h-full flex flex-col font-sans bg-transparent text-foreground antialiased selection:bg-zinc-200">
+    <div className="min-h-full flex flex-col font-sans bg-background text-foreground antialiased selection:bg-zinc-200">
       {/* ── PRELOADER / LOADING PAGE WITH HAMSTER WHEEL ── */}
       <LoadingScreen />
-
-      {/* ── PERMANENT NEURO NOISE SHADER BACKGROUND ── */}
-      <div
-        className="fixed inset-0 z-0 pointer-events-none select-none overflow-hidden"
-        aria-hidden="true"
-      >
-        <ShaderBackground className="size-full opacity-40 sm:opacity-50" />
-      </div>
 
       {/* Accessibility Skip Link */}
       <a
         href="#about"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-white focus:text-zinc-900 focus:p-3"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-background focus:p-3"
       >
         Skip to content
       </a>
 
-      <main className="relative isolate min-h-svh bg-transparent [--footer-height:50svh]" data-personal-site="true">
-        {/* Main Content Frosted Glass Container */}
+      <main className="relative isolate min-h-svh bg-scene [--footer-height:50svh]" data-personal-site="true">
+        {/* Main Content White Container */}
         <div
-          className="relative z-1 overflow-clip bg-white/75 backdrop-blur-xl origin-bottom shadow-[0_1px_0_#00000006]"
+          className="relative z-1 overflow-clip bg-background origin-bottom shadow-[0_1px_0_#00000006]"
           style={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}
         >
           {/* ── HERO / ORBITAL SPHERE RING (TOP-MOST PHASE - KEPT INTACT) ── */}
