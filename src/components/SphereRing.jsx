@@ -51,7 +51,7 @@ export default function SphereRing() {
   }, []);
 
   return (
-    <div className="absolute inset-0 size-full pointer-events-none overflow-visible select-none" aria-hidden="true">
+    <div className="absolute inset-x-0 top-0 -bottom-20 pointer-events-none overflow-visible select-none" aria-hidden="true">
       <GlassSpheres
         images={HERO_RING_IMAGES}
         variant="ring"

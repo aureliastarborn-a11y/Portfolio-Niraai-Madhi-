@@ -49,7 +49,7 @@ export default function App() {
           >
             {/* ── TOP LIGHT-SHADED MOSAIC SHADER BACKGROUND (HERO BACKDROP) ── */}
             <div
-              className="absolute inset-x-0 top-0 -bottom-40 z-0 pointer-events-none select-none overflow-hidden"
+              className="absolute inset-x-0 top-0 -bottom-64 z-0 pointer-events-none select-none overflow-hidden"
               aria-hidden="true"
             >
               <MosaicShaderBackground
@@ -60,8 +60,13 @@ export default function App() {
                 height="100%"
                 interactive={true}
               />
-              {/* Slowly Dissolve ONLY AFTER the Red Marked Hero Line (bottom 160px) */}
-              <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent via-background/60 to-background pointer-events-none" />
+              {/* Fade out / slowly dissolve AFTER the marked line */}
+              <div
+                className="absolute inset-x-0 bottom-0 h-64 z-10 pointer-events-none"
+                style={{
+                  background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 20%, rgba(255,255,255,0.65) 50%, rgba(255,255,255,0.95) 80%, #ffffff 100%)'
+                }}
+              />
             </div>
 
             {/* The 8 Interactive Refractive Glass Spheres */}
@@ -88,7 +93,7 @@ export default function App() {
           </header>
 
           {/* ── MIDDLE PHASE: MODERN EDITORIAL ASYMMETRIC / BENTO LAYOUT ── */}
-          <div className="relative z-10 w-full pt-36 sm:pt-48 lg:pt-56 pb-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
+          <div className="relative z-10 w-full pt-44 sm:pt-56 lg:pt-64 pb-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
             <div className="flex flex-col gap-44 sm:gap-52">
 
               {/* ── 01. ABOUT ME ──────────────────────────────────── */}
