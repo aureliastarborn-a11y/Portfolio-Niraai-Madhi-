@@ -118,16 +118,16 @@ export default function VinylAlbumCard({
           <div className="pointer-events-none absolute inset-0 -rotate-45 bg-gradient-to-br from-transparent via-white/45 to-transparent mix-blend-overlay" />
         </motion.div>
 
-        {/* ── ALBUM COVER SLEEVE (GOLDEN RING & WATERCOLOR FINE ART DESIGN - NO BLACK SHADE) ── */}
+        {/* ── ALBUM COVER SLEEVE (SHOWS ONLY THE HEADER IN THE CENTRE OF EACH CARD) ── */}
         <motion.div
           className={cn(
             "absolute z-20 overflow-hidden shadow-xl border border-black/10 cursor-default bg-[#FAF8F5]",
             isSmall
-              ? "h-48 w-48 sm:h-52 sm:w-52 rounded-xl p-3 sm:p-3.5"
+              ? "h-48 w-48 sm:h-52 sm:w-52 rounded-xl"
               : isCompact
-              ? "h-60 w-60 sm:h-64 sm:w-64 rounded-2xl p-4 sm:p-5"
-              : "h-72 w-72 rounded-2xl p-5",
-            "flex flex-col justify-between text-zinc-900 select-none",
+              ? "h-60 w-60 sm:h-64 sm:w-64 rounded-2xl"
+              : "h-72 w-72 rounded-2xl",
+            "flex items-center justify-center text-zinc-900 select-none",
           )}
           initial={{ rotate: 0, scale: 1, x: 0 }}
           animate={{
@@ -144,57 +144,16 @@ export default function VinylAlbumCard({
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
 
-          {/* Light Ambient Overlay - Zero Black Shade, Clean & High Contrast */}
-          <div className={cn(
-            "absolute inset-0 bg-gradient-to-t from-white/95 via-white/40 to-transparent flex flex-col justify-between text-zinc-900 select-none",
-            isSmall ? "p-3 sm:p-3.5" : "p-4 sm:p-5",
-          )}>
-            {/* ── TOP BAR: PROJECT / ROLE NAME ONLY (NO TIMING / NO ARROW BUTTON / NO GITHUB LINK) ── */}
-            <div className="relative z-10 flex items-start justify-between gap-2">
-              <span className={cn(
-                "font-bold text-zinc-900 tracking-tight leading-snug drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] whitespace-pre-line line-clamp-2",
-                isSmall ? "text-xs sm:text-[13px]" : "text-[14px] sm:text-[15px]",
-              )}>
-                {title}
-              </span>
-            </div>
-
-            {/* ── BOTTOM CONTENT: TAGLINE / ORGANIZATION, SUMMARY & TECH PILLS (NO TIMING) ── */}
-            <div className={cn("relative z-10", isSmall ? "space-y-1 pt-2" : "space-y-1.5 pt-3")}>
-              {artist && (
-                <div className={cn(
-                  "font-mono text-zinc-700 font-semibold line-clamp-1",
-                  isSmall ? "text-[10.5px]" : "text-xs",
-                )}>
-                  {artist}
-                </div>
+          {/* Light Translucent Backdrop - Center Header Only */}
+          <div className="absolute inset-0 bg-white/65 backdrop-blur-[2px] flex items-center justify-center p-4 sm:p-5 text-center select-none">
+            <h3
+              className={cn(
+                "font-bold text-zinc-900 tracking-tight leading-snug drop-shadow-[0_1px_2px_rgba(255,255,255,0.95)] text-balance",
+                isSmall ? "text-sm sm:text-[15px]" : "text-base sm:text-lg",
               )}
-
-              {description && (
-                <p className={cn(
-                  "text-zinc-600 leading-tight line-clamp-2 font-normal",
-                  isSmall ? "text-[9.5px]" : "text-[11px]",
-                )}>
-                  {description}
-                </p>
-              )}
-
-              {tags && tags.length > 0 && (
-                <div className="flex flex-wrap gap-1 pt-0.5">
-                  {tags.slice(0, 3).map((tag, idx) => (
-                    <span
-                      key={idx}
-                      className={cn(
-                        "font-mono text-zinc-700 bg-white/80 rounded border border-black/10 backdrop-blur-sm shadow-[0_1px_2px_rgba(0,0,0,0.04)]",
-                        isSmall ? "px-1 py-0.2 text-[8px]" : "px-1.5 py-0.5 text-[9px]",
-                      )}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
+            >
+              {title}
+            </h3>
           </div>
         </motion.div>
       </div>
