@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Rewind, FastForward } from "lucide-react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 export interface CarouselItem {
   id: number | string;
@@ -10,44 +9,30 @@ export interface CarouselItem {
   subtitle?: string;
 }
 
-// Create infinite items by triplicating the array
-const createInfiniteItems = (originalItems: CarouselItem[]) => {
-  const items: (CarouselItem & { originalIndex: number })[] = [];
-  for (let i = 0; i < 3; i++) {
-    originalItems.forEach((item, index) => {
-      items.push({
-        ...item,
-        id: `${i}-${item.id}`,
-        originalIndex: index,
-      });
-    });
-  }
-  return items;
-};
-
 const RulerLines = ({
   top = true,
-  totalLines = 80,
+  totalLines = 65,
 }: {
   top?: boolean;
   totalLines?: number;
 }) => {
   const lines = [];
   const lineSpacing = 100 / (totalLines - 1);
+  const centerIdx = Math.floor(totalLines / 2);
 
   for (let i = 0; i < totalLines; i++) {
     const isFifth = i % 5 === 0;
-    const isCenter = i === Math.floor(totalLines / 2);
+    const isCenter = i === centerIdx;
 
-    let height = "h-3";
-    let color = "bg-zinc-300 dark:bg-zinc-600";
+    let height = "h-1.5 sm:h-2";
+    let color = "bg-zinc-300 dark:bg-zinc-700";
 
     if (isCenter) {
-      height = "h-7 sm:h-8";
-      color = "bg-zinc-900 dark:bg-white";
+      height = "h-3.5 sm:h-4";
+      color = "bg-amber-600 dark:bg-amber-400";
     } else if (isFifth) {
-      height = "h-4 sm:h-5";
-      color = "bg-zinc-600 dark:bg-zinc-300";
+      height = "h-2.5 sm:h-3";
+      color = "bg-zinc-500 dark:bg-zinc-400";
     }
 
     const positionClass = top ? "top-0" : "bottom-0";
@@ -55,234 +40,173 @@ const RulerLines = ({
     lines.push(
       <div
         key={i}
-        className={`absolute w-0.5 ${height} ${color} ${positionClass} transition-colors`}
+        className={`absolute w-[1.5px] ${height} ${color} ${positionClass} pointer-events-none transition-colors duration-200`}
         style={{ left: `${i * lineSpacing}%` }}
       />
     );
   }
 
-  return <div className="relative w-full h-8 px-4 overflow-hidden">{lines}</div>;
+  return <div className="relative w-full h-4 px-2 overflow-hidden select-none">{lines}</div>;
 };
 
 export interface RulerCarouselProps {
   originalItems: CarouselItem[];
   className?: string;
   height?: string;
-  showControls?: boolean;
   itemWidth?: number;
   gap?: number;
+  initialIndex?: number;
 }
 
 export function RulerCarousel({
   originalItems,
   className = "",
-  height = "h-screen",
-  showControls = true,
-  itemWidth = 360,
-  gap = 70,
+  height = "h-[110px]",
+  itemWidth = 280,
+  gap = 40,
+  initialIndex = 0,
 }: RulerCarouselProps) {
-  const infiniteItems = createInfiniteItems(originalItems);
-  const itemsPerSet = originalItems.length;
-
-  // Start with middle set
-  const initialIndex = itemsPerSet + Math.min(itemsPerSet - 1, Math.floor(itemsPerSet / 2));
+  const count = originalItems.length;
+  const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(initialIndex);
-  const [isResetting, setIsResetting] = useState(false);
-  const previousIndexRef = useRef(initialIndex);
 
   const stepDistance = itemWidth + gap;
 
-  const handleItemClick = (newIndex: number) => {
-    if (isResetting) return;
+  // Spring-driven continuous cursor scrubbing
+  const cursorProgress = useMotionValue(
+    count > 1 ? initialIndex / (count - 1) : 0.5
+  );
 
-    // Find the original item index
-    const targetOriginalIndex = newIndex % itemsPerSet;
+  const smoothProgress = useSpring(cursorProgress, {
+    stiffness: 280,
+    damping: 30,
+    mass: 0.6,
+  });
 
-    // Find all instances of this item across the 3 copies
-    const possibleIndices = [
-      targetOriginalIndex,
-      targetOriginalIndex + itemsPerSet,
-      targetOriginalIndex + itemsPerSet * 2,
-    ];
+  // Calculate motion x position directly from smoothed progress
+  // At progress = 0, item 0 is centered. At progress = 1, item (count - 1) is centered.
+  const x = useTransform(smoothProgress, (p) => {
+    const floatIdx = p * Math.max(1, count - 1);
+    return -floatIdx * stepDistance;
+  });
 
-    let closestIndex = possibleIndices[0];
-    let smallestDistance = Math.abs(possibleIndices[0] - activeIndex);
-
-    for (const index of possibleIndices) {
-      const distance = Math.abs(index - activeIndex);
-      if (distance < smallestDistance) {
-        smallestDistance = distance;
-        closestIndex = index;
-      }
-    }
-
-    previousIndexRef.current = activeIndex;
-    setActiveIndex(closestIndex);
-  };
-
-  const handlePrevious = () => {
-    if (isResetting) return;
-    setActiveIndex((prev) => prev - 1);
-  };
-
-  const handleNext = () => {
-    if (isResetting) return;
-    setActiveIndex((prev) => prev + 1);
-  };
-
-  // Handle infinite scrolling
+  // Update active index based on current progress
   useEffect(() => {
-    if (isResetting) return;
+    const unsubscribe = smoothProgress.on("change", (latest) => {
+      const idx = Math.min(
+        count - 1,
+        Math.max(0, Math.round(latest * (count - 1)))
+      );
+      setActiveIndex(idx);
+    });
+    return () => unsubscribe();
+  }, [smoothProgress, count]);
 
-    if (activeIndex < itemsPerSet) {
-      setIsResetting(true);
-      setTimeout(() => {
-        setActiveIndex(activeIndex + itemsPerSet);
-        setIsResetting(false);
-      }, 0);
-    } else if (activeIndex >= itemsPerSet * 2) {
-      setIsResetting(true);
-      setTimeout(() => {
-        setActiveIndex(activeIndex - itemsPerSet);
-        setIsResetting(false);
-      }, 0);
+  // Handle pointer/cursor scrub across the component
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!containerRef.current || count <= 1) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const relativeX = e.clientX - rect.left;
+      // Map padding-aware progress [0.08, 0.92] so edges are easy to reach
+      const rawProgress = (relativeX - rect.width * 0.08) / (rect.width * 0.84);
+      const clampedProgress = Math.max(0, Math.min(1, rawProgress));
+      cursorProgress.set(clampedProgress);
+    },
+    [cursorProgress, count]
+  );
+
+  const handlePointerLeave = useCallback(() => {
+    // Keep on the current closest item cleanly
+    if (count > 1) {
+      cursorProgress.set(activeIndex / (count - 1));
     }
-  }, [activeIndex, itemsPerSet, isResetting]);
+  }, [cursorProgress, activeIndex, count]);
 
-  // Add keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (isResetting) return;
-
-      if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        setActiveIndex((prev) => prev - 1);
-      } else if (event.key === "ArrowRight") {
-        event.preventDefault();
-        setActiveIndex((prev) => prev + 1);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isResetting]);
-
-  // Center the active item dynamically
-  const centerOffset = Math.floor(itemsPerSet / 2);
-  const targetX = (centerOffset - (activeIndex % itemsPerSet)) * stepDistance;
-
-  // Get current page info
-  const currentPage = (activeIndex % itemsPerSet) + 1;
-  const totalPages = itemsPerSet;
+  const handleItemClick = (index: number) => {
+    if (count <= 1) return;
+    cursorProgress.set(index / (count - 1));
+    setActiveIndex(index);
+  };
 
   return (
-    <div className={`w-full ${height} flex flex-col items-center justify-center bg-transparent ${className}`}>
-      <div className="w-full h-[180px] sm:h-[200px] flex flex-col justify-center relative">
-        <div className="flex items-center justify-center">
-          <RulerLines top />
-        </div>
-
-        <div className="flex items-center justify-center w-full h-full relative overflow-hidden">
-          <motion.div
-            className="flex items-center"
-            style={{ gap: `${gap}px` }}
-            animate={{
-              x: targetX,
-            }}
-            transition={
-              isResetting
-                ? { duration: 0 }
-                : {
-                    type: "spring",
-                    stiffness: 260,
-                    damping: 24,
-                    mass: 0.9,
-                  }
-            }
-          >
-            {infiniteItems.map((item, index) => {
-              const isActive = index === activeIndex;
-
-              return (
-                <motion.button
-                  key={item.id}
-                  onClick={() => handleItemClick(index)}
-                  className={`text-2xl sm:text-4xl md:text-5xl font-bold whitespace-nowrap cursor-pointer flex flex-col items-center justify-center transition-colors ${
-                    isActive
-                      ? "text-zinc-900 dark:text-white"
-                      : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
-                  }`}
-                  animate={{
-                    scale: isActive ? 1 : 0.72,
-                    opacity: isActive ? 1 : 0.35,
-                  }}
-                  transition={
-                    isResetting
-                      ? { duration: 0 }
-                      : {
-                          type: "spring",
-                          stiffness: 400,
-                          damping: 25,
-                        }
-                  }
-                  style={{
-                    width: `${itemWidth}px`,
-                  }}
-                >
-                  <span className="tracking-tight">{item.title}</span>
-                  {item.subtitle && (
-                    <span
-                      className={`text-xs sm:text-sm font-mono font-medium mt-1.5 transition-all duration-300 ${
-                        isActive
-                          ? "text-amber-800 dark:text-amber-400 opacity-100 translate-y-0"
-                          : "opacity-0 -translate-y-1"
-                      }`}
-                    >
-                      {item.subtitle}
-                    </span>
-                  )}
-                </motion.button>
-              );
-            })}
-          </motion.div>
-        </div>
-
-        <div className="flex items-center justify-center">
-          <RulerLines top={false} />
-        </div>
+    <div
+      ref={containerRef}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
+      className={`w-full ${height} flex flex-col justify-between py-1 bg-transparent select-none cursor-ew-resize relative overflow-hidden group ${className}`}
+      style={{ touchAction: "none" }}
+    >
+      {/* Top Ruler Line */}
+      <div className="flex items-center justify-center w-full">
+        <RulerLines top={true} />
       </div>
 
-      {showControls && (
-        <div className="flex items-center justify-center gap-4 mt-3 sm:mt-5 select-none">
-          <button
-            onClick={handlePrevious}
-            disabled={isResetting}
-            className="flex items-center justify-center cursor-pointer p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-            aria-label="Previous item"
-          >
-            <Rewind className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-700 dark:text-zinc-300" />
-          </button>
+      {/* Dynamic Cursor-Scrubbed Text Content */}
+      <div className="relative w-full h-[58px] flex items-center justify-center overflow-hidden">
+        {/* Center alignment guide indicator */}
+        <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[2px] bg-amber-500/20 pointer-events-none" />
 
-          <div className="flex items-center gap-2 font-mono text-xs sm:text-sm">
-            <span className="font-semibold text-zinc-900 dark:text-zinc-200">
-              {currentPage}
-            </span>
-            <span className="text-zinc-400">/</span>
-            <span className="text-zinc-500">
-              {totalPages}
-            </span>
-          </div>
+        <motion.div
+          className="flex items-center absolute"
+          style={{
+            x,
+            left: "50%",
+            marginLeft: `-${itemWidth / 2}px`,
+            gap: `${gap}px`,
+          }}
+        >
+          {originalItems.map((item, index) => {
+            const isActive = index === activeIndex;
 
-          <button
-            onClick={handleNext}
-            disabled={isResetting}
-            className="flex items-center justify-center cursor-pointer p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-            aria-label="Next item"
-          >
-            <FastForward className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-700 dark:text-zinc-300" />
-          </button>
-        </div>
-      )}
+            return (
+              <motion.button
+                key={item.id}
+                type="button"
+                onClick={() => handleItemClick(index)}
+                className={`flex flex-col items-center justify-center text-center cursor-pointer transition-colors duration-200 ${
+                  isActive
+                    ? "text-zinc-900 dark:text-zinc-50"
+                    : "text-zinc-400/80 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+                }`}
+                style={{
+                  width: `${itemWidth}px`,
+                  minWidth: `${itemWidth}px`,
+                }}
+                animate={{
+                  scale: isActive ? 1 : 0.88,
+                  opacity: isActive ? 1 : 0.35,
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 350,
+                  damping: 28,
+                }}
+              >
+                <span className="text-lg sm:text-xl font-bold tracking-wider font-mono">
+                  {item.title}
+                </span>
+                {item.subtitle && (
+                  <span
+                    className={`text-xs font-medium tracking-tight mt-0.5 max-w-[270px] truncate transition-opacity duration-200 ${
+                      isActive
+                        ? "text-zinc-600 dark:text-zinc-300 opacity-100"
+                        : "text-zinc-400 opacity-50"
+                    }`}
+                  >
+                    {item.subtitle}
+                  </span>
+                )}
+              </motion.button>
+            );
+          })}
+        </motion.div>
+      </div>
+
+      {/* Bottom Ruler Line */}
+      <div className="flex items-center justify-center w-full">
+        <RulerLines top={false} />
+      </div>
     </div>
   );
 }

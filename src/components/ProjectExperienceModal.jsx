@@ -124,7 +124,7 @@ export default function ProjectExperienceModal({ item, onClose }) {
               {/* Large Bold Header */}
               <h3
                 id="modal-title"
-                className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-snug drop-shadow-xs"
+                className="text-2xl sm:text-3xl font-serif font-medium text-white tracking-tight leading-snug drop-shadow-xs"
               >
                 {isProject ? data.title : data.role}
               </h3>

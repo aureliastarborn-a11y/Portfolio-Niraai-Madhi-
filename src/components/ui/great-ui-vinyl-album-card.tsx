@@ -157,8 +157,8 @@ export default function VinylAlbumCard({
           <div className="absolute inset-0 bg-white/10 backdrop-blur-[0.5px] flex flex-col items-center justify-center p-4 sm:p-5 text-center select-none">
             <h3
               className={cn(
-                "relative z-10 font-bold text-zinc-900 tracking-tight leading-snug drop-shadow-[0_1px_2px_rgba(255,255,255,0.95)] text-balance",
-                isSmall ? "text-sm sm:text-[15px]" : "text-base sm:text-lg",
+                "relative z-10 font-serif font-medium text-zinc-900 tracking-tight leading-snug drop-shadow-[0_1px_2px_rgba(255,255,255,0.95)] text-balance",
+                isSmall ? "text-base sm:text-lg" : "text-lg sm:text-xl",
               )}
             >
               {title}

@@ -123,58 +123,19 @@ export default function App() {
                     {personal.bio[1]}
                   </p>
 
-                  {/* ── INTERACTIVE RULER CAROUSEL (SMALL DETAILS: EDUCATION, LOCATION, SPECIFICATION) ── */}
-                  <div className="rounded-2xl border border-black/[0.06] bg-white/70 backdrop-blur-sm p-4 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden">
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">
-                        Profile Metrics &amp; Specifications
-                      </span>
-                      <span className="text-[10px] font-mono text-zinc-400 hidden sm:inline">
-                        Use ← → keys or drag ruler
-                      </span>
-                    </div>
+                  {/* ── INTERACTIVE RULER CAROUSEL (CURSOR-FOLLOWING: ACADEMICS -> EDUCATION -> LOCATION -> SPECIFICATION) ── */}
+                  <div className="rounded-xl border border-black/[0.06] bg-white/70 backdrop-blur-sm p-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden">
                     <RulerCarousel
                       originalItems={[
-                        { id: 1, title: "EDUCATION", subtitle: "B.Tech AI & DS · CGPA 8.0 (2023–2027)" },
-                        { id: 2, title: "LOCATION", subtitle: "Chennai, India · Open to Remote & Onsite" },
-                        { id: 3, title: "SPECIFICATION", subtitle: "Data Analytics & Web Development" },
-                        { id: 4, title: "DATA ANALYTICS", subtitle: "Power BI · EDA · Multi-Source SQL ETL" },
-                        { id: 5, title: "WEB DEVELOPMENT", subtitle: "Responsive Web Applications · React · Tailwind" },
+                        { id: 1, title: "ACADEMICS", subtitle: "B.Tech AI & DS · CGPA 8.0" },
+                        { id: 2, title: "EDUCATION", subtitle: "Tagore Engineering College (2023–2027)" },
+                        { id: 3, title: "LOCATION", subtitle: "Tamil Nadu, India · Open to Remote & Onsite" },
+                        { id: 4, title: "SPECIFICATION", subtitle: "Data Analytics & Web Development" },
                       ]}
-                      height="h-[200px] sm:h-[220px]"
-                      itemWidth={320}
-                      gap={50}
+                      height="h-[105px]"
+                      itemWidth={270}
+                      gap={32}
                     />
-                  </div>
-
-                  {/* Quick Highlights Bento Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
-                    <div className="p-4 rounded-xl bg-white/80 backdrop-blur-sm border border-black/[0.06] space-y-1 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-                      <div className="flex items-center gap-2 text-zinc-500 text-xs font-mono">
-                        <GraduationCap className="size-3.5" />
-                        <span>Academics</span>
-                      </div>
-                      <div className="text-sm font-medium text-zinc-900">B.Tech AI & DS</div>
-                      <div className="text-xs text-zinc-500">CGPA 8.0 · 2023–2027</div>
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-white/80 backdrop-blur-sm border border-black/[0.06] space-y-1 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-                      <div className="flex items-center gap-2 text-zinc-500 text-xs font-mono">
-                        <MapPin className="size-3.5" />
-                        <span>Location</span>
-                      </div>
-                      <div className="text-sm font-medium text-zinc-900">{personal.location}</div>
-                      <div className="text-xs text-zinc-500">Open to Remote & Onsite</div>
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-white/80 backdrop-blur-sm border border-black/[0.06] space-y-1 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-                      <div className="flex items-center gap-2 text-zinc-500 text-xs font-mono">
-                        <Sparkles className="size-3.5" />
-                        <span>Specification</span>
-                      </div>
-                      <div className="text-sm font-medium text-zinc-900">Data Analytics &amp; Web</div>
-                      <div className="text-xs text-zinc-500">Analytics &amp; Modern UIs</div>
-                    </div>
                   </div>
 
                   {/* Soft Skills Pill Badges */}
@@ -200,7 +161,7 @@ export default function App() {
               <section id="projects" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-                  <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+                  <h2 className="text-3xl sm:text-4xl font-serif font-normal tracking-tight text-zinc-900">
                     Projects
                   </h2>
                   <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
@@ -231,7 +192,7 @@ export default function App() {
               <section id="experience" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-                  <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+                  <h2 className="text-3xl sm:text-4xl font-serif font-normal tracking-tight text-zinc-900">
                     Experience
                   </h2>
                   <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
