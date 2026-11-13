@@ -1,53 +1,85 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './HamsterWheel.css';
 
 export default function HamsterWheel({ className = '', size = '8px', style = {} }) {
-  const [isScrolling, setIsScrolling] = useState(false);
-  const [speedDur, setSpeedDur] = useState('0.85s');
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    let scrollTimeout = null;
+    let animId;
     let lastScrollY = window.scrollY;
-    let lastTime = performance.now();
+    let lastScrollTime = performance.now();
+    let currentVelocity = 0;
+    let targetVelocity = 0;
+    let isRunning = false;
 
-    const handleScroll = () => {
+    const onScroll = () => {
       const now = performance.now();
       const currentScrollY = window.scrollY;
       const deltaY = Math.abs(currentScrollY - lastScrollY);
-      const deltaTime = Math.max(1, now - lastTime);
-      const velocity = deltaY / deltaTime; // px per ms
+      const deltaTime = Math.max(1, now - lastScrollTime);
 
-      // Fast scroll -> fast sprint (0.35s), slow scroll -> casual jog (0.9s)
-      const duration = Math.max(0.35, Math.min(1.1, 1 / (1 + velocity * 1.5)));
-      setSpeedDur(`${duration.toFixed(2)}s`);
-      setIsScrolling(true);
+      // Instantaneous velocity in pixels per second
+      const instantVelocity = (deltaY / deltaTime) * 1000;
+      targetVelocity = Math.max(targetVelocity, instantVelocity);
 
       lastScrollY = currentScrollY;
-      lastTime = now;
-
-      if (scrollTimeout) {
-        clearTimeout(scrollTimeout);
-      }
-      scrollTimeout = setTimeout(() => {
-        setIsScrolling(false);
-      }, 160);
+      lastScrollTime = now;
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    const update = () => {
+      // Smoothly interpolate current velocity toward target velocity
+      currentVelocity += (targetVelocity - currentVelocity) * 0.35;
+      // Exponentially decay target velocity when scrolling pauses
+      targetVelocity *= 0.88;
+
+      const el = containerRef.current;
+      if (el) {
+        if (currentVelocity > 15) {
+          if (!isRunning) {
+            isRunning = true;
+            el.classList.add('is-running');
+          }
+
+          // Dynamic speed mapping according to scrolling speed:
+          // Slow scroll (~50px/s) -> 1.35s duration (relaxed stroll)
+          // Normal scroll (~500px/s) -> 0.70s duration (steady jog)
+          // Fast scroll (~2000px/s+) -> 0.25s duration (turbo sprint)
+          const minDur = 0.22;
+          const maxDur = 1.4;
+          const duration = minDur + (maxDur - minDur) / (1 + Math.pow(currentVelocity / 450, 1.15));
+
+          el.style.setProperty('--dur', `${duration.toFixed(3)}s`);
+        } else {
+          if (isRunning) {
+            isRunning = false;
+            el.classList.remove('is-running');
+            currentVelocity = 0;
+            targetVelocity = 0;
+          }
+        }
+      }
+
+      animId = requestAnimationFrame(update);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    animId = requestAnimationFrame(update);
+
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (scrollTimeout) clearTimeout(scrollTimeout);
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(animId);
     };
   }, []);
 
   return (
     <div
-      aria-label="Hamster running in a wheel while scrolling"
+      ref={containerRef}
+      aria-label="Hamster running in a wheel according to scrolling speed"
       role="img"
-      className={`wheel-and-hamster select-none pointer-events-none ${isScrolling ? 'is-running' : ''} ${className}`}
+      className={`wheel-and-hamster select-none pointer-events-none ${className}`}
       style={{
         '--hamster-size': size,
-        '--dur': speedDur,
+        '--dur': '1s',
         ...style
       }}
     >
