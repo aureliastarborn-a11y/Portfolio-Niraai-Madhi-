@@ -7,6 +7,17 @@
   font-size: var(--hamster-size, 14px);
 }
 
+/* Run strictly while scrolling (or hovered) */
+.wheel-and-hamster:not(.is-running) *,
+.wheel-and-hamster:not(.is-running) {
+  animation-play-state: paused !important;
+}
+
+.wheel-and-hamster.is-running *,
+.wheel-and-hamster.is-running {
+  animation-play-state: running !important;
+}
+
 .wheel,
 .hamster,
 .hamster div,
@@ -271,3 +282,4 @@
     transform: rotate(-1turn);
   }
 }
+
