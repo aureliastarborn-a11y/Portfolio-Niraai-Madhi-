@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import SphereRing from './components/SphereRing';
 import SphereFooter from './components/SphereFooter';
 import FolderCard from './components/FolderCard';
-import HamsterWheel from './components/HamsterWheel';
+import LoadingScreen from './components/LoadingScreen';
 import { LogoBurst } from '@/components/ui/logo-burst';
 import VinylAlbumCard from '@/components/ui/great-ui-vinyl-album-card';
 import Interactive3DSkillsTree from './components/Interactive3DSkillsTree';
@@ -144,6 +144,9 @@ export default function App() {
 
   return (
     <div className="min-h-full flex flex-col font-sans bg-background text-foreground antialiased selection:bg-zinc-200">
+      {/* ── PRELOADER / LOADING PAGE WITH HAMSTER WHEEL ── */}
+      <LoadingScreen />
+
       {/* Accessibility Skip Link */}
       <a
         href="#about"
@@ -151,14 +154,6 @@ export default function App() {
       >
         Skip to content
       </a>
-
-      {/* ── HAMSTER WHEEL RUNNER (RIGHT TOP CORNER) ── */}
-      <div 
-        className="fixed top-3 right-3 sm:top-5 sm:right-6 z-50 pointer-events-auto transition-transform hover:scale-110 drop-shadow-sm"
-        title="Hamster running in a wheel! 🐹"
-      >
-        <HamsterWheel size="8px" />
-      </div>
 
       <main className="relative isolate min-h-svh bg-scene [--footer-height:50svh]" data-personal-site="true">
         {/* Main Content White Container */}
