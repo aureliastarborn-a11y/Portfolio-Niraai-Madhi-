@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import SphereRing from './components/SphereRing';
 import SphereFooter from './components/SphereFooter';
 import FolderCard from './components/FolderCard';
 import LoadingScreen from './components/LoadingScreen';
-import { LogoBurst } from '@/components/ui/logo-burst';
 import VinylAlbumCard from '@/components/ui/great-ui-vinyl-album-card';
 import Interactive3DSkillsTree from './components/Interactive3DSkillsTree';
 import PolaroidLineCarousel from '@/components/ui/polaroid-line-carousel';
@@ -20,127 +19,7 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  const [burstVisible, setBurstVisible] = useState(false);
-  const [burstKey, setBurstKey] = useState(0);
-  const burstContainerRef = useRef(null);
-
-  const handleBurstClick = () => {
-    setBurstKey((k) => k + 1);
-  };
-
   const { personal, skills, projects, experiences, education, certifications } = portfolioData;
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const heroEl = document.getElementById('top');
-      const footerEl = document.querySelector('[data-footer-reveal]');
-
-      // 1. Not in first phase (where "NIRAAI MADHI" and rotatory images are)
-      let inHeroPhase = false;
-      if (heroEl) {
-        const heroRect = heroEl.getBoundingClientRect();
-        if (heroRect.bottom > 20) {
-          inHeroPhase = true;
-        }
-      } else {
-        inHeroPhase = scrollY < windowHeight * 0.7;
-      }
-
-      // 2. Not in last phase (where bottom sphere rotation is) - must hide instantly even on fast scroll
-      let inFooterPhase = false;
-      if (footerEl) {
-        const footerRect = footerEl.getBoundingClientRect();
-        if (footerRect.top <= windowHeight + 150) {
-          inFooterPhase = true;
-        }
-      } else {
-        const totalScrollHeight = document.documentElement.scrollHeight;
-        if (scrollY > totalScrollHeight - windowHeight - 450) {
-          inFooterPhase = true;
-        }
-      }
-
-      setBurstVisible(!inHeroPhase && !inFooterPhase);
-    };
-
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll);
-
-    // Fast-scroll guarantee: IntersectionObserver cuts off burst instantly before footer sphere rotation
-    let footerObserver;
-    const footerEl = document.querySelector('[data-footer-reveal]');
-    if (footerEl && 'IntersectionObserver' in window) {
-      footerObserver = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              setBurstVisible(false);
-            }
-          }
-        },
-        { rootMargin: '200px 0px 0px 0px' }
-      );
-      footerObserver.observe(footerEl);
-    }
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
-      if (footerObserver) footerObserver.disconnect();
-    };
-  }, []);
-
-  // Global click & hover detector: guarantees clicking the burst anywhere in all presented sections triggers explosion
-  useEffect(() => {
-    const isOverBurst = (clientX, clientY) => {
-      if (!burstVisible || !burstContainerRef.current) return false;
-      const rect = burstContainerRef.current.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const maxRadius = Math.min(rect.width, rect.height) * 0.52;
-      const dist = Math.hypot(clientX - centerX, clientY - centerY);
-      return dist <= maxRadius;
-    };
-
-    const handleGlobalClick = (e) => {
-      if (!burstVisible) return;
-      if (isOverBurst(e.clientX, e.clientY)) {
-        // Do not intercept interactive hyperlinks or form elements
-        const interactive = e.target.closest('a, input, textarea, select, [data-folder-links]');
-        if (!interactive) {
-          handleBurstClick();
-        }
-      }
-    };
-
-    const handleGlobalMouseMove = (e) => {
-      if (!burstVisible) {
-        if (document.body.style.cursor === 'pointer') document.body.style.cursor = '';
-        return;
-      }
-      const overBurst = isOverBurst(e.clientX, e.clientY);
-      const interactive = e.target.closest('a, button, input, textarea, select, [data-folder-links], .vinyl-card');
-      if (overBurst && !interactive) {
-        document.body.style.cursor = 'pointer';
-      } else if (document.body.style.cursor === 'pointer') {
-        document.body.style.cursor = '';
-      }
-    };
-
-    window.addEventListener('click', handleGlobalClick, true);
-    window.addEventListener('mousemove', handleGlobalMouseMove, { passive: true });
-
-    return () => {
-      window.removeEventListener('click', handleGlobalClick, true);
-      window.removeEventListener('mousemove', handleGlobalMouseMove);
-      if (document.body.style.cursor === 'pointer') {
-        document.body.style.cursor = '';
-      }
-    };
-  }, [burstVisible]);
 
   return (
     <div className="min-h-full flex flex-col font-sans bg-background text-foreground antialiased selection:bg-zinc-200">
@@ -189,30 +68,7 @@ export default function App() {
             </div>
           </header>
 
-          {/* ── BACKGROUND BURST (STATIC IN POSITION & FORM, BURSTS ON CLICK) ── */}
-          <div
-            ref={burstContainerRef}
-            className={`fixed top-1/2 -translate-y-1/2 right-[-40px] sm:right-[2%] lg:right-[6%] w-[440px] h-[440px] sm:w-[560px] sm:h-[560px] lg:w-[680px] lg:h-[680px] z-1 select-none overflow-visible transition-opacity duration-200 ease-out ${
-              burstVisible ? 'opacity-35 lg:opacity-45 hover:opacity-75 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'
-            }`}
-            onClick={handleBurstClick}
-            title="Click to burst"
-            aria-label="Click to burst"
-          >
-            <LogoBurst
-              color="#18181b"
-              tentacleCount={260}
-              radius={0.48}
-              duration={1.35}
-              breathe={false}
-              theme="light"
-              startSettled={true}
-              replayKey={burstKey}
-              replayOnClick={true}
-            />
-          </div>
-
-          {/* ── MIDDLE PHASE: MODERN EDITORIAL ASYMMETRIC / BENTO LAYOUT (Z-10 ON TOP OF BURST) ── */}
+          {/* ── MIDDLE PHASE: MODERN EDITORIAL ASYMMETRIC / BENTO LAYOUT ── */}
           <div className="relative z-10 w-full pt-[72px] pb-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
             <div className="flex flex-col gap-44 sm:gap-52">
 
