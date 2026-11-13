@@ -201,9 +201,8 @@ void main(){
   vec2 uv = frag / uRes;
 
   if (uTheme > 0.5) {
-    // Slowly dissolve the mosaic effect as it approaches the bottom marked area into pure white
-    float dissolve = smoothstep(0.02, 0.32, uv.y);
-    col = mix(vec3(1.0, 1.0, 1.0), col, dissolve);
+    // Keep mosaic 100% solid and present across the full canvas (no premature wash-out)
+    // Dissolve is handled smoothly after the marked area via container transition
   } else {
     float vig = smoothstep(1.25, 0.25, length((uv - 0.5) * vec2(1.0, 1.15)));
     col *= 0.55 + 0.45 * vig;
