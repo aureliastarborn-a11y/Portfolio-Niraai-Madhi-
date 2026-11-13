@@ -2,15 +2,19 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import * as THREE from 'three';
 
 // 3D Miniature Art Frames Sphere (1,850+ vibrant multi-colored framed artworks)
-// - Completely reactive movement driven by CURSOR and SCROLL:
-//   * Cursor Tracking: Sphere actively angles and rotates following mouse/pointer position
-//   * Cursor Kinetic Impulse: Fast cursor swishes add fluid rotational momentum
-//   * Interactive 3D Drag: Direct click/touch drag with inertial damping in all directions
-//   * Scroll Scrub Rotation: Scrolling actively drives dual-axis 3D spin (both X and Y)
-//   * Scroll Bloom & Scatter: Sphere blooms open from compact core when entering,
-//     forms a hollow sphere when centered, and scatters wide across widescreen when scrolling past
-//   * Harmonic Breathing: Each frame gently breathes in scale at unique frequencies (bysanthosh.me)
-//   * Per-element organic wobble: Micro-rotation drift on each frame
+// - Completely borderless free movement (zero rectangular clipping box):
+//   * Organic edge alpha dissolve in shader: cards smoothly dissolve to zero opacity
+//     before reaching viewport boundaries, eliminating any straight-line cuts
+//   * Controlled organic scatter envelope: cards disperse naturally across widescreen
+//     without exceeding the visible field of view
+//   * Expanded canvas viewport: taller vertical range with seamless negative margins
+// - Movement according to CURSOR and SCROLL:
+//   * Active Cursor Steering / Tilt: Sphere dynamically angles toward mouse position
+//   * Cursor Kinetic Impulse: Fast cursor swishes add fluid momentum
+//   * Direct 3D Drag: 360-degree rotation with inertia damping
+//   * Scroll Scrub: Scrolling actively spins the whole sphere across dual axes
+//   * Scroll Bloom: Blooms from compact inner core into hollow sphere when entering
+//   * Harmonic Breathing: Each frame gently pulses at unique frequencies (bysanthosh.me)
 // - 10 vibrant color spectrums: sapphire blue, emerald green, ruby red, sunset orange,
 //   amethyst violet, turquoise cyan, magenta, golden champagne, terracotta & ebony
 // - Ambient floating wireframe background rectangles with mouse parallax
@@ -53,11 +57,11 @@ export default function TracingArtGlobe() {
     lastScrollY: typeof window !== 'undefined' ? window.scrollY : 0,
   });
 
-  // Generate 1,850+ miniature artwork frames randomly distributed on a hollow 3D sphere shell
+  // Generate 1,850+ miniature artwork frames with organic borderless envelope
   const framesData = useMemo(() => {
     const items = [];
-    const BASE_RADIUS = 2.75;
-    const SHELL_THICKNESS = 0.80; // Hollow shell depth (2.35 to 3.15)
+    const BASE_RADIUS = 2.65;
+    const SHELL_THICKNESS = 0.75; // Hollow shell depth (2.27 to 3.02)
 
     let seed = 42;
     const random = () => {
@@ -79,8 +83,8 @@ export default function TracingArtGlobe() {
       const radius = (BASE_RADIUS - SHELL_THICKNESS * 0.5) + random() * SHELL_THICKNESS;
       const restPos = new THREE.Vector3(nx * radius, ny * radius, nz * radius);
 
-      // Contracted core position for scroll bloom (starts at 22% of radius, like bysanthosh.me)
-      const corePos = restPos.clone().multiplyScalar(0.22);
+      // Contracted core position for scroll bloom (20% of radius)
+      const corePos = restPos.clone().multiplyScalar(0.20);
 
       // 3. Atlas index (100 vibrant colorful varieties across 10x10 grid)
       const atlasIdx = i % (ATLAS_COLS * ATLAS_ROWS);
@@ -88,8 +92,8 @@ export default function TracingArtGlobe() {
       const row = Math.floor(atlasIdx / ATLAS_COLS);
 
       // 4. Individual frame size variation
-      let size = 0.18 + random() * 0.06;
-      if (i % 23 === 0) size *= 1.30; // Accent feature frame
+      let size = 0.17 + random() * 0.06;
+      if (i % 23 === 0) size *= 1.28; // Accent feature frame
       if (i % 7 === 0) size *= 0.84;  // Delicate gem frame
 
       // 5. Per-element movement dynamics (matching bysanthosh.me)
@@ -99,21 +103,26 @@ export default function TracingArtGlobe() {
       const rotSpeedY = (random() - 0.5) * 0.15;
       const rotSpeedZ = (random() - 0.5) * 0.15;
 
-      // Radial stagger delay for bloom (frames closer to center bloom slightly earlier)
+      // Radial stagger delay for bloom
       const radialDelay = (restPos.length() / (BASE_RADIUS + SHELL_THICKNESS * 0.5)) * 0.15;
 
       // Natural hanging tilt
       const tiltRoll = (random() - 0.5) * 0.22; // +- 6.5 degrees
       const tiltQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), tiltRoll);
 
-      // Widescreen scatter vector
-      const scatterDist = 3.8 + random() * 3.2;
-      const lateralSpread = (random() - 0.5) * 5.6;
-      const verticalSpread = (random() - 0.5) * 2.4;
+      // 6. Controlled widescreen organic scatter envelope (NO rectangular border hits!)
+      // Spreads wide horizontally (X) while gently undulating vertically (Y) so it never clips
+      const scatterDistX = 2.8 + random() * 2.5;
+      const scatterDistY = 1.1 + random() * 1.2;
+      const scatterDistZ = 1.6 + random() * 1.8;
+
+      const lateralSpread = (random() - 0.5) * 4.2;
+      const verticalSpread = (random() - 0.5) * 1.1;
+
       const scatterDir = new THREE.Vector3(
-        nx * scatterDist + lateralSpread,
-        ny * scatterDist * 0.75 + verticalSpread,
-        nz * scatterDist * 0.5
+        nx * scatterDistX + lateralSpread,
+        ny * scatterDistY + verticalSpread,
+        nz * scatterDistZ
       );
 
       const tumbleAxis = new THREE.Vector3(
@@ -151,7 +160,7 @@ export default function TracingArtGlobe() {
     return items;
   }, []);
 
-  // Scroll listener: continuous scroll scrubbing matching bysanthosh.me
+  // Scroll listener: continuous scroll scrubbing
   useEffect(() => {
     stateRef.current.lastScrollY = window.scrollY;
 
@@ -160,17 +169,12 @@ export default function TracingArtGlobe() {
       const deltaY = currentY - stateRef.current.lastScrollY;
       stateRef.current.lastScrollY = currentY;
 
-      // Track scroll velocity for kinetic pulse
       stateRef.current.scrollVelocity = Math.min(1.5, stateRef.current.scrollVelocity + Math.abs(deltaY) * 0.02);
 
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         const vh = window.innerHeight;
 
-        // Progress across viewport:
-        // 0.0 = top of container enters bottom of screen
-        // 0.5 = container centered in screen
-        // 1.0 = bottom of container leaves top of screen
         const totalTravel = vh + rect.height;
         const currentTravel = vh - rect.top;
         const progress = Math.max(0, Math.min(1, currentTravel / totalTravel));
@@ -191,15 +195,15 @@ export default function TracingArtGlobe() {
 
     const getViewportSize = () => ({
       width: window.innerWidth,
-      height: mount.clientHeight || window.innerHeight * 0.85,
+      height: mount.clientHeight || window.innerHeight * 0.95,
     });
 
     let { width, height } = getViewportSize();
 
-    // 1. Scene & Perspective Camera
+    // 1. Scene & Perspective Camera with generous field of view
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-    camera.position.set(0, 0, 11.0);
+    const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
+    camera.position.set(0, 0, 11.5);
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -212,7 +216,7 @@ export default function TracingArtGlobe() {
     renderer.toneMappingExposure = 1.05;
     mount.appendChild(renderer.domElement);
 
-    // 2. Ambient Floating Wireframe Rectangles (Getty background aesthetic)
+    // 2. Ambient Floating Wireframe Rectangles (Contained inside viewport)
     const wireframesGroup = new THREE.Group();
     scene.add(wireframesGroup);
 
@@ -228,37 +232,38 @@ export default function TracingArtGlobe() {
     const wireMat = new THREE.LineBasicMaterial({
       color: 0x222222,
       transparent: true,
-      opacity: 0.07,
+      opacity: 0.06,
     });
 
-    const WIREFRAME_COUNT = 52;
+    const WIREFRAME_COUNT = 48;
     for (let i = 0; i < WIREFRAME_COUNT; i++) {
       const line = new THREE.LineSegments(wireGeo, wireMat);
       const aspectType = i % 4;
-      let ww = 0.6 + (i * 0.035) % 0.8;
+      let ww = 0.55 + (i * 0.03) % 0.7;
       let hh = ww;
       if (aspectType === 1) hh *= 1.35;
       if (aspectType === 2) ww *= 1.45;
       if (aspectType === 3) hh *= 1.6;
 
       line.scale.set(ww, hh, 1);
+      // Confine wireframes comfortably within frustum bounds (x in -9..9, y in -3..3)
       line.position.set(
-        ((i * 1.83) % 28) - 14 + (Math.sin(i * 3.7) * 1.2),
-        ((i * 1.41) % 15) - 7.5 + (Math.cos(i * 2.3) * 0.8),
-        -3.5 - ((i * 0.35) % 4.5)
+        ((i * 1.67) % 20) - 10 + (Math.sin(i * 3.7) * 1.0),
+        ((i * 1.25) % 8) - 4 + (Math.cos(i * 2.3) * 0.6),
+        -3.5 - ((i * 0.35) % 4.0)
       );
 
       line.userData = {
         baseY: line.position.y,
         phase: i * 0.45,
         speed: 0.35 + (i % 5) * 0.15,
-        driftAmp: 0.15 + (i % 3) * 0.1,
+        driftAmp: 0.12 + (i % 3) * 0.08,
       };
 
       wireframesGroup.add(line);
     }
 
-    // 3. Texture Atlas & Custom Multi-Color Material
+    // 3. Texture Atlas & Custom Multi-Color Material with Seamless Edge Dissolve
     const texLoader = new THREE.TextureLoader();
     const atlasTex = texLoader.load(ATLAS_URL);
     atlasTex.generateMipmaps = true;
@@ -272,11 +277,13 @@ export default function TracingArtGlobe() {
       side: THREE.DoubleSide,
     });
 
+    // Custom shader injection: Seamless organic edge fade eliminates any rectangular clipping borders!
     frameMat.onBeforeCompile = (shader) => {
       shader.vertexShader = `
         attribute vec4 aInstanceUV;
         varying vec2 vAtlasUv;
         varying float vDepthFactor;
+        varying vec2 vScreenPos;
         ${shader.vertexShader}
       `.replace(
         '#include <uv_vertex>',
@@ -286,11 +293,19 @@ export default function TracingArtGlobe() {
         vec4 mvPos = modelViewMatrix * instanceMatrix * vec4(position, 1.0);
         vDepthFactor = clamp((mvPos.z + 13.5) / 5.0, 0.0, 1.0);
         `
+      ).replace(
+        '#include <project_vertex>',
+        `
+        #include <project_vertex>
+        // Normalized device coordinates for borderless soft edge dissolve:
+        vScreenPos = gl_Position.xy / gl_Position.w;
+        `
       );
 
       shader.fragmentShader = `
         varying vec2 vAtlasUv;
         varying float vDepthFactor;
+        varying vec2 vScreenPos;
         ${shader.fragmentShader}
       `.replace(
         '#include <map_fragment>',
@@ -299,9 +314,18 @@ export default function TracingArtGlobe() {
           vec4 sampledDiffuseColor = texture2D(map, vAtlasUv);
           if (sampledDiffuseColor.a < 0.02) discard;
 
+          // ── ORGANIC BORDERLESS EDGE DISSOLVE ──
+          // Smoothly fades to 0 opacity before reaching viewport bounds,
+          // ensuring frames move freely without any rectangular border cuts!
+          float fadeX = smoothstep(1.0, 0.82, abs(vScreenPos.x));
+          float fadeY = smoothstep(1.0, 0.76, abs(vScreenPos.y));
+          float edgeAlpha = fadeX * fadeY;
+          if (edgeAlpha < 0.01) discard;
+
           // Atmospheric hollow depth: back cards softly muted, front cards crisp and bright
           float depthShade = mix(0.70, 1.05, vDepthFactor);
           sampledDiffuseColor.rgb *= depthShade;
+          sampledDiffuseColor.a *= edgeAlpha;
 
           diffuseColor *= sampledDiffuseColor;
         #endif
@@ -328,19 +352,15 @@ export default function TracingArtGlobe() {
 
     // 5. Interactive Cursor Movement & Drag Orbit
     const handleMouseMove = (e) => {
-      // Normalized cursor coordinates (-1 to 1)
       const normX = (e.clientX / window.innerWidth) * 2 - 1;
       const normY = (e.clientY / window.innerHeight) * 2 - 1;
 
-      // Target cursor tilt angles (sphere dynamically angles towards the cursor)
-      stateRef.current.cursorTargetX = normX * 1.35; // Follows mouse horizontally
-      stateRef.current.cursorTargetY = -normY * 0.95; // Follows mouse vertically
+      stateRef.current.cursorTargetX = normX * 1.35;
+      stateRef.current.cursorTargetY = -normY * 0.95;
 
-      // Cursor movement delta
       if (stateRef.current.lastMouseX !== 0) {
         const dx = e.clientX - stateRef.current.lastMouseX;
         const dy = e.clientY - stateRef.current.lastMouseY;
-        // Kinetic impulse when cursor swishes fast
         stateRef.current.cursorVelX += dx * 0.0008;
         stateRef.current.cursorVelY += dy * 0.0008;
 
@@ -425,11 +445,10 @@ export default function TracingArtGlobe() {
       animId = requestAnimationFrame(animate);
       const time = performance.now() * 0.001;
 
-      // ── 1. SMOOTH CURSOR TRACKING WITH LERP ──
+      // 1. Cursor tracking with lerp
       stateRef.current.cursorCurX += (stateRef.current.cursorTargetX - stateRef.current.cursorCurX) * 0.08;
       stateRef.current.cursorCurY += (stateRef.current.cursorTargetY - stateRef.current.cursorCurY) * 0.08;
 
-      // Kinetic cursor velocity damping
       stateRef.current.cursorVelX *= 0.92;
       stateRef.current.cursorVelY *= 0.92;
       stateRef.current.kineticRotY += stateRef.current.cursorVelX;
@@ -443,28 +462,25 @@ export default function TracingArtGlobe() {
         stateRef.current.dragRotX += stateRef.current.dragVelX;
       }
 
-      // ── 2. SMOOTH SCROLL SCRUB PROGRESS (0.0 to 1.0) ──
+      // 2. Scroll scrub progress smoothing
       stateRef.current.scrollProgress += (stateRef.current.targetScrollProgress - stateRef.current.scrollProgress) * 0.075;
       stateRef.current.scrollVelocity *= 0.90;
       const sp = stateRef.current.scrollProgress;
 
-      // ── 3. COMPUTE WHOLE SPHERE ROTATION ACCORDING TO CURSOR + SCROLL ──
-      // Ambient slow drift
+      // 3. Dual-axis sphere rotation driven by cursor + scroll
       const ambientY = time * 0.12;
       const ambientX = Math.sin(time * 0.08) * 0.06;
 
-      // Scroll directly drives dual-axis spinning (3.5 full turns on Y, 1.2 turns on X):
       const scrollRotY = sp * Math.PI * 3.5;
       const scrollRotX = (sp - 0.5) * Math.PI * 1.2;
 
-      // Total sphere rotation: Ambient + Scroll + Drag + Cursor Tilt + Kinetic Velocity
       const totalRotY = ambientY + scrollRotY + stateRef.current.dragRotY + stateRef.current.cursorCurX + stateRef.current.kineticRotY;
       const totalRotX = ambientX + scrollRotX + stateRef.current.dragRotX + stateRef.current.cursorCurY + stateRef.current.kineticRotX;
 
       const globeEuler = new THREE.Euler(totalRotX, totalRotY, 0, 'YXZ');
       const globeQuat = new THREE.Quaternion().setFromEuler(globeEuler);
 
-      // Background wireframes react to cursor parallax & ambient drift
+      // Background wireframes drift & mouse parallax
       wireframesGroup.children.forEach((line) => {
         const d = line.userData;
         line.position.y = d.baseY + Math.sin(time * d.speed + d.phase) * d.driftAmp;
@@ -472,14 +488,11 @@ export default function TracingArtGlobe() {
       wireframesGroup.position.x = -stateRef.current.cursorCurX * 0.6;
       wireframesGroup.position.y = -stateRef.current.cursorCurY * 0.45;
 
-      // ── 4. SCROLL BLOOM & SCATTER STAGES (matching bysanthosh.me) ──
-      // Stage A: Bloom expansion from core (sp from 0.0 to 0.45)
-      // Stage B: Hollow sphere settled (sp around 0.45 to 0.55)
-      // Stage C: Widescreen scatter dispersion (sp > 0.55 or fast scroll)
+      // 4. Scroll bloom & organic scatter stages
       let bloomT = 1.0;
       if (sp < 0.45) {
         bloomT = Math.max(0.0, Math.min(1.0, sp / 0.45));
-        bloomT = bloomT * bloomT * (3.0 - 2.0 * bloomT); // smoothstep
+        bloomT = bloomT * bloomT * (3.0 - 2.0 * bloomT);
       }
 
       let scatter = 0.0;
@@ -490,38 +503,34 @@ export default function TracingArtGlobe() {
       scatter = Math.min(1.25, scatter + stateRef.current.scrollVelocity * 0.35);
       if (scatter < 0.002) scatter = 0.0;
 
-      // ── 5. UPDATE ALL 1,850+ MINIATURE FRAMES ──
+      // 5. Update all 1,850+ miniature frames
       for (let i = 0; i < framesData.length; i++) {
         const f = framesData[i];
 
-        // Individual radial bloom stagger (bysanthosh.me):
-        // Inner frames bloom slightly ahead of outer frames
+        // Staggered bloom
         const frameBloom = Math.max(0.0, Math.min(1.0, (bloomT - f.radialDelay * 0.4) / (1.0 - f.radialDelay * 0.4 + 0.001)));
         const smoothBloom = frameBloom * frameBloom * (3.0 - 2.0 * frameBloom);
 
-        // Interpolate position from compact core to full hollow sphere
         dummyPos.copy(f.corePos).lerp(f.restPos, smoothBloom);
-
-        // Rotate entire sphere in 3D according to cursor & scroll
         dummyPos.applyQuaternion(globeQuat);
 
-        // Scatter outward along trajectory on scroll
+        // Scatter outward along trajectory
         if (scatter > 0.001) {
           dummyScatterVec.copy(f.scatterDir).applyQuaternion(globeQuat);
           dummyPos.addScaledVector(dummyScatterVec, scatter);
         }
 
-        // Harmonic breathing scale pulsation (bysanthosh.me)
+        // Harmonic breathing
         const breath = 1.0 + 0.07 * Math.sin(time * f.scaleFreq + f.phase);
         const bloomScale = THREE.MathUtils.lerp(0.35, 1.0, smoothBloom);
         const currentSize = f.size * breath * bloomScale;
 
-        // Billboard orientation towards camera with subtle spherical curvature
+        // Billboard orientation
         forwardVec.set(dummyPos.x * 0.12, dummyPos.y * 0.12, 1.0).normalize();
         dummyQuat.setFromUnitVectors(baseForward, forwardVec);
         dummyQuat.multiply(f.tiltQuat);
 
-        // Per-element gentle 3D wobble
+        // Organic wobble
         wobbleEuler.set(
           Math.sin(time * 0.6 + f.phase) * f.rotSpeedX,
           Math.cos(time * 0.6 + f.phase) * f.rotSpeedY,
@@ -530,7 +539,6 @@ export default function TracingArtGlobe() {
         wobbleQuat.setFromEuler(wobbleEuler);
         dummyQuat.multiply(wobbleQuat);
 
-        // Organic 3D tumble during scatter
         if (scatter > 0.001) {
           tumbleRot.setFromAxisAngle(f.tumbleAxis, scatter * f.tumbleSpeed);
           dummyQuat.multiply(tumbleRot);
@@ -567,10 +575,10 @@ export default function TracingArtGlobe() {
   return (
     <div
       ref={containerRef}
-      className="relative z-10 w-screen left-1/2 -translate-x-1/2 min-h-[750px] h-[85vh] lg:h-[900px] flex items-center justify-center my-6 sm:my-10 select-none overflow-visible pointer-events-auto"
+      className="relative z-10 w-screen left-1/2 -translate-x-1/2 -my-8 sm:-my-16 min-h-[850px] h-[95vh] lg:h-[1050px] flex items-center justify-center select-none overflow-visible pointer-events-auto"
       aria-label="Interactive 3D Art Gallery Globe with 1,850+ Miniature Multi-Colored Framed Artworks"
     >
-      {/* ── FULL-VIEW EDGE-TO-EDGE HOLLOW 3D MULTI-COLORED ART PICTURE SPHERE ── */}
+      {/* ── BORDERLESS FULL-VIEW HOLLOW 3D MULTI-COLORED ART PICTURE SPHERE ── */}
       <div
         ref={mountRef}
         className="relative size-full flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none overflow-visible"
@@ -581,7 +589,7 @@ export default function TracingArtGlobe() {
           className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center"
           aria-hidden="true"
         >
-          <div className="size-[550px] sm:size-[750px] rounded-full bg-radial from-amber-500/[0.04] via-zinc-400/[0.015] to-transparent blur-3xl" />
+          <div className="size-[650px] sm:size-[850px] rounded-full bg-radial from-amber-500/[0.035] via-zinc-400/[0.01] to-transparent blur-3xl" />
         </div>
       </div>
     </div>
