@@ -59,11 +59,11 @@ function formatSkillLines(name) {
  * - Long skill names break cleanly into double lines so no words get cut off
  */
 function SmallRotatableCuboid3D({ category, items, index, isReading }) {
-  // 3D rotation state (degrees)
-  const [rotX, setRotX] = useState(0);
-  const [rotY, setRotY] = useState(0);
+  // 3D rotation state (degrees) - resting 3D perspective angle showing depth (matching Image 2)
+  const [rotX, setRotX] = useState(-10);
+  const [rotY, setRotY] = useState(15);
   const [isDragging, setIsDragging] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0, rotX: 0, rotY: 0, moved: false });
+  const dragStartRef = useRef({ x: 0, y: 0, rotX: -10, rotY: 15, moved: false });
 
   const handlePointerDown = (e) => {
     setIsDragging(true);
@@ -101,8 +101,11 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
     e.stopPropagation();
     // Only toggle flip if user didn't drag
     if (!dragStartRef.current.moved) {
-      setRotX(0);
-      setRotY((prev) => (Math.abs(prev % 360) < 90 ? 180 : 0));
+      setRotX(-10);
+      setRotY((prev) => {
+        const isBack = Math.abs((prev - 195) % 360) < 90;
+        return isBack ? 15 : 195;
+      });
     }
   };
 
@@ -195,30 +198,23 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
             </h4>
           </div>
 
-          {/* 2. BACK FACE (THE BLACK AREA) - PRESENTS THE SKILLS CONTENT */}
+          {/* 2. BACK FACE (THE BLACK AREA) - LINEAR ARRANGEMENT WITHOUT INTERIOR CURVY BOXES */}
           <div
-            className="absolute inset-0 rounded-xl bg-zinc-900 border-2 border-zinc-700 text-white p-3 flex flex-col items-center justify-center shadow-xl select-none"
+            className="absolute inset-0 rounded-xl bg-zinc-900 border-2 border-zinc-700 text-white p-3 sm:p-3.5 flex flex-col items-center justify-center shadow-xl select-none"
             style={{
               transform: `rotateY(180deg) translateZ(${D / 2}px)`,
               backfaceVisibility: 'hidden',
             }}
           >
-            <div className="flex flex-wrap gap-1.5 items-center justify-center">
-              {items.map((item, idx) => {
-                const lines = formatSkillLines(item);
-                return (
-                  <span
-                    key={idx}
-                    className="inline-flex flex-col items-center justify-center px-1.5 py-0.5 text-[8.5px] sm:text-[9px] font-medium text-zinc-100 bg-zinc-800/90 rounded border border-zinc-700/80 shadow-xs leading-[1.1] text-center hover:bg-zinc-700 transition-colors"
-                  >
-                    {lines.map((line, lIdx) => (
-                      <span key={lIdx} className="block whitespace-nowrap">
-                        {line}
-                      </span>
-                    ))}
-                  </span>
-                );
-              })}
+            <div className="flex flex-col items-center justify-center space-y-1.5 w-full text-center">
+              {items.map((item, idx) => (
+                <span
+                  key={idx}
+                  className="text-[10.5px] sm:text-[11px] font-medium text-zinc-200 tracking-wide leading-tight hover:text-white transition-colors"
+                >
+                  {item}
+                </span>
+              ))}
             </div>
           </div>
 
