@@ -72,23 +72,25 @@ export default function App() {
             {/* The 8 Interactive Refractive Glass Spheres */}
             <SphereRing />
 
-            {/* Center Content */}
+            {/* Center Content - Perfectly Centralized inside Sphere Circulator */}
             <div
-              className="relative z-10 max-w-[260px] sm:max-w-[280px] w-full text-center select-none mx-auto px-2"
+              className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 select-none px-4"
               data-hero-copy="true"
             >
-              <h1 id="intro-heading" className="mb-2 flex justify-center items-center focus:outline-none">
-                <span className="font-signature text-2xl sm:text-3xl md:text-[32px] text-zinc-900 select-none whitespace-nowrap leading-none tracking-normal py-0.5">
-                  {personal.shortName}
-                </span>
-              </h1>
-              <p className="text-muted text-[13px] sm:text-[14px] leading-[1.5] text-balance font-normal">
-                {personal.role} at Tagore Engineering College.
-                <br />
-                <span className="block mt-1 sm:mt-1.5">
-                  {personal.tagline}
-                </span>
-              </p>
+              <div className="pointer-events-auto max-w-[280px] w-full text-center">
+                <h1 id="intro-heading" className="mb-2 flex justify-center items-center focus:outline-none">
+                  <span className="font-signature text-2xl sm:text-3xl md:text-[32px] text-zinc-900 select-none whitespace-nowrap leading-none tracking-normal py-0.5">
+                    {personal.shortName}
+                  </span>
+                </h1>
+                <p className="text-muted text-[13px] sm:text-[14px] leading-[1.5] text-balance font-normal">
+                  {personal.role} at Tagore Engineering College.
+                  <br />
+                  <span className="block mt-1 sm:mt-1.5">
+                    {personal.tagline}
+                  </span>
+                </p>
+              </div>
             </div>
           </header>
 
