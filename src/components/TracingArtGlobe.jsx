@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import * as THREE from 'three';
 
 // 3D Miniature Architectural City Globe (Alex Shuper style)
-// Real 3D building skyscraper planet where the 3D buildings scatter and reassemble on scroll
-// Movement reference: getty.edu/tracingart/ (scroll-driven 3D convergence into a tight sphere and scatter on scroll)
+// - Full-view edge-to-edge spread (no clipping box!)
+// - Real 3D building skyscraper planet where the 3D buildings scatter wide across the full viewport
+// - Movement reference: getty.edu/tracingart/ (scroll-driven 3D convergence into a tight sphere and scatter on scroll)
 
 // Alex Shuper Architectural Palette (Terracotta, Coral, Sandstone, Limestone, Copper)
 const BUILDING_COLORS = [
@@ -125,14 +126,18 @@ export default function TracingArtGlobe() {
       const streetQuat = new THREE.Quaternion().setFromAxisAngle(normal, streetAngle);
       quat.premultiply(streetQuat);
 
-      // Scatter trajectory: outward along normal with organic dispersion & tumble
-      const scatterDistance = 1.8 + (i % 8) * 0.35 + Math.sin(i * 1.5) * 0.3;
+      // Wide scatter trajectory: outward along normal with wide horizontal spread across full view
+      const scatterDistance = 2.6 + (i % 8) * 0.55 + Math.sin(i * 1.5) * 0.45;
       const lateralAngle = i * 0.85;
+      
+      // Give horizontal expansion so buildings spread wide across the widescreen viewport
+      const spreadX = Math.cos(lateralAngle) * 1.8;
+      const spreadY = Math.sin(lateralAngle) * 0.9;
       const tangent = new THREE.Vector3(
-        -normal.z * Math.cos(lateralAngle),
-        Math.sin(lateralAngle) * 0.45,
-        normal.x * Math.cos(lateralAngle)
-      ).normalize().multiplyScalar(0.4);
+        -normal.z * spreadX,
+        spreadY,
+        normal.x * spreadX
+      ).multiplyScalar(0.65);
 
       const scatterDir = normal.clone().multiplyScalar(scatterDistance).add(tangent);
 
@@ -179,21 +184,21 @@ export default function TracingArtGlobe() {
 
         // Position-based continuous convergence:
         // When center of globe is in center of viewport: targetScatter = 0 (solid closed sphere)
-        // As user scrolls above or below: targetScatter smoothly increases (buildings scatter open)
+        // As user scrolls above or below: targetScatter smoothly increases (buildings scatter wide open)
         const centerDist = Math.abs((rect.top + rect.height * 0.5) - vh * 0.5);
         const deadzone = 80;
         if (centerDist < deadzone) {
           stateRef.current.targetScatter = 0.0;
         } else {
-          const maxDist = vh * 0.65;
+          const maxDist = vh * 0.7;
           const distNorm = Math.min(1.0, (centerDist - deadzone) / maxDist);
-          stateRef.current.targetScatter = Math.pow(distNorm, 1.35) * 0.85;
+          stateRef.current.targetScatter = Math.pow(distNorm, 1.35) * 0.95;
         }
 
-        // Velocity pulse: scrolling fast dynamically expands the scatter
+        // Velocity pulse: scrolling fast dynamically expands the scatter across the full view
         stateRef.current.scrollScatterVelocity = Math.min(
-          1.2,
-          stateRef.current.scrollScatterVelocity + Math.min(0.65, deltaY * 0.018)
+          1.25,
+          stateRef.current.scrollScatterVelocity + Math.min(0.7, deltaY * 0.018)
         );
       }
     };
@@ -208,13 +213,18 @@ export default function TracingArtGlobe() {
     const mount = mountRef.current;
     if (!mount) return;
 
-    const width = mount.clientWidth || 800;
-    const height = mount.clientHeight || 700;
+    // Use full window width for unconstrained edge-to-edge spread
+    const getViewportSize = () => ({
+      width: window.innerWidth,
+      height: mount.clientHeight || window.innerHeight * 0.85,
+    });
+
+    let { width, height } = getViewportSize();
 
     // 1. Scene, Camera, WebGL Renderer
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
-    camera.position.set(0, 0, 10.2);
+    camera.position.set(0, 0, 11.2);
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -289,7 +299,7 @@ export default function TracingArtGlobe() {
     }
     const shadowTex = new THREE.CanvasTexture(shadowCanvas);
     const shadowPlane = new THREE.Mesh(
-      new THREE.PlaneGeometry(6.5, 6.5),
+      new THREE.PlaneGeometry(7.5, 7.5),
       new THREE.MeshBasicMaterial({
         map: shadowTex,
         transparent: true,
@@ -363,14 +373,12 @@ export default function TracingArtGlobe() {
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
     window.addEventListener('touchend', handleTouchEnd);
 
-    // Resize Handler
+    // Full Viewport Resize Handler (keeps full-screen unclipped view)
     const handleResize = () => {
-      if (!mount) return;
-      const w = mount.clientWidth;
-      const h = mount.clientHeight;
-      camera.aspect = w / h;
+      const s = getViewportSize();
+      camera.aspect = s.width / s.height;
       camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
+      renderer.setSize(s.width, s.height);
     };
     window.addEventListener('resize', handleResize);
 
@@ -405,7 +413,7 @@ export default function TracingArtGlobe() {
       globeGroup.rotation.y = stateRef.current.curRotY;
       globeGroup.rotation.x = stateRef.current.curRotX;
 
-      // ── SCATTER PHYSICS: BUILDINGS SCATTER OUTWARD WHILE SCROLLING ──
+      // ── SCATTER PHYSICS: BUILDINGS SCATTER OUTWARD OVER FULL VIEWPORT ──
       // Velocity decay
       stateRef.current.scrollScatterVelocity *= 0.90;
 
@@ -465,13 +473,13 @@ export default function TracingArtGlobe() {
   return (
     <div
       ref={containerRef}
-      className="relative z-10 w-full flex items-center justify-center my-8 sm:my-12 select-none overflow-hidden"
+      className="relative z-10 w-screen left-1/2 -translate-x-1/2 min-h-[750px] h-[85vh] lg:h-[900px] flex items-center justify-center my-6 sm:my-10 select-none overflow-visible pointer-events-auto"
       aria-label="Interactive 3D Miniature City Globe with Real 3D Building Scatter Physics"
     >
-      {/* ── 3D MINIATURE CITY GLOBE (CENTERED IN EMPTY SPACE) ── */}
+      {/* ── FULL-VIEW EDGE-TO-EDGE 3D MINIATURE CITY GLOBE (NO CLIPPING BOX) ── */}
       <div
         ref={mountRef}
-        className="relative w-full h-[620px] sm:h-[720px] lg:h-[800px] flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none"
+        className="relative size-full flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none overflow-visible"
         title="Scroll to scatter 3D buildings outward or drag to rotate the miniature city globe"
       >
         {/* Ambient subtle center glow behind globe */}
@@ -479,7 +487,7 @@ export default function TracingArtGlobe() {
           className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center"
           aria-hidden="true"
         >
-          <div className="size-[440px] sm:size-[560px] rounded-full bg-radial from-amber-500/[0.05] via-zinc-400/[0.02] to-transparent blur-3xl" />
+          <div className="size-[550px] sm:size-[750px] rounded-full bg-radial from-amber-500/[0.05] via-zinc-400/[0.02] to-transparent blur-3xl" />
         </div>
       </div>
     </div>

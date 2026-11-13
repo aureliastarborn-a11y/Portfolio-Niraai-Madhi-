@@ -293,10 +293,14 @@ export default function App() {
                   </div>
                 </div>
               </section>
+            </div>
+          </div>
 
-              {/* ── INTERACTIVE 3D ARTWORK GLOBE (CENTERED IN EMPTY SPACE) ── */}
-              <TracingArtGlobe />
+          {/* ── FULL-VIEW EDGE-TO-EDGE 3D ARCHITECTURAL CITY GLOBE (SCATTERS FREELY OVER ENTIRE SCREEN) ── */}
+          <TracingArtGlobe />
 
+          <div className="relative z-10 w-full pb-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
+            <div className="flex flex-col gap-44 sm:gap-52">
               {/* ── 05. TECHNICAL STACK (INTERACTIVE 3D SKILLS TREE) ── */}
               <section id="skills" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
