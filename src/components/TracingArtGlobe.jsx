@@ -1,68 +1,16 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import * as THREE from 'three';
 
-// 3D Miniature Architectural City Globe (Alex Shuper style)
+// 3D Miniature Art Frames Sphere (1000+ mini framed artwork pictures)
+// - 1000+ miniature framed images with varied square and rectangle frames
+// - Real museum gilded gold, antique wood, ivory gallery, and bronze borders
+// - Smooth scroll convergence and scatter dynamics (matching getty.edu/tracingart/)
 // - Full-view edge-to-edge spread (no clipping box!)
-// - Real 3D building skyscraper planet where the 3D buildings scatter wide across the full viewport
-// - Movement reference: getty.edu/tracingart/ (scroll-driven 3D convergence into a tight sphere and scatter on scroll)
 
-// Alex Shuper Architectural Palette (Terracotta, Coral, Sandstone, Limestone, Copper)
-const BUILDING_COLORS = [
-  0xb85d43, // Terracotta Red
-  0xc76c52, // Warm Coral Terracotta
-  0xa84e36, // Deep Rust Brick
-  0xd8c4af, // Cream Sandstone
-  0xe8d7c5, // Pale Limestone
-  0xc4ae9b, // Warm Beige
-  0xf0eae1, // Modern Off-white Skyscraper
-  0x7d493b, // Weathered Brownstone
-  0x634b42, // Dark Bronze Granite
-  0x8f5945, // Clay Ochre
-  0xe0cebd, // Ivory Facade
-  0x995341, // Burnt Sienna
-  0xd47a5b, // Sunset Terracotta
-  0xbaa390, // Antique Sandstone
-  0x524039, // Slate Foundation
-  0xad614d, // Roman Brick
-];
-
-function createFacadeTexture() {
-  if (typeof document === 'undefined') return null;
-  const canvas = document.createElement('canvas');
-  canvas.width = 128;
-  canvas.height = 256;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return null;
-
-  // Base building facade
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, 128, 256);
-
-  // Architectural window grid
-  const rows = 18;
-  const cols = 6;
-  const padX = 5;
-  const padY = 4;
-  const winW = (128 - padX * (cols + 1)) / cols;
-  const winH = (256 - padY * (rows + 1)) / rows;
-
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const x = padX + c * (winW + padX);
-      const y = padY + r * (winH + padY);
-
-      // Subtle variation in window illumination
-      const isLit = (r * 7 + c * 13) % 9 === 0;
-      ctx.fillStyle = isLit ? '#ffeaa7' : '#221a17';
-      ctx.fillRect(x, y, winW, winH);
-    }
-  }
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  return texture;
-}
+const ATLAS_URL = '/images/art-frames-atlas.png';
+const ATLAS_COLS = 8;
+const ATLAS_ROWS = 6;
+const TOTAL_FRAMES = 1120; // 1000+ mini frames
 
 export default function TracingArtGlobe() {
   const containerRef = useRef(null);
@@ -72,13 +20,13 @@ export default function TracingArtGlobe() {
     isDown: false,
     prevX: 0,
     prevY: 0,
-    rotY: 0.25,
+    rotY: 0.2,
     rotX: -0.06,
     velY: 0,
     velX: 0,
     mouseTargetY: 0,
     mouseTargetX: 0,
-    curRotY: 0.25,
+    curRotY: 0.2,
     curRotX: -0.06,
 
     // Scroll movement physics (inspired by getty.edu/tracingart/)
@@ -88,15 +36,14 @@ export default function TracingArtGlobe() {
     lastScrollY: typeof window !== 'undefined' ? window.scrollY : 0,
   });
 
-  // Generate 860 dense architectural 3D building skyscrapers across the sphere
-  const buildingsData = useMemo(() => {
-    const COUNT = 860;
+  // Generate 1,120 mini image frames with varied square & rectangle sizes on a 3D sphere
+  const framesData = useMemo(() => {
     const items = [];
-    const phi = Math.PI * (3 - Math.sqrt(5)); // Golden ratio angle
-    const baseRadius = 2.45;
+    const phi = Math.PI * (3 - Math.sqrt(5)); // Golden ratio
+    const baseRadius = 2.85;
 
-    for (let i = 0; i < COUNT; i++) {
-      const y = 1 - (i / (COUNT - 1)) * 2;
+    for (let i = 0; i < TOTAL_FRAMES; i++) {
+      const y = 1 - (i / (TOTAL_FRAMES - 1)) * 2; // -1 to 1
       const radiusAtY = Math.sqrt(Math.max(0, 1 - y * y));
       const theta = phi * i;
 
@@ -105,71 +52,91 @@ export default function TracingArtGlobe() {
       const nz = Math.sin(theta) * radiusAtY;
       const normal = new THREE.Vector3(nx, ny, nz).normalize();
 
-      // Building dimensions: varied heights, widths, and depths
-      const isSpire = i % 17 === 0;
-      const isTower = i % 7 === 0;
-      let height = 0.28 + (i % 6) * 0.08 + Math.sin(i * 1.9) * 0.12;
-      if (isSpire) height = 1.05 + (i % 5) * 0.12; // Landmark skyscraper spires
-      else if (isTower) height = 0.65 + (i % 4) * 0.10; // High-rise towers
+      // Atlas texture index (48 varieties)
+      const atlasIdx = i % (ATLAS_COLS * ATLAS_ROWS);
+      const col = atlasIdx % ATLAS_COLS;
+      const row = Math.floor(atlasIdx / ATLAS_COLS);
 
-      const width = 0.10 + (i % 5) * 0.022;
-      const depth = 0.10 + ((i + 2) % 5) * 0.022;
+      // Aspect ratio type based on row in atlas:
+      // row 0, 1: Square
+      // row 2, 3: Portrait rectangle
+      // row 4, 5: Landscape rectangle
+      const sizeScale = 0.8 + (i % 7) * 0.08 + ((i % 13 === 0) ? 0.35 : 0); // Some larger feature frames
+
+      let w = 0.20 * sizeScale;
+      let h = 0.20 * sizeScale;
+
+      if (row >= 2 && row < 4) {
+        // Portrait rectangle
+        w = 0.165 * sizeScale;
+        h = 0.225 * sizeScale;
+      } else if (row >= 4) {
+        // Landscape rectangle
+        w = 0.225 * sizeScale;
+        h = 0.165 * sizeScale;
+      }
+
+      const depth = 0.015; // Thin framed picture card thickness
+
+      // Tangential outward orientation facing normal
+      const quat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+
+      // Slight natural organic tilt angle (each painting hangs with human character)
+      const tiltAngle = ((i % 5) - 2) * 0.08 + Math.sin(i * 1.7) * 0.05;
+      const tiltQuat = new THREE.Quaternion().setFromAxisAngle(normal, tiltAngle);
+      quat.premultiply(tiltQuat);
 
       // Resting position on sphere surface
-      const restPos = normal.clone().multiplyScalar(baseRadius + height * 0.5);
+      const restPos = normal.clone().multiplyScalar(baseRadius + (i % 5) * 0.02);
 
-      // Orientation quaternion: aligns (0, 1, 0) with normal
-      const quat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
-
-      // Alignment to street grid
-      const streetAngle = (i % 4) * (Math.PI / 2);
-      const streetQuat = new THREE.Quaternion().setFromAxisAngle(normal, streetAngle);
-      quat.premultiply(streetQuat);
-
-      // Wide scatter trajectory: outward along normal with wide horizontal spread across full view
-      const scatterDistance = 2.6 + (i % 8) * 0.55 + Math.sin(i * 1.5) * 0.45;
+      // Scatter trajectory: wide horizontal spread across widescreen viewport
+      const scatterDistance = 2.4 + (i % 8) * 0.5 + Math.sin(i * 1.4) * 0.4;
       const lateralAngle = i * 0.85;
-      
-      // Give horizontal expansion so buildings spread wide across the widescreen viewport
-      const spreadX = Math.cos(lateralAngle) * 1.8;
-      const spreadY = Math.sin(lateralAngle) * 0.9;
+
+      const spreadX = Math.cos(lateralAngle) * 2.2;
+      const spreadY = Math.sin(lateralAngle) * 1.1;
       const tangent = new THREE.Vector3(
         -normal.z * spreadX,
         spreadY,
         normal.x * spreadX
-      ).multiplyScalar(0.65);
+      ).multiplyScalar(0.7);
 
       const scatterDir = normal.clone().multiplyScalar(scatterDistance).add(tangent);
 
-      // Random tumble axis for 3D flight
+      // Random tumble axis during 3D flight
       const tumbleAxis = new THREE.Vector3(
         (i % 5) - 2,
         (i % 7) - 3,
         (i % 3) - 1
       ).normalize();
-      const tumbleSpeed = 1.1 + (i % 5) * 0.35;
+      const tumbleSpeed = 1.0 + (i % 5) * 0.3;
 
-      const colorHex = BUILDING_COLORS[i % BUILDING_COLORS.length];
+      // UV coordinates in atlas (1024x768)
+      // Cell is 128x128. WebGL texture coordinates (0,0 is bottom-left)
+      const uScale = 1.0 / ATLAS_COLS;
+      const vScale = 1.0 / ATLAS_ROWS;
+      const uOffset = col * uScale;
+      const vOffset = (ATLAS_ROWS - 1 - row) * vScale;
 
       items.push({
         id: i,
         normal,
         restPos,
         quat,
-        width,
-        height,
+        w,
+        h,
         depth,
         scatterDir,
         tumbleAxis,
         tumbleSpeed,
-        color: new THREE.Color(colorHex),
+        uv: [uOffset, vOffset, uScale, vScale],
       });
     }
 
     return items;
   }, []);
 
-  // Scroll listener: movement directly modeled after getty.edu/tracingart/
+  // Scroll listener: continuous scroll scrubbing matching getty.edu/tracingart/
   useEffect(() => {
     stateRef.current.lastScrollY = window.scrollY;
 
@@ -182,9 +149,9 @@ export default function TracingArtGlobe() {
         const rect = containerRef.current.getBoundingClientRect();
         const vh = window.innerHeight;
 
-        // Position-based continuous convergence:
-        // When center of globe is in center of viewport: targetScatter = 0 (solid closed sphere)
-        // As user scrolls above or below: targetScatter smoothly increases (buildings scatter wide open)
+        // Position-based convergence:
+        // Centered in viewport: targetScatter = 0 (tight cohesive sphere)
+        // Scrolling above/below: targetScatter smoothly increases (frames scatter open)
         const centerDist = Math.abs((rect.top + rect.height * 0.5) - vh * 0.5);
         const deadzone = 80;
         if (centerDist < deadzone) {
@@ -195,10 +162,10 @@ export default function TracingArtGlobe() {
           stateRef.current.targetScatter = Math.pow(distNorm, 1.35) * 0.95;
         }
 
-        // Velocity pulse: scrolling fast dynamically expands the scatter across the full view
+        // Velocity pulse: rapid scroll expands the scatter wider
         stateRef.current.scrollScatterVelocity = Math.min(
           1.25,
-          stateRef.current.scrollScatterVelocity + Math.min(0.7, deltaY * 0.018)
+          stateRef.current.scrollScatterVelocity + Math.min(0.75, deltaY * 0.018)
         );
       }
     };
@@ -213,7 +180,6 @@ export default function TracingArtGlobe() {
     const mount = mountRef.current;
     if (!mount) return;
 
-    // Use full window width for unconstrained edge-to-edge spread
     const getViewportSize = () => ({
       width: window.innerWidth,
       height: mount.clientHeight || window.innerHeight * 0.85,
@@ -223,8 +189,8 @@ export default function TracingArtGlobe() {
 
     // 1. Scene, Camera, WebGL Renderer
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
-    camera.position.set(0, 0, 11.2);
+    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+    camera.position.set(0, 0, 11.0);
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -234,81 +200,109 @@ export default function TracingArtGlobe() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(width, height);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 1.1;
     mount.appendChild(renderer.domElement);
 
-    // 2. Lighting (Rich directional sunlight + ambient fill)
-    const sunLight = new THREE.DirectionalLight(0xfff6ec, 2.9);
-    sunLight.position.set(6, 8, 6);
+    // 2. Lighting
+    const sunLight = new THREE.DirectionalLight(0xfff8ee, 2.5);
+    sunLight.position.set(5, 7, 7);
     scene.add(sunLight);
 
-    const skyLight = new THREE.DirectionalLight(0xdde8ff, 1.2);
-    skyLight.position.set(-6, -2, -5);
-    scene.add(skyLight);
+    const fillLight = new THREE.DirectionalLight(0xe8f0ff, 1.2);
+    fillLight.position.set(-6, -3, -5);
+    scene.add(fillLight);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
     scene.add(ambientLight);
 
     // 3. Central Pivot Group for interactive rotation
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    // 4. Planet Core Sphere (warm city street / bedrock foundation)
-    const coreGeo = new THREE.SphereGeometry(2.44, 48, 48);
-    const coreMat = new THREE.MeshStandardMaterial({
-      color: 0x8a624a,
-      roughness: 0.85,
-      metalness: 0.1,
-    });
-    const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-    globeGroup.add(coreMesh);
+    // 4. Load Art Frames Texture Atlas
+    const texLoader = new THREE.TextureLoader();
+    const atlasTex = texLoader.load(ATLAS_URL);
+    atlasTex.generateMipmaps = true;
+    atlasTex.minFilter = THREE.LinearMipmapLinearFilter;
 
-    // 5. Instanced 3D Building Skyscrapers (860 towers)
-    const facadeTex = createFacadeTexture();
-    const buildingGeo = new THREE.BoxGeometry(1, 1, 1);
-    const buildingMat = new THREE.MeshStandardMaterial({
-      map: facadeTex || undefined,
-      roughness: 0.55,
-      metalness: 0.12,
+    // Custom Instanced Material supporting individual UV frame sampling
+    const frameMat = new THREE.MeshStandardMaterial({
+      map: atlasTex,
+      roughness: 0.45,
+      metalness: 0.15,
+      side: THREE.DoubleSide,
     });
 
-    const instancedMesh = new THREE.InstancedMesh(buildingGeo, buildingMat, buildingsData.length);
+    frameMat.onBeforeCompile = (shader) => {
+      shader.vertexShader = `
+        attribute vec4 aInstanceUV;
+        varying vec2 vAtlasUv;
+        ${shader.vertexShader}
+      `.replace(
+        '#include <uv_vertex>',
+        `
+        #include <uv_vertex>
+        vAtlasUv = uv * aInstanceUV.zw + aInstanceUV.xy;
+        `
+      );
+
+      shader.fragmentShader = `
+        varying vec2 vAtlasUv;
+        ${shader.fragmentShader}
+      `.replace(
+        '#include <map_fragment>',
+        `
+        #ifdef USE_MAP
+          vec4 sampledDiffuseColor = texture2D( map, vAtlasUv );
+          diffuseColor *= sampledDiffuseColor;
+        #endif
+        `
+      );
+    };
+
+    // 5. Instanced 3D Mesh for 1,120 mini image frames
+    const frameGeo = new THREE.BoxGeometry(1, 1, 1);
+
+    // Attach instance UV attribute [uOffset, vOffset, uScale, vScale]
+    const uvArray = new Float32Array(framesData.length * 4);
+    for (let i = 0; i < framesData.length; i++) {
+      const uv = framesData[i].uv;
+      uvArray[i * 4 + 0] = uv[0];
+      uvArray[i * 4 + 1] = uv[1];
+      uvArray[i * 4 + 2] = uv[2];
+      uvArray[i * 4 + 3] = uv[3];
+    }
+    frameGeo.setAttribute('aInstanceUV', new THREE.InstancedBufferAttribute(uvArray, 4));
+
+    const instancedMesh = new THREE.InstancedMesh(frameGeo, frameMat, framesData.length);
     instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-
-    // Set individual colors for each building
-    for (let i = 0; i < buildingsData.length; i++) {
-      instancedMesh.setColorAt(i, buildingsData[i].color);
-    }
-    if (instancedMesh.instanceColor) {
-      instancedMesh.instanceColor.needsUpdate = true;
-    }
     globeGroup.add(instancedMesh);
 
-    // 6. Ground Ambient Shadow underneath the planet
+    // 6. Ground Ambient Shadow underneath
     const shadowCanvas = document.createElement('canvas');
     shadowCanvas.width = 256;
     shadowCanvas.height = 256;
     const sCtx = shadowCanvas.getContext('2d');
     if (sCtx) {
       const grad = sCtx.createRadialGradient(128, 128, 15, 128, 128, 120);
-      grad.addColorStop(0, 'rgba(40, 26, 18, 0.28)');
-      grad.addColorStop(0.5, 'rgba(50, 32, 22, 0.09)');
+      grad.addColorStop(0, 'rgba(30, 20, 15, 0.24)');
+      grad.addColorStop(0.5, 'rgba(40, 28, 20, 0.08)');
       grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       sCtx.fillStyle = grad;
       sCtx.fillRect(0, 0, 256, 256);
     }
     const shadowTex = new THREE.CanvasTexture(shadowCanvas);
     const shadowPlane = new THREE.Mesh(
-      new THREE.PlaneGeometry(7.5, 7.5),
+      new THREE.PlaneGeometry(8, 8),
       new THREE.MeshBasicMaterial({
         map: shadowTex,
         transparent: true,
-        opacity: 0.75,
+        opacity: 0.7,
         depthWrite: false,
       })
     );
     shadowPlane.rotation.x = -Math.PI / 2;
-    shadowPlane.position.y = -3.25;
+    shadowPlane.position.y = -3.4;
     scene.add(shadowPlane);
 
     // 7. Mouse & Touch Drag Interaction
@@ -393,7 +387,7 @@ export default function TracingArtGlobe() {
     const animate = () => {
       animId = requestAnimationFrame(animate);
 
-      // Continuous ambient rotation + inertia damping
+      // Ambient slow rotation + inertia damping
       stateRef.current.rotY += 0.0016;
 
       if (!stateRef.current.isDown) {
@@ -413,34 +407,30 @@ export default function TracingArtGlobe() {
       globeGroup.rotation.y = stateRef.current.curRotY;
       globeGroup.rotation.x = stateRef.current.curRotX;
 
-      // ── SCATTER PHYSICS: BUILDINGS SCATTER OUTWARD OVER FULL VIEWPORT ──
-      // Velocity decay
+      // ── SCATTER PHYSICS: 1000+ FRAMES SCATTER WIDE ON SCROLL ──
       stateRef.current.scrollScatterVelocity *= 0.90;
 
-      // Combine position-driven convergence and velocity pulse
-      const totalTargetScatter = Math.min(1.2, stateRef.current.targetScatter + stateRef.current.scrollScatterVelocity);
-
-      // Silky smooth spring interpolation matching the Getty reference
+      const totalTargetScatter = Math.min(1.25, stateRef.current.targetScatter + stateRef.current.scrollScatterVelocity);
       stateRef.current.scatterAmount += (totalTargetScatter - stateRef.current.scatterAmount) * 0.075;
       let scatter = stateRef.current.scatterAmount;
       if (scatter < 0.002) scatter = 0;
 
-      // Update each 3D building's position & orientation in the InstancedMesh
-      for (let i = 0; i < buildingsData.length; i++) {
-        const b = buildingsData[i];
+      // Update each framed picture's position, orientation, and scale
+      for (let i = 0; i < framesData.length; i++) {
+        const f = framesData[i];
 
-        // Building moves outward radially along its normal vector when scrolling
-        dummyPos.copy(b.restPos).addScaledVector(b.scatterDir, scatter);
+        // Moves outward radially + lateral dispersion across full viewport
+        dummyPos.copy(f.restPos).addScaledVector(f.scatterDir, scatter);
 
-        // Building tumbles slightly during flight
-        dummyQuat.copy(b.quat);
+        // Organic tumble in 3D space
+        dummyQuat.copy(f.quat);
         if (scatter > 0.001) {
-          tumbleRot.setFromAxisAngle(b.tumbleAxis, scatter * b.tumbleSpeed);
+          tumbleRot.setFromAxisAngle(f.tumbleAxis, scatter * f.tumbleSpeed);
           dummyQuat.multiply(tumbleRot);
         }
 
-        // Scale box to individual skyscraper dimensions
-        dummyScale.set(b.width, b.height, b.depth);
+        // Varied square & rectangular frame dimensions
+        dummyScale.set(f.w, f.h, f.depth);
 
         dummyMatrix.compose(dummyPos, dummyQuat, dummyScale);
         instancedMesh.setMatrixAt(i, dummyMatrix);
@@ -448,7 +438,6 @@ export default function TracingArtGlobe() {
 
       instancedMesh.instanceMatrix.needsUpdate = true;
 
-      // Render 3D Scene
       renderer.render(scene, camera);
     };
 
@@ -468,19 +457,19 @@ export default function TracingArtGlobe() {
       }
       renderer.dispose();
     };
-  }, [buildingsData]);
+  }, [framesData]);
 
   return (
     <div
       ref={containerRef}
       className="relative z-10 w-screen left-1/2 -translate-x-1/2 min-h-[750px] h-[85vh] lg:h-[900px] flex items-center justify-center my-6 sm:my-10 select-none overflow-visible pointer-events-auto"
-      aria-label="Interactive 3D Miniature City Globe with Real 3D Building Scatter Physics"
+      aria-label="Interactive 3D Art Gallery Globe with 1000+ Miniature Framed Artwork Pictures"
     >
-      {/* ── FULL-VIEW EDGE-TO-EDGE 3D MINIATURE CITY GLOBE (NO CLIPPING BOX) ── */}
+      {/* ── FULL-VIEW EDGE-TO-EDGE 3D MINIATURE ART PICTURE SPHERE (NO CLIPPING BOX) ── */}
       <div
         ref={mountRef}
         className="relative size-full flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none overflow-visible"
-        title="Scroll to scatter 3D buildings outward or drag to rotate the miniature city globe"
+        title="Scroll to scatter 1000+ miniature framed artworks or drag to rotate the sphere"
       >
         {/* Ambient subtle center glow behind globe */}
         <div
