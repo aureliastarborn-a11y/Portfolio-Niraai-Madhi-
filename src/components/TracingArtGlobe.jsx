@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 
 // Classical museum art color themes for generating miniature painting sprites
 const SPRITE_THEMES = [
@@ -37,37 +37,40 @@ const SPRITE_THEMES = [
 export default function TracingArtGlobe() {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
-  const mouseRef = useRef({
+
+  // Dynamic mouse & rotation state
+  const stateRef = useRef({
     isDown: false,
     prevX: 0,
     prevY: 0,
-    velX: 0,
-    velY: 0,
-    rotY: 0.4,
-    rotX: -0.15,
-    mouseX: 0,
-    mouseY: 0,
-    hoveredTileIdx: -1,
+    dragVelX: 0,
+    dragVelY: 0,
+    ambientRotY: 0.2,
+    ambientRotX: -0.05,
+    mouseTargetY: 0,
+    mouseTargetX: 0,
+    mouseNormX: 0,
+    mouseNormY: 0,
+    currentRotY: 0.2,
+    currentRotX: -0.05,
+    hoveredTileId: -1,
   });
 
-  const [hoveredInfo, setHoveredInfo] = useState(null);
-
-  // Generate high-resolution pre-rendered miniature artwork sprites
+  // 1. Generate high-resolution pre-rendered miniature artwork sprites
   const sprites = useMemo(() => {
     if (typeof document === 'undefined') return [];
 
     const generated = [];
-    const dpr = 2; // high-resolution offscreen canvas
+    const dpr = 2; // High-resolution offscreen canvas
 
-    SPRITE_THEMES.forEach((theme, index) => {
-      // Create variations in aspect ratio
+    SPRITE_THEMES.forEach((theme) => {
       const aspectVariants = [
-        { w: 20, h: 26 }, // Portrait
-        { w: 26, h: 20 }, // Landscape
-        { w: 22, h: 22 }, // Square
+        { w: 18, h: 24 }, // Portrait
+        { w: 24, h: 18 }, // Landscape
+        { w: 20, h: 20 }, // Square
       ];
 
-      aspectVariants.forEach((aspect, vIdx) => {
+      aspectVariants.forEach((aspect) => {
         const offCanvas = document.createElement('canvas');
         const width = aspect.w;
         const height = aspect.h;
@@ -78,43 +81,38 @@ export default function TracingArtGlobe() {
 
         ctx.scale(dpr, dpr);
 
-        // 1. Frame / Mount (Gilded gold, walnut wood, or ivory mat)
+        // Frame mount (gilded gold, antique wood, ivory)
         ctx.fillStyle = theme.frame;
         ctx.beginPath();
-        ctx.roundRect(0, 0, width, height, 1.5);
+        ctx.roundRect(0, 0, width, height, 1.2);
         ctx.fill();
 
-        // 2. Inner Artwork Canvas
-        const border = 1.4;
+        // Inner painting canvas
+        const border = 1.3;
         const innerW = width - border * 2;
         const innerH = height - border * 2;
         ctx.fillStyle = theme.bg;
         ctx.fillRect(border, border, innerW, innerH);
 
-        // 3. Artistic composition based on type
+        // Painting content
         if (theme.type === 'portrait') {
-          // Dark moody background, subtle head silhouette, bright lace collar/face highlight
           ctx.fillStyle = theme.sky;
-          ctx.fillRect(border, border, innerW, innerH * 0.6);
-          // Shoulder / garment
+          ctx.fillRect(border, border, innerW, innerH * 0.58);
           ctx.fillStyle = theme.ground;
           ctx.beginPath();
-          ctx.ellipse(width * 0.5, height * 0.85, innerW * 0.45, innerH * 0.35, 0, 0, Math.PI * 2);
+          ctx.ellipse(width * 0.5, height * 0.85, innerW * 0.44, innerH * 0.35, 0, 0, Math.PI * 2);
           ctx.fill();
-          // Face / flesh tone
           ctx.fillStyle = theme.highlight;
           ctx.beginPath();
           ctx.ellipse(width * 0.5, height * 0.42, innerW * 0.22, innerH * 0.24, 0, 0, Math.PI * 2);
           ctx.fill();
         } else if (theme.type === 'landscape') {
-          // Atmospheric sky with gradient
           const skyGrad = ctx.createLinearGradient(0, border, 0, height * 0.55);
           skyGrad.addColorStop(0, theme.sky);
           skyGrad.addColorStop(1, theme.highlight);
           ctx.fillStyle = skyGrad;
           ctx.fillRect(border, border, innerW, innerH * 0.55);
 
-          // Rolling hills / horizon
           ctx.fillStyle = theme.ground;
           ctx.beginPath();
           ctx.moveTo(border, height * 0.55);
@@ -126,12 +124,10 @@ export default function TracingArtGlobe() {
           ctx.closePath();
           ctx.fill();
         } else if (theme.type === 'sketch') {
-          // Parchment paper with delicate charcoal / sepia linework
           ctx.fillStyle = theme.bg;
           ctx.fillRect(border, border, innerW, innerH);
-
           ctx.strokeStyle = theme.highlight;
-          ctx.lineWidth = 0.8;
+          ctx.lineWidth = 0.7;
           ctx.beginPath();
           ctx.moveTo(width * 0.25, height * 0.35);
           ctx.lineTo(width * 0.75, height * 0.35);
@@ -141,13 +137,10 @@ export default function TracingArtGlobe() {
           ctx.lineTo(width * 0.65, height * 0.65);
           ctx.stroke();
         } else {
-          // Still life / Allegory composition
           ctx.fillStyle = theme.sky;
           ctx.fillRect(border, border, innerW, innerH * 0.45);
           ctx.fillStyle = theme.ground;
           ctx.fillRect(border, border + innerH * 0.45, innerW, innerH * 0.55);
-
-          // Highlight centerpiece (fruit bowl, candle, goblet)
           ctx.fillStyle = theme.highlight;
           ctx.beginPath();
           ctx.arc(width * 0.5, height * 0.52, innerW * 0.22, 0, Math.PI * 2);
@@ -158,7 +151,6 @@ export default function TracingArtGlobe() {
           canvas: offCanvas,
           width,
           height,
-          type: theme.type,
         });
       });
     });
@@ -166,36 +158,77 @@ export default function TracingArtGlobe() {
     return generated;
   }, []);
 
-  // Generate 720 3D particles on a Fibonacci sphere
+  // 2. Generate ~820 particles along Fibonacci sphere
   const particles = useMemo(() => {
-    const COUNT = 740;
+    const COUNT = 820;
     const items = [];
     const phi = Math.PI * (3 - Math.sqrt(5)); // Golden ratio angle
 
-    const baseRadius = 265; // Base radius of the 3D globe
-
     for (let i = 0; i < COUNT; i++) {
-      // Fibonacci sphere distribution: evenly spaced across sphere surface
       const y = 1 - (i / (COUNT - 1)) * 2; // -1 to 1
       const radiusAtY = Math.sqrt(1 - y * y);
       const theta = phi * i;
 
-      // Volumetric depth: 80% on outer shell, 20% slightly nested inside
+      // Volumetric sphere layering
       const isInner = i % 5 === 0;
-      const r = isInner ? (baseRadius * 0.82 + (i % 7) * 4) : (baseRadius + ((i % 5) - 2) * 4);
+      const baseR = 1.0;
+      const rMult = isInner ? (0.84 + (i % 7) * 0.02) : (0.97 + ((i % 5) - 2) * 0.015);
 
-      const x = Math.cos(theta) * radiusAtY * r;
-      const z = Math.sin(theta) * radiusAtY * r;
-      const yPos = y * r;
+      const nx = Math.cos(theta) * radiusAtY * rMult;
+      const nz = Math.sin(theta) * radiusAtY * rMult;
+      const ny = y * rMult;
 
       items.push({
         id: i,
-        x,
-        y: yPos,
-        z,
+        nx,
+        ny,
+        nz,
         spriteIdx: i % Math.max(1, SPRITE_THEMES.length * 3),
         wobble: Math.random() * Math.PI * 2,
         wobbleSpeed: 0.5 + Math.random() * 0.8,
+      });
+    }
+
+    return items;
+  }, []);
+
+  // 3. Generate 115 hollow floating background frames in 3D parallax space
+  const bgFrames = useMemo(() => {
+    const COUNT = 115;
+    const items = [];
+
+    // Seeded random distribution to keep stable positions
+    for (let i = 0; i < COUNT; i++) {
+      const u = (i * 1.6180339887) % 1;
+      const v = ((i + 0.3819) * 2.7182818) % 1;
+
+      // Aspect ratios (portrait, landscape, square)
+      const type = i % 3;
+      let w = 42;
+      let h = 54;
+      if (type === 0) { // Landscape
+        w = 54 + (i % 6) * 6;
+        h = 36 + (i % 4) * 5;
+      } else if (type === 1) { // Portrait
+        w = 38 + (i % 4) * 5;
+        h = 52 + (i % 6) * 6;
+      } else { // Square
+        w = 46 + (i % 5) * 4;
+        h = w;
+      }
+
+      // 3D Parallax depth layers (0.35 to 1.35)
+      const depth = 0.35 + ((i % 7) / 6) * 1.0;
+      const alpha = 0.055 + (depth / 1.35) * 0.045; // Subtle stroke alpha
+
+      items.push({
+        id: i,
+        u, // 0..1 relative horizontal pos
+        v, // 0..1 relative vertical pos
+        w,
+        h,
+        depth,
+        alpha,
       });
     }
 
@@ -211,77 +244,79 @@ export default function TracingArtGlobe() {
     let animId;
     let time = 0;
 
-    // Interactive pointer drag controls
-    const onMouseDown = (e) => {
-      mouseRef.current.isDown = true;
-      mouseRef.current.prevX = e.clientX;
-      mouseRef.current.prevY = e.clientY;
-    };
+    // Track mouse across the window for smooth continuous globe & background response
+    const handleWindowMouseMove = (e) => {
+      const normX = (e.clientX / window.innerWidth) * 2 - 1;
+      const normY = (e.clientY / window.innerHeight) * 2 - 1;
 
-    const onMouseMove = (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-      mouseRef.current.mouseX = mouseX;
-      mouseRef.current.mouseY = mouseY;
+      stateRef.current.mouseNormX = normX;
+      stateRef.current.mouseNormY = normY;
+      stateRef.current.mouseTargetY = normX * 0.65;
+      stateRef.current.mouseTargetX = -normY * 0.45;
 
-      if (mouseRef.current.isDown) {
-        const deltaX = e.clientX - mouseRef.current.prevX;
-        const deltaY = e.clientY - mouseRef.current.prevY;
-        mouseRef.current.velX = deltaX * 0.004;
-        mouseRef.current.velY = deltaY * 0.004;
-        mouseRef.current.rotY += mouseRef.current.velX;
-        mouseRef.current.rotX -= mouseRef.current.velY;
-        mouseRef.current.prevX = e.clientX;
-        mouseRef.current.prevY = e.clientY;
+      if (stateRef.current.isDown) {
+        const deltaX = e.clientX - stateRef.current.prevX;
+        const deltaY = e.clientY - stateRef.current.prevY;
+        stateRef.current.dragVelX = deltaX * 0.0035;
+        stateRef.current.dragVelY = deltaY * 0.0035;
+        stateRef.current.ambientRotY += stateRef.current.dragVelX;
+        stateRef.current.ambientRotX -= stateRef.current.dragVelY;
+        stateRef.current.prevX = e.clientX;
+        stateRef.current.prevY = e.clientY;
       }
     };
 
-    const onMouseUp = () => {
-      mouseRef.current.isDown = false;
+    const handleMouseDown = (e) => {
+      stateRef.current.isDown = true;
+      stateRef.current.prevX = e.clientX;
+      stateRef.current.prevY = e.clientY;
     };
 
-    // Touch support for mobile devices
-    const onTouchStart = (e) => {
+    const handleMouseUp = () => {
+      stateRef.current.isDown = false;
+    };
+
+    // Touch events for mobile
+    const handleTouchStart = (e) => {
       if (e.touches.length === 1) {
-        mouseRef.current.isDown = true;
-        mouseRef.current.prevX = e.touches[0].clientX;
-        mouseRef.current.prevY = e.touches[0].clientY;
+        stateRef.current.isDown = true;
+        stateRef.current.prevX = e.touches[0].clientX;
+        stateRef.current.prevY = e.touches[0].clientY;
       }
     };
 
-    const onTouchMove = (e) => {
-      if (mouseRef.current.isDown && e.touches.length === 1) {
-        const deltaX = e.touches[0].clientX - mouseRef.current.prevX;
-        const deltaY = e.touches[0].clientY - mouseRef.current.prevY;
-        mouseRef.current.velX = deltaX * 0.005;
-        mouseRef.current.velY = deltaY * 0.005;
-        mouseRef.current.rotY += mouseRef.current.velX;
-        mouseRef.current.rotX -= mouseRef.current.velY;
-        mouseRef.current.prevX = e.touches[0].clientX;
-        mouseRef.current.prevY = e.touches[0].clientY;
+    const handleTouchMove = (e) => {
+      if (stateRef.current.isDown && e.touches.length === 1) {
+        const deltaX = e.touches[0].clientX - stateRef.current.prevX;
+        const deltaY = e.touches[0].clientY - stateRef.current.prevY;
+        stateRef.current.dragVelX = deltaX * 0.004;
+        stateRef.current.dragVelY = deltaY * 0.004;
+        stateRef.current.ambientRotY += stateRef.current.dragVelX;
+        stateRef.current.ambientRotX -= stateRef.current.dragVelY;
+        stateRef.current.prevX = e.touches[0].clientX;
+        stateRef.current.prevY = e.touches[0].clientY;
       }
     };
 
-    const onTouchEnd = () => {
-      mouseRef.current.isDown = false;
+    const handleTouchEnd = () => {
+      stateRef.current.isDown = false;
     };
 
-    window.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-    canvas.addEventListener('touchstart', onTouchStart, { passive: true });
-    window.addEventListener('touchmove', onTouchMove, { passive: true });
-    window.addEventListener('touchend', onTouchEnd);
+    window.addEventListener('mousemove', handleWindowMouseMove, { passive: true });
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd);
 
-    // Main 3D render loop
+    // Main 3D Animation Loop
     const render = () => {
       time += 0.016;
 
-      // Ensure canvas sizing matches display pixels
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
+
       if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
         canvas.width = width * dpr;
         canvas.height = height * dpr;
@@ -291,19 +326,25 @@ export default function TracingArtGlobe() {
       ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, width, height);
 
-      // Physics damping & continuous elegant ambient rotation
-      if (!mouseRef.current.isDown) {
-        mouseRef.current.velX *= 0.94;
-        mouseRef.current.velY *= 0.94;
-        mouseRef.current.rotY += mouseRef.current.velX + 0.0022; // subtle continuous spin
-        mouseRef.current.rotX += mouseRef.current.velY;
+      // Continuous ambient rotation + mouse following
+      stateRef.current.ambientRotY += 0.0018; // smooth constant rotation
+
+      if (!stateRef.current.isDown) {
+        stateRef.current.dragVelX *= 0.94;
+        stateRef.current.dragVelY *= 0.94;
+        stateRef.current.ambientRotY += stateRef.current.dragVelX;
+        stateRef.current.ambientRotX += stateRef.current.dragVelY;
       }
 
-      // Restrict pitch angle to avoid flipping upside down
-      mouseRef.current.rotX = Math.max(-0.85, Math.min(0.85, mouseRef.current.rotX));
+      // Smooth interpolation towards mouse orientation
+      const targetY = stateRef.current.ambientRotY + stateRef.current.mouseTargetY;
+      const targetX = Math.max(-0.6, Math.min(0.6, stateRef.current.ambientRotX + stateRef.current.mouseTargetX));
 
-      const curRotY = mouseRef.current.rotY;
-      const curRotX = mouseRef.current.rotX;
+      stateRef.current.currentRotY += (targetY - stateRef.current.currentRotY) * 0.055;
+      stateRef.current.currentRotX += (targetX - stateRef.current.currentRotX) * 0.055;
+
+      const curRotY = stateRef.current.currentRotY;
+      const curRotX = stateRef.current.currentRotX;
 
       const cosY = Math.cos(curRotY);
       const sinY = Math.sin(curRotY);
@@ -312,19 +353,50 @@ export default function TracingArtGlobe() {
 
       const centerX = width * 0.5;
       const centerY = height * 0.5;
+
+      // ── 1. RENDER BACKGROUND HOLLOW FRAMES (PARALLAX FIELD) ──
+      // The background moves inversely and in sync with the globe movement / mouse cursor
+      ctx.lineWidth = 1;
+
+      for (let i = 0; i < bgFrames.length; i++) {
+        const frame = bgFrames[i];
+        
+        // Multi-depth parallax offset
+        const parallaxX = (curRotY * 110 + stateRef.current.mouseNormX * 45) * frame.depth;
+        const parallaxY = (curRotX * 90 + stateRef.current.mouseNormY * 35) * frame.depth;
+
+        // Base screen position mapped across width & height
+        let screenX = (frame.u * width - parallaxX) % width;
+        let screenY = (frame.v * height - parallaxY) % height;
+
+        if (screenX < -frame.w) screenX += width + frame.w * 2;
+        if (screenX > width + frame.w) screenX -= width + frame.w * 2;
+        if (screenY < -frame.h) screenY += height + frame.h * 2;
+        if (screenY > height + frame.h) screenY -= height + frame.h * 2;
+
+        ctx.strokeStyle = `rgba(0, 0, 0, ${frame.alpha})`;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+
+        ctx.beginPath();
+        ctx.rect(screenX - frame.w * 0.5, screenY - frame.h * 0.5, frame.w, frame.h);
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // ── 2. RENDER 3D ARTWORK GLOBE ──
+      const globeRadius = Math.min(260, Math.min(width, height) * 0.35);
       const fov = 680;
 
-      // Project all 3D points
       const projected = [];
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
-        // Micro-flutter to simulate organic suspension
-        const flutter = Math.sin(time * p.wobbleSpeed + p.wobble) * 1.5;
-        const px = p.x;
-        const py = p.y + flutter;
-        const pz = p.z;
+        // Micro-flutter
+        const flutter = Math.sin(time * p.wobbleSpeed + p.wobble) * 1.2;
+        const px = p.nx * globeRadius;
+        const py = p.ny * globeRadius + flutter;
+        const pz = p.nz * globeRadius;
 
         // Y-axis rotation
         const x1 = px * cosY + pz * sinY;
@@ -334,7 +406,7 @@ export default function TracingArtGlobe() {
         const y2 = py * cosX - z1 * sinX;
         const z2 = py * sinX + z1 * cosX;
 
-        // Perspective scale & projection
+        // Perspective projection
         const scale = fov / (fov + z2);
         const projX = centerX + x1 * scale;
         const projY = centerY + y2 * scale;
@@ -348,67 +420,39 @@ export default function TracingArtGlobe() {
         });
       }
 
-      // Sort by depth (back to front) for accurate 3D layering
+      // Depth sort (back to front) for authentic stereoscopic layering
       projected.sort((a, b) => a.projZ - b.projZ);
 
-      // Check hover proximity on front-facing tiles
-      const mouseX = mouseRef.current.mouseX;
-      const mouseY = mouseRef.current.mouseY;
-      let closestHoverIdx = -1;
-      let minDistance = 22;
-
-      for (let i = projected.length - 1; i >= Math.floor(projected.length * 0.5); i--) {
-        const item = projected[i];
-        const dist = Math.hypot(mouseX - item.projX, mouseY - item.projY);
-        if (dist < minDistance) {
-          closestHoverIdx = item.p.id;
-          minDistance = dist;
-          break;
-        }
-      }
-      mouseRef.current.hoveredTileIdx = closestHoverIdx;
-
-      // Render each artwork tile
+      // Render miniature artwork tiles
       for (let i = 0; i < projected.length; i++) {
         const item = projected[i];
         const { p, projX, projY, projZ, scale } = item;
         const sprite = sprites[p.spriteIdx % sprites.length];
         if (!sprite) continue;
 
-        const isHovered = p.id === closestHoverIdx;
-        const hoverScale = isHovered ? 1.75 : 1.0;
-
-        const w = sprite.width * scale * hoverScale * 0.72;
-        const h = sprite.height * scale * hoverScale * 0.72;
+        const w = sprite.width * scale * 0.74;
+        const h = sprite.height * scale * 0.74;
         const x = projX - w * 0.5;
         const y = projY - h * 0.5;
 
-        // Depth cueing: back tiles are softly translucent, front tiles are 100% crisp
-        const depthNorm = (projZ + 270) / 540; // 0 (back) to 1 (front)
-        const alpha = isHovered ? 1.0 : Math.min(1.0, Math.max(0.22, 0.2 + depthNorm * 0.8));
+        // Depth cueing: back tiles softly translucent, front tiles crisp & opaque
+        const depthNorm = (projZ + globeRadius) / (globeRadius * 2);
+        const alpha = Math.min(1.0, Math.max(0.24, 0.22 + depthNorm * 0.78));
 
         ctx.globalAlpha = alpha;
 
         // Realistic museum drop shadow for foreground tiles
-        if (projZ > -50 || isHovered) {
-          ctx.shadowColor = isHovered ? 'rgba(0, 0, 0, 0.35)' : 'rgba(0, 0, 0, 0.14)';
-          ctx.shadowBlur = isHovered ? 14 : 5 * scale;
+        if (projZ > -40) {
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+          ctx.shadowBlur = 5 * scale;
           ctx.shadowOffsetX = 0;
-          ctx.shadowOffsetY = isHovered ? 6 : 2.5 * scale;
+          ctx.shadowOffsetY = 2.5 * scale;
         } else {
           ctx.shadowColor = 'transparent';
         }
 
-        // Draw miniature artwork tile
+        // Draw miniature artwork painting
         ctx.drawImage(sprite.canvas, x, y, w, h);
-
-        // Highlight ring if hovered
-        if (isHovered) {
-          ctx.shadowColor = 'transparent';
-          ctx.strokeStyle = '#D4AF37';
-          ctx.lineWidth = 1.5;
-          ctx.strokeRect(x - 1, y - 1, w + 2, h + 2);
-        }
       }
 
       ctx.restore();
@@ -418,38 +462,30 @@ export default function TracingArtGlobe() {
     animId = requestAnimationFrame(render);
 
     return () => {
-      window.removeEventListener('mousedown', onMouseDown);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-      canvas.removeEventListener('touchstart', onTouchStart);
-      window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('mousemove', handleWindowMouseMove);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+      canvas.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
       if (animId) cancelAnimationFrame(animId);
     };
-  }, [particles, sprites]);
+  }, [particles, sprites, bgFrames]);
 
   return (
     <div
       ref={containerRef}
-      className="relative z-10 w-full flex flex-col items-center justify-center py-6 sm:py-10 select-none overflow-visible"
-      aria-label="Interactive 3D Artwork Provenance Globe"
+      className="relative z-10 w-full flex items-center justify-center my-6 select-none overflow-hidden"
+      aria-label="Getty Tracing Art 3D Artwork Globe with Parallax Background"
     >
-      {/* ── 3D ARTWORK GLOBE (CENTERED IN VIEWPORT) ── */}
-      <div className="relative w-full max-w-[760px] h-[580px] sm:h-[680px] lg:h-[740px] flex items-center justify-center">
+      {/* ── FULL-BLEED CANVAS CONTAINER: GLOBE IN CENTER, FLOATING FRAMES BEHIND ── */}
+      <div className="relative w-full h-[620px] sm:h-[720px] lg:h-[780px] flex items-center justify-center">
         <canvas
           ref={canvasRef}
           className="size-full block cursor-grab active:cursor-grabbing touch-none select-none"
-          title="Click and drag to spin the artwork globe"
+          title="Move cursor to tilt globe and parallax background"
           style={{ width: '100%', height: '100%' }}
         />
-
-        {/* Ambient subtle center glow behind globe */}
-        <div
-          className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center"
-          aria-hidden="true"
-        >
-          <div className="size-[380px] sm:size-[480px] rounded-full bg-radial from-amber-500/[0.04] via-zinc-500/[0.02] to-transparent blur-3xl" />
-        </div>
       </div>
     </div>
   );
