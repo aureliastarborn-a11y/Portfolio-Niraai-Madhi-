@@ -38,22 +38,27 @@ export default function TracingArtGlobe() {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
 
-  // Dynamic mouse & rotation state
+  // Dynamic state: mouse, rotation, scroll scatter physics
   const stateRef = useRef({
     isDown: false,
     prevX: 0,
     prevY: 0,
     dragVelX: 0,
     dragVelY: 0,
-    ambientRotY: 0.2,
-    ambientRotX: -0.05,
+    ambientRotY: 0.25,
+    ambientRotX: -0.06,
     mouseTargetY: 0,
     mouseTargetX: 0,
     mouseNormX: 0,
     mouseNormY: 0,
-    currentRotY: 0.2,
-    currentRotX: -0.05,
-    hoveredTileId: -1,
+    currentRotY: 0.25,
+    currentRotX: -0.06,
+    
+    // Scroll-driven scatter physics
+    scatterAmount: 0.0,    // 0.0 = completely normal closed sphere, 1.0 = fully scattered
+    targetScatter: 0.0,
+    scrollVelocityScatter: 0.0,
+    lastScrollY: 0,
   });
 
   // 1. Generate high-resolution pre-rendered miniature artwork sprites
@@ -158,9 +163,9 @@ export default function TracingArtGlobe() {
     return generated;
   }, []);
 
-  // 2. Generate ~820 particles along Fibonacci sphere
+  // 2. Generate 780 3D particles on a Fibonacci sphere with unique radial scatter vectors
   const particles = useMemo(() => {
-    const COUNT = 820;
+    const COUNT = 780;
     const items = [];
     const phi = Math.PI * (3 - Math.sqrt(5)); // Golden ratio angle
 
@@ -169,20 +174,30 @@ export default function TracingArtGlobe() {
       const radiusAtY = Math.sqrt(1 - y * y);
       const theta = phi * i;
 
-      // Volumetric sphere layering
+      // Volumetric sphere layering (normal state)
       const isInner = i % 5 === 0;
-      const baseR = 1.0;
-      const rMult = isInner ? (0.84 + (i % 7) * 0.02) : (0.97 + ((i % 5) - 2) * 0.015);
+      const baseR = isInner ? (0.84 + (i % 7) * 0.02) : (0.98 + ((i % 5) - 2) * 0.015);
 
-      const nx = Math.cos(theta) * radiusAtY * rMult;
-      const nz = Math.sin(theta) * radiusAtY * rMult;
-      const ny = y * rMult;
+      const nx = Math.cos(theta) * radiusAtY;
+      const ny = y;
+      const nz = Math.sin(theta) * radiusAtY;
+
+      // Unique 3D scatter destination when scrolling
+      // Outward radial dispersion + individual organic noise
+      const scatterDist = 320 + (i % 9) * 35;
+      const scatterAngle = (i * 0.85) + Math.sin(i * 1.5) * 2.0;
+      const scatterX = nx * scatterDist + Math.cos(scatterAngle) * 80;
+      const scatterY = ny * scatterDist + Math.sin(scatterAngle) * 80;
+      const scatterZ = nz * scatterDist + ((i % 7) - 3) * 60;
 
       items.push({
         id: i,
-        nx,
-        ny,
-        nz,
+        nx: nx * baseR,
+        ny: ny * baseR,
+        nz: nz * baseR,
+        scatterX,
+        scatterY,
+        scatterZ,
         spriteIdx: i % Math.max(1, SPRITE_THEMES.length * 3),
         wobble: Math.random() * Math.PI * 2,
         wobbleSpeed: 0.5 + Math.random() * 0.8,
@@ -197,34 +212,32 @@ export default function TracingArtGlobe() {
     const COUNT = 115;
     const items = [];
 
-    // Seeded random distribution to keep stable positions
     for (let i = 0; i < COUNT; i++) {
       const u = (i * 1.6180339887) % 1;
       const v = ((i + 0.3819) * 2.7182818) % 1;
 
-      // Aspect ratios (portrait, landscape, square)
       const type = i % 3;
       let w = 42;
       let h = 54;
-      if (type === 0) { // Landscape
+      if (type === 0) {
         w = 54 + (i % 6) * 6;
         h = 36 + (i % 4) * 5;
-      } else if (type === 1) { // Portrait
+      } else if (type === 1) {
         w = 38 + (i % 4) * 5;
         h = 52 + (i % 6) * 6;
-      } else { // Square
+      } else {
         w = 46 + (i % 5) * 4;
         h = w;
       }
 
-      // 3D Parallax depth layers (0.35 to 1.35)
+      // Parallax depth layers (0.35 to 1.35)
       const depth = 0.35 + ((i % 7) / 6) * 1.0;
-      const alpha = 0.055 + (depth / 1.35) * 0.045; // Subtle stroke alpha
+      const alpha = 0.055 + (depth / 1.35) * 0.045;
 
       items.push({
         id: i,
-        u, // 0..1 relative horizontal pos
-        v, // 0..1 relative vertical pos
+        u,
+        v,
         w,
         h,
         depth,
@@ -235,6 +248,43 @@ export default function TracingArtGlobe() {
     return items;
   }, []);
 
+  // 4. Scroll listener: controls the scatter and re-assemble physics
+  useEffect(() => {
+    let lastY = window.scrollY;
+
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      const deltaY = Math.abs(currentY - lastY);
+      lastY = currentY;
+
+      // A) Velocity-driven scatter: scrolling fast pushes particles outward!
+      stateRef.current.scrollVelocityScatter = Math.min(
+        1.3,
+        stateRef.current.scrollVelocityScatter + Math.min(0.65, deltaY * 0.016)
+      );
+
+      // B) Position-driven scatter: as the user scrolls towards the globe, it is scattered open;
+      // as they center on the globe, it comes back together into the normal closed sphere!
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const vh = window.innerHeight;
+        
+        // Distance from center of container to center of viewport
+        const centerDist = Math.abs((rect.top + rect.height * 0.5) - vh * 0.5);
+        const normDist = Math.min(1, centerDist / (vh * 0.65));
+
+        // When far from center (entering or leaving): targetScatter increases
+        // When centered in viewport: targetScatter drops to 0 (normal closed sphere)
+        stateRef.current.targetScatter = Math.pow(normDist, 1.4) * 0.85;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // 5. Main 3D Render Loop & Mouse / Touch controls
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || sprites.length === 0) return;
@@ -244,15 +294,14 @@ export default function TracingArtGlobe() {
     let animId;
     let time = 0;
 
-    // Track mouse across the window for smooth continuous globe & background response
     const handleWindowMouseMove = (e) => {
       const normX = (e.clientX / window.innerWidth) * 2 - 1;
       const normY = (e.clientY / window.innerHeight) * 2 - 1;
 
       stateRef.current.mouseNormX = normX;
       stateRef.current.mouseNormY = normY;
-      stateRef.current.mouseTargetY = normX * 0.65;
-      stateRef.current.mouseTargetX = -normY * 0.45;
+      stateRef.current.mouseTargetY = normX * 0.55;
+      stateRef.current.mouseTargetX = -normY * 0.40;
 
       if (stateRef.current.isDown) {
         const deltaX = e.clientX - stateRef.current.prevX;
@@ -276,7 +325,7 @@ export default function TracingArtGlobe() {
       stateRef.current.isDown = false;
     };
 
-    // Touch events for mobile
+    // Touch support for mobile devices
     const handleTouchStart = (e) => {
       if (e.touches.length === 1) {
         stateRef.current.isDown = true;
@@ -327,7 +376,7 @@ export default function TracingArtGlobe() {
       ctx.clearRect(0, 0, width, height);
 
       // Continuous ambient rotation + mouse following
-      stateRef.current.ambientRotY += 0.0018; // smooth constant rotation
+      stateRef.current.ambientRotY += 0.0018;
 
       if (!stateRef.current.isDown) {
         stateRef.current.dragVelX *= 0.94;
@@ -354,8 +403,16 @@ export default function TracingArtGlobe() {
       const centerX = width * 0.5;
       const centerY = height * 0.5;
 
-      // ── 1. RENDER BACKGROUND HOLLOW FRAMES (PARALLAX FIELD) ──
-      // The background moves inversely and in sync with the globe movement / mouse cursor
+      // ── SCATTER PHYSICS: "WHILE SCROLLING SCATTERED, AFTER SCROLL COME BACK TO NORMAL" ──
+      // Decaying velocity scatter back to 0
+      stateRef.current.scrollVelocityScatter *= 0.88;
+
+      // Combine position-based scatter and scroll velocity scatter
+      const combinedTargetScatter = Math.min(1.2, stateRef.current.targetScatter + stateRef.current.scrollVelocityScatter);
+      stateRef.current.scatterAmount += (combinedTargetScatter - stateRef.current.scatterAmount) * 0.085;
+      const scatter = stateRef.current.scatterAmount;
+
+      // ── 1. RENDER BACKGROUND HOLLOW PICTURE FRAMES (PARALLAX FIELD) ──
       ctx.lineWidth = 1;
 
       for (let i = 0; i < bgFrames.length; i++) {
@@ -365,7 +422,6 @@ export default function TracingArtGlobe() {
         const parallaxX = (curRotY * 110 + stateRef.current.mouseNormX * 45) * frame.depth;
         const parallaxY = (curRotX * 90 + stateRef.current.mouseNormY * 35) * frame.depth;
 
-        // Base screen position mapped across width & height
         let screenX = (frame.u * width - parallaxX) % width;
         let screenY = (frame.v * height - parallaxY) % height;
 
@@ -383,7 +439,7 @@ export default function TracingArtGlobe() {
         ctx.stroke();
       }
 
-      // ── 2. RENDER 3D ARTWORK GLOBE ──
+      // ── 2. RENDER 3D ARTWORK GLOBE (SCATTERS & COMES BACK TO NORMAL) ──
       const globeRadius = Math.min(260, Math.min(width, height) * 0.35);
       const fov = 680;
 
@@ -394,9 +450,16 @@ export default function TracingArtGlobe() {
 
         // Micro-flutter
         const flutter = Math.sin(time * p.wobbleSpeed + p.wobble) * 1.2;
-        const px = p.nx * globeRadius;
-        const py = p.ny * globeRadius + flutter;
-        const pz = p.nz * globeRadius;
+
+        // Position: Normal Fibonacci sphere position + scattered outward offset
+        const normalX = p.nx * globeRadius;
+        const normalY = p.ny * globeRadius;
+        const normalZ = p.nz * globeRadius;
+
+        // When scatter > 0, particles fly outward to scatterX, scatterY, scatterZ
+        const px = normalX + p.scatterX * scatter;
+        const py = normalY + flutter + p.scatterY * scatter;
+        const pz = normalZ + p.scatterZ * scatter;
 
         // Y-axis rotation
         const x1 = px * cosY + pz * sinY;
@@ -436,7 +499,7 @@ export default function TracingArtGlobe() {
         const y = projY - h * 0.5;
 
         // Depth cueing: back tiles softly translucent, front tiles crisp & opaque
-        const depthNorm = (projZ + globeRadius) / (globeRadius * 2);
+        const depthNorm = (projZ + globeRadius * 1.5) / (globeRadius * 3);
         const alpha = Math.min(1.0, Math.max(0.24, 0.22 + depthNorm * 0.78));
 
         ctx.globalAlpha = alpha;
@@ -475,17 +538,25 @@ export default function TracingArtGlobe() {
   return (
     <div
       ref={containerRef}
-      className="relative z-10 w-full flex items-center justify-center my-6 select-none overflow-hidden"
-      aria-label="Getty Tracing Art 3D Artwork Globe with Parallax Background"
+      className="relative z-10 w-full flex items-center justify-center my-8 sm:my-12 select-none overflow-hidden"
+      aria-label="Interactive 3D Artwork Globe with Scroll Scatter and Parallax Background"
     >
-      {/* ── FULL-BLEED CANVAS CONTAINER: GLOBE IN CENTER, FLOATING FRAMES BEHIND ── */}
-      <div className="relative w-full h-[620px] sm:h-[720px] lg:h-[780px] flex items-center justify-center">
+      {/* ── 3D ARTWORK GLOBE & PARALLAX BACKGROUND FRAMES (CENTERED) ── */}
+      <div className="relative w-full h-[640px] sm:h-[740px] lg:h-[820px] flex items-center justify-center">
         <canvas
           ref={canvasRef}
           className="size-full block cursor-grab active:cursor-grabbing touch-none select-none"
-          title="Move cursor to tilt globe and parallax background"
+          title="Scroll or move cursor to scatter and rotate the globe"
           style={{ width: '100%', height: '100%' }}
         />
+
+        {/* Ambient subtle center glow behind globe */}
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center"
+          aria-hidden="true"
+        >
+          <div className="size-[400px] sm:size-[520px] rounded-full bg-radial from-amber-500/[0.04] via-zinc-500/[0.02] to-transparent blur-3xl" />
+        </div>
       </div>
     </div>
   );
