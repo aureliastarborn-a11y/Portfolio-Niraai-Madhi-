@@ -49,7 +49,7 @@ export default function App() {
           >
             {/* ── TOP LIGHT-SHADED MOSAIC SHADER BACKGROUND (HERO BACKDROP) ── */}
             <div
-              className="absolute inset-x-0 top-0 -bottom-28 z-0 pointer-events-none select-none overflow-hidden"
+              className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden"
               aria-hidden="true"
             >
               <MosaicShaderBackground
@@ -60,8 +60,8 @@ export default function App() {
                 height="100%"
                 interactive={true}
               />
-              {/* Smooth Fade Out After / Below the Marked Hero Area */}
-              <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-b from-transparent via-background/60 to-background pointer-events-none" />
+              {/* Smooth Dissolve into Pure White Canvas before About Me */}
+              <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-background pointer-events-none" />
             </div>
 
             {/* The 8 Interactive Refractive Glass Spheres */}

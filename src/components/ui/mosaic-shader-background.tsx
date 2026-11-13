@@ -8,7 +8,7 @@ import * as React from "react"
  * spectral facets on slate, "waves" is flowing silk on plum. Switching the
  * `scene` prop does not crossfade: the sky re-tiles into the next scene cell
  * by cell, from the bottom up. Children sit on top.
- * Supports "light" (warm faded gold palette, zero blue) and "dark" mode.
+ * Supports "light" (clean light porcelain with mild faded gold on cursor move) and "dark" mode.
  */
 
 export type MosaicScene = "mosaic" | "prism" | "waves"
@@ -16,7 +16,7 @@ export type MosaicAccent = "ice" | "ember" | "lime"
 export type MosaicTheme = "light" | "dark"
 
 export interface MosaicShaderBackgroundProps {
-  /** "light" (warm faded gold palette, zero blue) or "dark". Defaults to "light". */
+  /** "light" (clean light porcelain with mild faded gold on cursor move) or "dark". Defaults to "light". */
   theme?: MosaicTheme
   /** Which scene is showing. Changing it re-tiles the sky into the new one. */
   scene?: MosaicScene
@@ -35,9 +35,9 @@ export interface MosaicShaderBackgroundProps {
 const SCENES: MosaicScene[] = ["mosaic", "prism", "waves"]
 
 const ACCENTS = {
-  ice: [0.95, 0.85, 0.65],
-  ember: [1.0, 0.78, 0.52],
-  lime: [0.92, 0.88, 0.60],
+  ice: [0.95, 0.88, 0.72],
+  ember: [0.96, 0.86, 0.68],
+  lime: [0.94, 0.90, 0.74],
 }
 
 const VERT = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos,0.0,1.0);}"
@@ -66,6 +66,45 @@ vec3 mosaic(vec2 frag){
   vec2 p = (id + 0.5) * cell / uRes.y;
   float ax = uRes.x / uRes.y;
   float t = uTime * 0.07;
+  
+  float h = hash(id);
+  vec2 q = abs(f - 0.5);
+  float tile = smoothstep(0.47, 0.41, max(q.x, q.y));
+
+  if (uTheme > 0.5) {
+    // Light Theme:
+    // Base tile is a pristine, clean light porcelain (no center yellow/gold blob!)
+    vec3 baseTile = vec3(0.985, 0.983, 0.980);
+    // Subtle neutral seam between tiles
+    vec3 groove = vec3(0.928, 0.924, 0.918);
+    
+    // Very subtle ambient shimmer across all tiles
+    float ambientL = 0.015 * sin(uTime * 0.8 + h * 6.28);
+    vec3 tileCol = baseTile + vec3(ambientL);
+    
+    // MILD FADED GOLD ONLY WHEN CURSOR MOVES
+    float ptrDist2 = dot(p - uPtr, p - uPtr);
+    float ptrLight = uPtrOn * exp(-9.5 * ptrDist2);
+    // Quantized stepped light levels for tiles near cursor
+    float steppedPtr = floor(ptrLight * 7.0 + h * 0.5) / 7.0;
+    
+    // Soft, mild faded gold / champagne shade (gentle, not bright or oversaturated)
+    vec3 mildGold = vec3(0.945, 0.885, 0.775);
+    vec3 warmChampagne = vec3(0.970, 0.930, 0.855);
+    vec3 goldTint = mix(mildGold, warmChampagne, h);
+    
+    // Only illuminate with mild gold when cursor is active and near
+    tileCol = mix(tileCol, goldTint, clamp(steppedPtr * 0.70, 0.0, 0.70));
+    
+    // 3D Bevel and rounded tile gloss
+    tileCol *= (0.95 + 0.10 * f.y);
+    
+    // Combine tile with groove
+    vec3 col = mix(groove, tileCol, tile);
+    return col;
+  }
+
+  // Dark-shaded original
   vec2 l1 = vec2(ax * 0.5 + 0.38 * sin(t * 2.1), 0.56 + 0.14 * cos(t * 1.7));
   vec2 l2 = vec2(ax * 0.5 - 0.55 * cos(t * 1.3), 0.2 + 0.1 * sin(t * 2.3));
   vec2 l3 = vec2(ax * 0.5 + 0.62 * cos(t * 0.9 + 2.0), 0.86 + 0.08 * sin(t * 1.1));
@@ -73,34 +112,9 @@ vec3 mosaic(vec2 frag){
   L += uPtrOn * 0.5 * exp(-14.0 * dot(p - uPtr, p - uPtr));
   float n = fbm(p * 3.0 + vec2(t * 1.6, -t * 1.1));
   L *= 0.45 + n;
-  float h = hash(id);
   L *= 0.8 + 0.28 * sin(uTime * (0.5 + h * 1.4) + h * 40.0);
   L = clamp(L, 0.0, 1.0);
   L = floor(L * 8.0 + h * 0.6) / 8.0;
-  vec2 q = abs(f - 0.5);
-  float tile = smoothstep(0.47, 0.41, max(q.x, q.y));
-
-  if (uTheme > 0.5) {
-    // Pure Light Faded Gold Mosaic - Absolutely Zero Blue
-    vec3 baseTile = vec3(0.978, 0.972, 0.962);
-    // Soft champagne gold & warm faded amber
-    vec3 goldSoft = vec3(0.965, 0.915, 0.815);
-    vec3 goldRich = vec3(0.915, 0.805, 0.615);
-    vec3 tileColor = mix(goldSoft, goldRich, smoothstep(0.25, 0.75, n));
-    vec3 goldAccent = vec3(0.945, 0.835, 0.595);
-    tileColor = mix(tileColor, goldAccent, 0.22 * L);
-    // Quantized stepped light levels per tile
-    vec3 litTile = mix(baseTile, tileColor, 0.15 + 0.85 * L);
-    litTile += vec3(0.09, 0.08, 0.05) * pow(L, 2.0);
-    // 3D Bevel and rounded tile gloss
-    litTile *= (0.87 + 0.23 * f.y);
-    // Soft warm dimensional tile groove
-    vec3 groove = vec3(0.895, 0.875, 0.840);
-    vec3 col = mix(groove, litTile, tile);
-    return col;
-  }
-
-  // Dark-shaded original
   vec3 cool = vec3(0.60, 0.70, 0.86);
   vec3 warm = vec3(0.96, 0.88, 0.78);
   vec3 col = mix(cool, warm, smoothstep(0.25, 0.75, n)) * L * 0.6;
@@ -121,13 +135,12 @@ vec3 prism(vec2 frag){
   float beam = exp(-pow((d - (0.55 + 0.35 * sin(t * 2.0))) * 2.4, 2.0));
 
   if (uTheme > 0.5) {
-    // Light faded gold prism: warm amber facets on champagne alabaster
-    vec3 base = mix(vec3(0.96, 0.94, 0.91), vec3(0.985, 0.98, 0.96), smoothstep(-0.2, 1.3, p.y + p.x * 0.15));
+    vec3 base = mix(vec3(0.97, 0.96, 0.94), vec3(0.99, 0.985, 0.975), smoothstep(-0.2, 1.3, p.y + p.x * 0.15));
     float glint = pow(max(0.0, 1.0 - abs(s - 0.02) * 30.0), 3.0) * beam;
-    vec3 goldSpec = mix(vec3(0.92, 0.80, 0.58), vec3(0.98, 0.92, 0.75), spec.r);
-    vec3 col = mix(base, goldSpec, facet * (0.35 + 0.65 * beam));
-    col += goldSpec * beam * 0.15;
-    col += vec3(0.14, 0.12, 0.08) * glint;
+    vec3 goldSpec = mix(vec3(0.94, 0.86, 0.70), vec3(0.98, 0.93, 0.82), spec.r);
+    vec3 col = mix(base, goldSpec, facet * (0.25 + 0.45 * beam));
+    col += goldSpec * beam * 0.10;
+    col += vec3(0.10, 0.09, 0.06) * glint;
     return col;
   }
 
@@ -146,18 +159,17 @@ vec3 waves(vec2 frag){
   float t = uTime * 0.11;
 
   if (uTheme > 0.5) {
-    // Light faded gold waves: warm champagne ribbons
-    vec3 col = mix(vec3(0.96, 0.94, 0.91), vec3(0.985, 0.98, 0.965), smoothstep(0.0, 1.1, p.y));
+    vec3 col = mix(vec3(0.97, 0.96, 0.94), vec3(0.99, 0.985, 0.975), smoothstep(0.0, 1.1, p.y));
     for (int i = 0; i < 5; i++){
       float fi = float(i);
       float y = 0.52 + (fi - 2.0) * 0.055
         + 0.16 * sin(p.x * (1.5 + fi * 0.3) + t * (1.0 + fi * 0.22) + fi * 1.7)
         + 0.05 * sin(p.x * 3.7 - t * 1.4 + fi * 2.3);
       float dist = abs(p.y - y);
-      vec3 goldRibbon = mix(vec3(0.92, 0.81, 0.58), vec3(0.98, 0.91, 0.72), sin(fi + t) * 0.5 + 0.5);
-      col = mix(col, goldRibbon, (exp(-dist * 42.0) * 0.35 + exp(-dist * 7.0) * 0.08));
+      vec3 goldRibbon = mix(vec3(0.94, 0.88, 0.74), vec3(0.98, 0.94, 0.82), sin(fi + t) * 0.5 + 0.5);
+      col = mix(col, goldRibbon, (exp(-dist * 42.0) * 0.25 + exp(-dist * 7.0) * 0.06));
     }
-    col *= 0.97 + 0.03 * fbm(p * 2.2 + t);
+    col *= 0.98 + 0.02 * fbm(p * 2.2 + t);
     return col;
   }
 
@@ -189,8 +201,9 @@ void main(){
   vec2 uv = frag / uRes;
 
   if (uTheme > 0.5) {
-    float vig = smoothstep(1.35, 0.3, length((uv - 0.5) * vec2(1.0, 1.15)));
-    col = mix(vec3(0.985, 0.98, 0.965), col, 0.92 + 0.08 * vig);
+    // Slowly dissolve the mosaic effect as it approaches the bottom marked area into pure white
+    float dissolve = smoothstep(0.02, 0.32, uv.y);
+    col = mix(vec3(1.0, 1.0, 1.0), col, dissolve);
   } else {
     float vig = smoothstep(1.25, 0.25, length((uv - 0.5) * vec2(1.0, 1.15)));
     col *= 0.55 + 0.45 * vig;
@@ -356,13 +369,30 @@ export default function MosaicShaderBackground({
     }
     raf = requestAnimationFrame(frame)
 
+    let ptrTimer: any = 0
     const move = (e: PointerEvent) => {
       const r = root.getBoundingClientRect()
       s.ptr = [(e.clientX - r.left) / r.height, (r.bottom - e.clientY) / r.height]
-      s.ptrOn = 1
+      s.ptrOn = 1.0
+      s.dirty = true
+      clearTimeout(ptrTimer)
+      ptrTimer = window.setTimeout(() => {
+        const fade = () => {
+          if (s.ptrOn > 0.02) {
+            s.ptrOn *= 0.88
+            s.dirty = true
+            requestAnimationFrame(fade)
+          } else {
+            s.ptrOn = 0.0
+            s.dirty = true
+          }
+        }
+        requestAnimationFrame(fade)
+      }, 1000)
     }
     const leave = () => {
-      s.ptrOn = 0
+      s.ptrOn = 0.0
+      s.dirty = true
     }
     if (interactive) {
       window.addEventListener("pointermove", move)
@@ -373,6 +403,7 @@ export default function MosaicShaderBackground({
       cancelAnimationFrame(raf)
       ro.disconnect()
       io.disconnect()
+      clearTimeout(ptrTimer)
       window.removeEventListener("pointermove", move)
       window.removeEventListener("pointerleave", leave)
       gl.deleteBuffer(buf)
@@ -409,10 +440,10 @@ const MSB_CSS = `
 .msb-shade{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(5,5,6,.45),transparent 22%,transparent 72%,rgba(5,5,6,.55))}
 .msb-content{position:absolute;inset:0;z-index:1}
 
-/* Light theme overrides for portfolio light mode: warm champagne & faded gold */
-.msb-root[data-theme="light"]{color:#18181b;background:radial-gradient(60% 50% at 50% 55%,#f9f7f2,transparent 70%),#fdfcf9}
-.msb-root[data-theme="light"][data-scene="prism"]{background:linear-gradient(120deg,#fcfaf5,#f4eedf 50%,#fcfaf5)}
-.msb-root[data-theme="light"][data-scene="waves"]{background:radial-gradient(80% 60% at 50% 60%,#fdf8f0,transparent 70%),#faf5ea}
+/* Light theme overrides for portfolio light mode: pristine porcelain with mild faded gold on cursor move */
+.msb-root[data-theme="light"]{color:#18181b;background:#ffffff}
+.msb-root[data-theme="light"][data-scene="prism"]{background:#ffffff}
+.msb-root[data-theme="light"][data-scene="waves"]{background:#ffffff}
 .msb-root[data-theme="light"] .msb-shade{display:none}
 
 @media (prefers-reduced-motion:reduce){
