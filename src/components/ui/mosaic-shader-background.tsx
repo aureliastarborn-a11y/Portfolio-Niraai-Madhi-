@@ -7,8 +7,8 @@ import * as React from "react"
  * "mosaic" is soft light quantised into rounded tiles, "prism" is diagonal
  * spectral facets on slate, "waves" is flowing silk on plum. Switching the
  * `scene` prop does not crossfade: the sky re-tiles into the next scene cell
- * by cell, from the bottom up. Children sit on top. Supports "light" (for light
- * themed portfolios) and "dark" mode.
+ * by cell, from the bottom up. Children sit on top.
+ * Supports "light" (for light themed portfolios) and "dark" mode.
  */
 
 export type MosaicScene = "mosaic" | "prism" | "waves"
@@ -80,21 +80,28 @@ vec3 mosaic(vec2 frag){
   vec2 q = abs(f - 0.5);
   float tile = smoothstep(0.47, 0.41, max(q.x, q.y));
 
+  vec3 cool = vec3(0.55, 0.74, 0.95);
+  vec3 warm = vec3(1.0, 0.80, 0.62);
+
   if (uTheme > 0.5) {
-    // Light shaded theme: luminous porcelain tiles with subtle ice / pearlescent accents
-    vec3 tileBase = mix(vec3(0.935, 0.94, 0.955), vec3(0.985, 0.988, 0.995), tile);
-    vec3 coolTint = vec3(0.88, 0.93, 0.99);
-    vec3 warmTint = vec3(0.99, 0.965, 0.935);
-    vec3 lightTint = mix(coolTint, warmTint, smoothstep(0.2, 0.8, n));
-    vec3 col = mix(tileBase, lightTint, L * 0.45);
-    col = mix(col, mix(tileBase, uAccent, 0.22), 0.20 * L);
-    col *= (0.96 + 0.04 * f.y) * (0.95 + 0.05 * tile);
+    // Exact Mosaic in Light Color Palette:
+    // Base porcelain tile
+    vec3 baseTile = vec3(0.95, 0.955, 0.975);
+    // Vibrant pastel cool & warm color mixture (rivers of warm amber & cool ice)
+    vec3 tileColor = mix(cool, warm, smoothstep(0.25, 0.75, n));
+    tileColor = mix(tileColor, uAccent, 0.15 * L);
+    // Quantized stepped light levels per tile (distinct mosaic variations)
+    vec3 litTile = mix(baseTile, tileColor, 0.18 + 0.82 * L);
+    litTile += vec3(0.10, 0.10, 0.12) * pow(L, 2.0);
+    // 3D Bevel and rounded tile gloss
+    litTile *= (0.86 + 0.24 * f.y);
+    // Soft dimensional tile groove
+    vec3 groove = vec3(0.83, 0.85, 0.89);
+    vec3 col = mix(groove, litTile, tile);
     return col;
   }
 
-  // Dark shaded theme (original)
-  vec3 cool = vec3(0.60, 0.70, 0.86);
-  vec3 warm = vec3(0.96, 0.88, 0.78);
+  // Dark-shaded original
   vec3 col = mix(cool, warm, smoothstep(0.25, 0.75, n)) * L * 0.6;
   col = mix(col, uAccent * L * 0.75, 0.2 * L);
   col *= tile * (0.82 + 0.36 * f.y);
@@ -113,16 +120,17 @@ vec3 prism(vec2 frag){
   float beam = exp(-pow((d - (0.55 + 0.35 * sin(t * 2.0))) * 2.4, 2.0));
 
   if (uTheme > 0.5) {
-    // Light shaded theme: crystal facets on alabaster
-    vec3 col = mix(vec3(0.94, 0.945, 0.965), vec3(0.985, 0.988, 0.995), smoothstep(-0.2, 1.3, p.y + p.x * 0.15));
-    col = mix(col, spec, facet * beam * 0.18 + beam * 0.08);
+    // Light shaded exact prism: crystal facets on alabaster
+    vec3 base = mix(vec3(0.92, 0.94, 0.97), vec3(0.98, 0.985, 0.995), smoothstep(-0.2, 1.3, p.y + p.x * 0.15));
     float glint = pow(max(0.0, 1.0 - abs(s - 0.02) * 30.0), 3.0) * beam;
-    col += vec3(0.04, 0.06, 0.10) * glint;
-    col = mix(col, uAccent, 0.03);
+    vec3 col = mix(base, spec, facet * (0.35 + 0.65 * beam));
+    col += spec * beam * 0.15;
+    col += vec3(0.12, 0.12, 0.15) * glint;
+    col = mix(col, uAccent, 0.04);
     return col;
   }
 
-  // Dark shaded theme (original)
+  // Dark shaded original
   vec3 col = mix(vec3(0.06, 0.08, 0.13), vec3(0.17, 0.22, 0.31), smoothstep(-0.2, 1.3, p.y + p.x * 0.15));
   col += spec * facet * (0.09 + 0.3 * beam);
   col += spec * beam * 0.06;
@@ -137,8 +145,8 @@ vec3 waves(vec2 frag){
   float t = uTime * 0.11;
 
   if (uTheme > 0.5) {
-    // Light shaded theme: soft ribbons over airy off-white
-    vec3 col = mix(vec3(0.95, 0.945, 0.965), vec3(0.985, 0.98, 0.995), smoothstep(0.0, 1.1, p.y));
+    // Light shaded exact waves: pastel ribbons drifting over alabaster
+    vec3 col = mix(vec3(0.93, 0.92, 0.95), vec3(0.985, 0.98, 0.995), smoothstep(0.0, 1.1, p.y));
     for (int i = 0; i < 5; i++){
       float fi = float(i);
       float y = 0.52 + (fi - 2.0) * 0.055
@@ -146,13 +154,13 @@ vec3 waves(vec2 frag){
         + 0.05 * sin(p.x * 3.7 - t * 1.4 + fi * 2.3);
       float dist = abs(p.y - y);
       vec3 c = spectrum(fi * 0.16 + p.x * 0.12 - t * 0.25);
-      col = mix(col, c, (exp(-dist * 42.0) * 0.12 + exp(-dist * 7.0) * 0.03));
+      col = mix(col, c, (exp(-dist * 42.0) * 0.35 + exp(-dist * 7.0) * 0.08));
     }
-    col *= 0.98 + 0.03 * fbm(p * 2.2 + t);
+    col *= 0.97 + 0.03 * fbm(p * 2.2 + t);
     return col;
   }
 
-  // Dark shaded theme (original)
+  // Dark shaded original
   vec3 col = mix(vec3(0.07, 0.04, 0.08), vec3(0.20, 0.11, 0.19), smoothstep(0.0, 1.1, p.y));
   for (int i = 0; i < 5; i++){
     float fi = float(i);
@@ -180,8 +188,8 @@ void main(){
   vec2 uv = frag / uRes;
 
   if (uTheme > 0.5) {
-    float vig = smoothstep(1.3, 0.25, length((uv - 0.5) * vec2(1.0, 1.15)));
-    col = mix(vec3(0.975, 0.98, 0.99), col, 0.90 + 0.10 * vig);
+    float vig = smoothstep(1.35, 0.3, length((uv - 0.5) * vec2(1.0, 1.15)));
+    col = mix(vec3(0.965, 0.97, 0.985), col, 0.92 + 0.08 * vig);
   } else {
     float vig = smoothstep(1.25, 0.25, length((uv - 0.5) * vec2(1.0, 1.15)));
     col *= 0.55 + 0.45 * vig;
@@ -404,7 +412,7 @@ const MSB_CSS = `
 .msb-root[data-theme="light"]{color:#18181b;background:radial-gradient(60% 50% at 50% 55%,#f2f4f8,transparent 70%),#fafafc}
 .msb-root[data-theme="light"][data-scene="prism"]{background:linear-gradient(120deg,#f3f5f9,#e5eaf2 50%,#f3f5f9)}
 .msb-root[data-theme="light"][data-scene="waves"]{background:radial-gradient(80% 60% at 50% 60%,#f7f0f6,transparent 70%),#fbf7fa}
-.msb-root[data-theme="light"] .msb-shade{background:linear-gradient(180deg,rgba(255,255,255,.25),transparent 25%,transparent 65%,rgba(255,255,255,.92))}
+.msb-root[data-theme="light"] .msb-shade{display:none}
 
 @media (prefers-reduced-motion:reduce){
 .msb-root,.msb-canvas{transition:none}

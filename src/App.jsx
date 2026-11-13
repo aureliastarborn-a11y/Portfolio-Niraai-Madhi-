@@ -45,7 +45,7 @@ export default function App() {
           {/* ── HERO / ORBITAL SPHERE RING (TOP-MOST PHASE - KEPT INTACT) ── */}
           <header
             id="top"
-            className="sphere-ring relative z-10 grid min-h-screen h-screen place-items-center overflow-hidden isolate [--hero-height:100svh]"
+            className="sphere-ring relative z-10 grid min-h-screen h-screen place-items-center overflow-visible isolate [--hero-height:100svh]"
           >
             {/* ── TOP LIGHT-SHADED MOSAIC SHADER BACKGROUND (HERO BACKDROP) ── */}
             <div
@@ -60,8 +60,6 @@ export default function App() {
                 height="100%"
                 interactive={true}
               />
-              {/* Bottom Soft Dissolve into Clean Portfolio Canvas */}
-              <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background via-background/40 to-transparent pointer-events-none" />
             </div>
 
             {/* The 8 Interactive Refractive Glass Spheres */}
