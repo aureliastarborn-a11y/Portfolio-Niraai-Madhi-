@@ -75,10 +75,10 @@ export default function VinylAlbumCard({
             : "h-72 w-72",
         )}
       >
-        {/* Animated Spinning Dark Champagne Bronze CD Disc */}
+        {/* Animated Spinning Champagne Bronze CD Disc */}
         <motion.div
           className={cn(
-            "absolute flex items-center justify-center overflow-hidden rounded-full border border-[#524A3D] transition-colors duration-300 shadow-2xl backdrop-blur-md",
+            "absolute flex items-center justify-center overflow-hidden rounded-full border border-black/10 transition-colors duration-300 shadow-xl backdrop-blur-md",
             isSmall
               ? "h-44 w-44 sm:h-48 sm:w-48"
               : isCompact
@@ -108,7 +108,7 @@ export default function VinylAlbumCard({
           {/* Center Album Label - Darkened Ring Artwork Matching Sleeve */}
           <div
             className={cn(
-              "relative flex items-center justify-center overflow-hidden rounded-full shadow-md border border-[#524A3D] bg-[#FAF8F5]",
+              "relative flex items-center justify-center overflow-hidden rounded-full shadow-sm border border-black/10 bg-[#FAF8F5]",
               isSmall ? "h-16 w-16" : isCompact ? "h-20 w-20" : "h-24 w-24",
             )}
           >
@@ -127,10 +127,10 @@ export default function VinylAlbumCard({
           <div className="pointer-events-none absolute inset-0 -rotate-45 bg-gradient-to-br from-transparent via-white/35 to-transparent mix-blend-overlay" />
         </motion.div>
 
-        {/* ── ALBUM COVER SLEEVE (DARKENED RING DESIGN + CENTER HEADER ONLY) ── */}
+        {/* ── ALBUM COVER SLEEVE (LIGHTENED BORDER + CENTER HEADER ONLY) ── */}
         <motion.div
           className={cn(
-            "absolute z-20 overflow-hidden shadow-xl border-2 border-[#736858]/60 cursor-pointer bg-[#FAF8F5]",
+            "absolute z-20 overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.10)] border border-black/[0.08] cursor-pointer bg-[#FAF8F5] transition-shadow duration-300",
             isSmall
               ? "h-48 w-48 sm:h-52 sm:w-52 rounded-2xl"
               : isCompact
