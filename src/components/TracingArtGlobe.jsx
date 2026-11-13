@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import * as THREE from 'three';
 
 // 3D Miniature Architectural City Globe (Alex Shuper style)
-// Authentic 3D building skyscraper planet where the actual 3D buildings scatter outward on scroll and reassemble into the sphere
+// Real 3D building skyscraper planet where the 3D buildings scatter and reassemble on scroll
+// Movement reference: getty.edu/tracingart/ (scroll-driven 3D convergence into a tight sphere and scatter on scroll)
 
-// Alex Shuper Architectural Palette (Terracotta, Brick, Sandstone, Limestone, Copper)
+// Alex Shuper Architectural Palette (Terracotta, Coral, Sandstone, Limestone, Copper)
 const BUILDING_COLORS = [
   0xb85d43, // Terracotta Red
   0xc76c52, // Warm Coral Terracotta
@@ -78,7 +79,10 @@ export default function TracingArtGlobe() {
     mouseTargetX: 0,
     curRotY: 0.25,
     curRotX: -0.06,
+
+    // Scroll movement physics (inspired by getty.edu/tracingart/)
     scatterAmount: 0.0,
+    targetScatter: 0.0,
     scrollScatterVelocity: 0.0,
     lastScrollY: typeof window !== 'undefined' ? window.scrollY : 0,
   });
@@ -122,13 +126,13 @@ export default function TracingArtGlobe() {
       quat.premultiply(streetQuat);
 
       // Scatter trajectory: outward along normal with organic dispersion & tumble
-      const scatterDistance = 1.6 + (i % 8) * 0.35 + Math.sin(i * 1.5) * 0.3;
+      const scatterDistance = 1.8 + (i % 8) * 0.35 + Math.sin(i * 1.5) * 0.3;
       const lateralAngle = i * 0.85;
       const tangent = new THREE.Vector3(
         -normal.z * Math.cos(lateralAngle),
         Math.sin(lateralAngle) * 0.45,
         normal.x * Math.cos(lateralAngle)
-      ).normalize().multiplyScalar(0.35);
+      ).normalize().multiplyScalar(0.4);
 
       const scatterDir = normal.clone().multiplyScalar(scatterDistance).add(tangent);
 
@@ -160,7 +164,7 @@ export default function TracingArtGlobe() {
     return items;
   }, []);
 
-  // Scroll listener: scatter buildings while scrolling, smoothly close back down
+  // Scroll listener: movement directly modeled after getty.edu/tracingart/
   useEffect(() => {
     stateRef.current.lastScrollY = window.scrollY;
 
@@ -172,17 +176,30 @@ export default function TracingArtGlobe() {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         const vh = window.innerHeight;
-        // React to scroll when near this section
-        if (rect.bottom > -vh * 0.5 && rect.top < vh * 1.5) {
-          stateRef.current.scrollScatterVelocity = Math.min(
-            1.25,
-            stateRef.current.scrollScatterVelocity + Math.min(0.75, deltaY * 0.022)
-          );
+
+        // Position-based continuous convergence:
+        // When center of globe is in center of viewport: targetScatter = 0 (solid closed sphere)
+        // As user scrolls above or below: targetScatter smoothly increases (buildings scatter open)
+        const centerDist = Math.abs((rect.top + rect.height * 0.5) - vh * 0.5);
+        const deadzone = 80;
+        if (centerDist < deadzone) {
+          stateRef.current.targetScatter = 0.0;
+        } else {
+          const maxDist = vh * 0.65;
+          const distNorm = Math.min(1.0, (centerDist - deadzone) / maxDist);
+          stateRef.current.targetScatter = Math.pow(distNorm, 1.35) * 0.85;
         }
+
+        // Velocity pulse: scrolling fast dynamically expands the scatter
+        stateRef.current.scrollScatterVelocity = Math.min(
+          1.2,
+          stateRef.current.scrollScatterVelocity + Math.min(0.65, deltaY * 0.018)
+        );
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -388,12 +405,15 @@ export default function TracingArtGlobe() {
       globeGroup.rotation.y = stateRef.current.curRotY;
       globeGroup.rotation.x = stateRef.current.curRotX;
 
-      // ── SCATTER PHYSICS: 3D BUILDINGS SCATTER OUTWARD WHILE SCROLLING ──
+      // ── SCATTER PHYSICS: BUILDINGS SCATTER OUTWARD WHILE SCROLLING ──
       // Velocity decay
-      stateRef.current.scrollScatterVelocity *= 0.88;
+      stateRef.current.scrollScatterVelocity *= 0.90;
 
-      // Spring scatterAmount towards velocity
-      stateRef.current.scatterAmount += (stateRef.current.scrollScatterVelocity - stateRef.current.scatterAmount) * 0.095;
+      // Combine position-driven convergence and velocity pulse
+      const totalTargetScatter = Math.min(1.2, stateRef.current.targetScatter + stateRef.current.scrollScatterVelocity);
+
+      // Silky smooth spring interpolation matching the Getty reference
+      stateRef.current.scatterAmount += (totalTargetScatter - stateRef.current.scatterAmount) * 0.075;
       let scatter = stateRef.current.scatterAmount;
       if (scatter < 0.002) scatter = 0;
 
