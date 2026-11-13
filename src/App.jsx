@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SphereRing from './components/SphereRing';
 import SphereFooter from './components/SphereFooter';
 import FolderCard from './components/FolderCard';
@@ -8,6 +8,7 @@ import Interactive3DSkillsTree from './components/Interactive3DSkillsTree';
 import PolaroidLineCarousel from '@/components/ui/polaroid-line-carousel';
 import TracingArtGlobe from './components/TracingArtGlobe';
 import MosaicShaderBackground from '@/components/ui/mosaic-shader-background';
+import ProjectExperienceModal from './components/ProjectExperienceModal';
 import { portfolioData } from './data/portfolioData';
 import {
   Sparkles,
@@ -22,6 +23,7 @@ import {
 
 export default function App() {
   const { personal, skills, projects, experiences, education, certifications } = portfolioData;
+  const [selectedItem, setSelectedItem] = useState(null);
 
   return (
     <div className="min-h-full flex flex-col font-sans bg-background text-foreground antialiased selection:bg-zinc-200">
@@ -177,7 +179,7 @@ export default function App() {
                     Projects
                   </h2>
                   <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
-                    Autonomous agents, enterprise data warehousing solutions, and exploratory analytics. Hover over any album to slide out its vinyl record.
+                    Autonomous agents, enterprise data warehousing solutions, and exploratory analytics. Click any album to view full project details and tech stack.
                   </p>
                 </div>
 
@@ -193,6 +195,7 @@ export default function App() {
                         description={proj.description}
                         tags={proj.tags}
                         size="small"
+                        onClick={() => setSelectedItem({ type: 'project', data: proj })}
                       />
                     ))}
                   </div>
@@ -207,7 +210,7 @@ export default function App() {
                     Experience
                   </h2>
                   <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
-                    Internship tenures, independent engineering, and technical development showcased as vinyl records.
+                    Internship tenures, independent engineering, and technical development showcased as vinyl records. Click any album to view full role details and milestones.
                   </p>
                 </div>
 
@@ -223,6 +226,7 @@ export default function App() {
                         description={exp.summary}
                         tags={exp.tags || [exp.organization]}
                         size="small"
+                        onClick={() => setSelectedItem({ type: 'experience', data: exp })}
                       />
                     ))}
                   </div>
@@ -364,6 +368,12 @@ export default function App() {
 
         {/* ── FOOTER SPHERE SCENE (FOOT-MOST PHASE - KEPT INTACT) ── */}
         <SphereFooter />
+
+        {/* ── PROJECT & EXPERIENCE INTERACTIVE DETAIL MODAL DIALOG ── */}
+        <ProjectExperienceModal
+          item={selectedItem}
+          onClose={() => setSelectedItem(null)}
+        />
       </main>
     </div>
   );

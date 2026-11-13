@@ -140,14 +140,16 @@ export const portfolioData = {
       role: "Machine Learning Intern",
       organization: "Sparwix",
       summary: "Data preprocessing, exploratory data analysis (EDA), and interactive Power BI dashboards for business insights.",
-      bg: "/images/covers/cover-rose.jpg"
+      bg: "/images/covers/cover-rose.jpg",
+      tags: ["Machine Learning", "EDA", "Power BI", "Python"]
     },
     {
       period: "2024",
       role: "AI Agent Developer",
       organization: "Independent",
       summary: "Constructed autonomous LLM agents, prompt engineering pipelines, and automated resume analysis tools.",
-      bg: "/images/covers/cover-lavender.jpg"
+      bg: "/images/covers/cover-lavender.jpg",
+      tags: ["Autonomous Agents", "LLMs", "Prompt Engineering", "Python"]
     },
     {
       period: "2023 – 2024",

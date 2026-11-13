@@ -43,7 +43,7 @@ export default function VinylAlbumCard({
   return (
     <div
       className={cn(
-        "group relative flex items-center justify-start select-none transition-all",
+        "group relative flex items-center justify-start select-none transition-all cursor-pointer",
         isSmall
           ? "w-full max-w-[270px] h-[215px] sm:h-[225px] p-1"
           : isCompact
@@ -54,8 +54,17 @@ export default function VinylAlbumCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
+      aria-label={`${title} - Click to view full details`}
     >
-      {/* ── THE MARKED BOX: SLEEVE WITH ALL CONTENT INSIDE + SLIDING GLASSY BEIGE CD DISC ── */}
+      {/* ── THE SLEEVE WITH ALL CONTENT INSIDE + SLIDING DARKENED BRONZE CD DISC ── */}
       <div
         className={cn(
           "relative z-10 flex items-center justify-center",
@@ -66,16 +75,16 @@ export default function VinylAlbumCard({
             : "h-72 w-72",
         )}
       >
-        {/* Animated Spinning Champagne Silver (#C9C2B6) CD Disc */}
+        {/* Animated Spinning Dark Champagne Bronze CD Disc */}
         <motion.div
           className={cn(
-            "absolute flex items-center justify-center overflow-hidden rounded-full border border-[#B8B0A2] transition-colors duration-300 shadow-2xl backdrop-blur-md",
+            "absolute flex items-center justify-center overflow-hidden rounded-full border border-[#524A3D] transition-colors duration-300 shadow-2xl backdrop-blur-md",
             isSmall
               ? "h-44 w-44 sm:h-48 sm:w-48"
               : isCompact
               ? "h-56 w-56 sm:h-60 sm:w-60"
               : "h-72 w-72",
-            "bg-[#C9C2B6] bg-gradient-to-tr from-[#BCB4A7] via-[#C9C2B6] to-[#D8D2C8]",
+            "bg-[#7D7364] bg-gradient-to-tr from-[#544C3F] via-[#756B5D] to-[#918676]",
           )}
           initial={{ x: 0, rotate: 0 }}
           animate={{
@@ -84,46 +93,46 @@ export default function VinylAlbumCard({
           }}
           transition={{ type: "spring", stiffness: 85, damping: 16, mass: 1 }}
         >
-          {/* Concentric Grooves in Champagne Silver Tones */}
-          <div className="absolute inset-1 rounded-full border border-[#D8D2C8]/70" />
-          <div className="absolute inset-2.5 rounded-full border border-[#B3AAA0]/60" />
-          <div className="absolute inset-4 rounded-full border border-[#D8D2C8]/80" />
-          <div className="absolute inset-6 rounded-full border border-[#B3AAA0]/60" />
-          <div className="absolute inset-8 rounded-full border border-[#D8D2C8]/70" />
-          <div className="absolute inset-10 rounded-full border border-[#B3AAA0]/60" />
-          <div className="absolute inset-12 rounded-full border border-[#D8D2C8]/80" />
-          <div className="absolute inset-15 rounded-full border border-[#B3AAA0]/60" />
-          <div className="absolute inset-18 rounded-full border border-[#D8D2C8]/70" />
-          <div className="absolute inset-22 rounded-full border border-[#B3AAA0]/60" />
+          {/* Concentric Grooves in Dark Burnished Bronze Tones */}
+          <div className="absolute inset-1 rounded-full border border-[#918676]/60" />
+          <div className="absolute inset-2.5 rounded-full border border-[#423C32]/75" />
+          <div className="absolute inset-4 rounded-full border border-[#918676]/70" />
+          <div className="absolute inset-6 rounded-full border border-[#423C32]/75" />
+          <div className="absolute inset-8 rounded-full border border-[#918676]/60" />
+          <div className="absolute inset-10 rounded-full border border-[#423C32]/75" />
+          <div className="absolute inset-12 rounded-full border border-[#918676]/70" />
+          <div className="absolute inset-15 rounded-full border border-[#423C32]/75" />
+          <div className="absolute inset-18 rounded-full border border-[#918676]/60" />
+          <div className="absolute inset-22 rounded-full border border-[#423C32]/75" />
 
-          {/* Center Album Label - Golden ring watercolor artwork matching sleeve */}
+          {/* Center Album Label - Darkened Ring Artwork Matching Sleeve */}
           <div
             className={cn(
-              "relative flex items-center justify-center overflow-hidden rounded-full shadow-md border border-[#B8B0A2] bg-[#FAF8F5]",
+              "relative flex items-center justify-center overflow-hidden rounded-full shadow-md border border-[#524A3D] bg-[#FAF8F5]",
               isSmall ? "h-16 w-16" : isCompact ? "h-20 w-20" : "h-24 w-24",
             )}
           >
             <img
               src={coverImage}
               alt="label"
-              className="absolute inset-0 h-full w-full scale-[1.08] object-cover"
+              className="absolute inset-0 h-full w-full scale-[1.08] object-cover contrast-[1.25] saturate-[1.35] brightness-[0.92]"
             />
-            {/* Center Spindle Hole with Champagne Silver Rim */}
-            <div className="z-10 h-3 w-3 rounded-full bg-[#A89F92] shadow-inner ring-1 ring-[#8A8174]" />
-            <div className="absolute inset-0 rounded-full ring-2 inset-ring ring-[#D8D2C8]/70" />
+            {/* Center Spindle Hole with Dark Gunmetal Bronze Rim */}
+            <div className="z-10 h-3 w-3 rounded-full bg-[#302B23] shadow-inner ring-2 ring-[#1F1B16]" />
+            <div className="absolute inset-0 rounded-full ring-2 inset-ring ring-[#524A3D]/80" />
           </div>
 
-          {/* Champagne Silver Radial Light Sheen */}
-          <div className="pointer-events-none absolute inset-0 rotate-45 bg-gradient-to-tr from-white/30 via-transparent to-amber-100/20 mix-blend-overlay" />
-          <div className="pointer-events-none absolute inset-0 -rotate-45 bg-gradient-to-br from-transparent via-white/45 to-transparent mix-blend-overlay" />
+          {/* Radial Light Sheen */}
+          <div className="pointer-events-none absolute inset-0 rotate-45 bg-gradient-to-tr from-white/25 via-transparent to-amber-200/15 mix-blend-overlay" />
+          <div className="pointer-events-none absolute inset-0 -rotate-45 bg-gradient-to-br from-transparent via-white/35 to-transparent mix-blend-overlay" />
         </motion.div>
 
-        {/* ── ALBUM COVER SLEEVE (SHOWS ONLY THE HEADER IN THE CENTRE OF EACH CARD) ── */}
+        {/* ── ALBUM COVER SLEEVE (DARKENED RING DESIGN + CENTER HEADER ONLY) ── */}
         <motion.div
           className={cn(
-            "absolute z-20 overflow-hidden shadow-xl border border-black/10 cursor-default bg-[#FAF8F5]",
+            "absolute z-20 overflow-hidden shadow-xl border-2 border-[#736858]/60 cursor-pointer bg-[#FAF8F5]",
             isSmall
-              ? "h-48 w-48 sm:h-52 sm:w-52 rounded-xl"
+              ? "h-48 w-48 sm:h-52 sm:w-52 rounded-2xl"
               : isCompact
               ? "h-60 w-60 sm:h-64 sm:w-64 rounded-2xl"
               : "h-72 w-72 rounded-2xl",
@@ -137,23 +146,32 @@ export default function VinylAlbumCard({
           }}
           transition={{ type: "spring", stiffness: 150, damping: 20 }}
         >
-          {/* Golden Ring & Watercolor Artwork */}
+          {/* Cover Artwork Image with Vibrant Watercolor and Darkened Ring */}
           <img
             src={coverImage}
             alt={title}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 contrast-[1.25] saturate-[1.35] brightness-[0.92]"
           />
 
-          {/* Light Translucent Backdrop - Center Header Only */}
-          <div className="absolute inset-0 bg-white/65 backdrop-blur-[2px] flex items-center justify-center p-4 sm:p-5 text-center select-none">
+          {/* ── PROMINENT DARKENED CIRCULAR RING DESIGN OVERLAY ── */}
+          <div className="absolute inset-3.5 sm:inset-4 rounded-full border-2 border-[#4A3F31]/75 shadow-[0_0_2px_rgba(0,0,0,0.45),inset_0_0_6px_rgba(0,0,0,0.18)] pointer-events-none transition-transform duration-300 group-hover:scale-[1.02]" />
+          <div className="absolute inset-5 sm:inset-5.5 rounded-full border border-[#6E614E]/35 pointer-events-none" />
+
+          {/* Translucent Backdrop Veil - Keeps Ring and Watercolor Sharp while Enhancing Title Legibility */}
+          <div className="absolute inset-0 bg-white/20 backdrop-blur-[1px] flex flex-col items-center justify-center p-4 sm:p-5 text-center select-none">
             <h3
               className={cn(
-                "font-bold text-zinc-900 tracking-tight leading-snug drop-shadow-[0_1px_2px_rgba(255,255,255,0.95)] text-balance",
+                "relative z-10 font-bold text-zinc-950 tracking-tight leading-snug drop-shadow-[0_1px_3px_rgba(255,255,255,0.95)] text-balance",
                 isSmall ? "text-sm sm:text-[15px]" : "text-base sm:text-lg",
               )}
             >
               {title}
             </h3>
+
+            {/* Subtle Hover Cue: Click for Details */}
+            <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-zinc-900/80 backdrop-blur-sm text-[10px] font-mono font-medium uppercase tracking-wider text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-sm whitespace-nowrap">
+              Click to view
+            </div>
           </div>
         </motion.div>
       </div>
