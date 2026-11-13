@@ -310,7 +310,7 @@ const UNIFORMS = {
   offsetX: 0.000,
   offsetY: 0.000,
   drift: 0.000,
-  cursorEnabled: false,
+  cursorEnabled: true,
   cursorEffect: 2.0,
   cursorStrength: 0.650,
   cursorRadius: 0.460,
@@ -597,3 +597,4 @@ export function ShaderBackground({ className }: { className?: string }) {
     <canvas ref={canvasRef} className={className} style={{ display: "block", width: "100%", height: "100%" }} />
   )
 }
+

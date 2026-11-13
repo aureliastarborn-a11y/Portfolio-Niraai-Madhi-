@@ -118,7 +118,7 @@ export default function VinylAlbumCard({
           <div className="pointer-events-none absolute inset-0 -rotate-45 bg-gradient-to-br from-transparent via-white/45 to-transparent mix-blend-overlay" />
         </motion.div>
 
-        {/* ── ALBUM COVER SLEEVE (GOLDEN RING & WATERCOLOR FINE ART DESIGN) ── */}
+        {/* ── ALBUM COVER SLEEVE (GOLDEN RING & WATERCOLOR FINE ART DESIGN - NO BLACK SHADE) ── */}
         <motion.div
           className={cn(
             "absolute z-20 overflow-hidden shadow-xl border border-black/10 cursor-default bg-[#FAF8F5]",
@@ -127,7 +127,7 @@ export default function VinylAlbumCard({
               : isCompact
               ? "h-60 w-60 sm:h-64 sm:w-64 rounded-2xl p-4 sm:p-5"
               : "h-72 w-72 rounded-2xl p-5",
-            "flex flex-col justify-between text-white select-none",
+            "flex flex-col justify-between text-zinc-900 select-none",
           )}
           initial={{ rotate: 0, scale: 1, x: 0 }}
           animate={{
@@ -144,15 +144,15 @@ export default function VinylAlbumCard({
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
 
-          {/* Dark Gradient Overlay for Maximum Text Contrast */}
+          {/* Light Ambient Overlay - Zero Black Shade, Clean & High Contrast */}
           <div className={cn(
-            "absolute inset-0 bg-gradient-to-t from-black/92 via-black/55 to-black/25 backdrop-blur-[0.5px] flex flex-col justify-between text-white select-none",
+            "absolute inset-0 bg-gradient-to-t from-white/95 via-white/40 to-transparent flex flex-col justify-between text-zinc-900 select-none",
             isSmall ? "p-3 sm:p-3.5" : "p-4 sm:p-5",
           )}>
             {/* ── TOP BAR: PROJECT / ROLE NAME ONLY (NO TIMING / NO ARROW BUTTON / NO GITHUB LINK) ── */}
             <div className="relative z-10 flex items-start justify-between gap-2">
               <span className={cn(
-                "font-bold text-white tracking-tight leading-snug drop-shadow-sm whitespace-pre-line line-clamp-2",
+                "font-bold text-zinc-900 tracking-tight leading-snug drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] whitespace-pre-line line-clamp-2",
                 isSmall ? "text-xs sm:text-[13px]" : "text-[14px] sm:text-[15px]",
               )}>
                 {title}
@@ -163,7 +163,7 @@ export default function VinylAlbumCard({
             <div className={cn("relative z-10", isSmall ? "space-y-1 pt-2" : "space-y-1.5 pt-3")}>
               {artist && (
                 <div className={cn(
-                  "font-mono text-zinc-200 font-medium line-clamp-1 drop-shadow-xs",
+                  "font-mono text-zinc-700 font-semibold line-clamp-1",
                   isSmall ? "text-[10.5px]" : "text-xs",
                 )}>
                   {artist}
@@ -172,7 +172,7 @@ export default function VinylAlbumCard({
 
               {description && (
                 <p className={cn(
-                  "text-zinc-300 leading-tight line-clamp-2 drop-shadow-xs",
+                  "text-zinc-600 leading-tight line-clamp-2 font-normal",
                   isSmall ? "text-[9.5px]" : "text-[11px]",
                 )}>
                   {description}
@@ -185,7 +185,7 @@ export default function VinylAlbumCard({
                     <span
                       key={idx}
                       className={cn(
-                        "font-mono text-white bg-white/20 rounded border border-white/20 backdrop-blur-md",
+                        "font-mono text-zinc-700 bg-white/80 rounded border border-black/10 backdrop-blur-sm shadow-[0_1px_2px_rgba(0,0,0,0.04)]",
                         isSmall ? "px-1 py-0.2 text-[8px]" : "px-1.5 py-0.5 text-[9px]",
                       )}
                     >
