@@ -6,6 +6,7 @@ import LoadingScreen from './components/LoadingScreen';
 import VinylAlbumCard from '@/components/ui/great-ui-vinyl-album-card';
 import Interactive3DSkillsTree from './components/Interactive3DSkillsTree';
 import PolaroidLineCarousel from '@/components/ui/polaroid-line-carousel';
+import TracingArtProvenance from './components/TracingArtProvenance';
 import { portfolioData } from './data/portfolioData';
 import {
   Sparkles,
@@ -268,11 +269,8 @@ export default function App() {
                 </div>
               </section>
 
-              {/* ── EMPTY SPACE TO FULLY SHOWCASE BACKGROUND BURST (NO OVERWRITING CONTENT) ── */}
-              <div 
-                className="h-[70vh] sm:h-[80vh] w-full select-none pointer-events-none" 
-                aria-hidden="true" 
-              />
+              {/* ── GETTY PROVENANCE INDEX: TRACING ART 3D CONSTELLATION ── */}
+              <TracingArtProvenance />
 
               {/* ── 05. TECHNICAL STACK (INTERACTIVE 3D SKILLS TREE) ── */}
               <section id="skills" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
