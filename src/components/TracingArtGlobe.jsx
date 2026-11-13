@@ -2,22 +2,21 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import * as THREE from 'three';
 
 // 3D Miniature Art Frames Sphere (1,850+ vibrant multi-colored framed artworks)
-// - Completely borderless free movement (zero rectangular clipping box):
-//   * Organic edge alpha dissolve in shader: cards smoothly dissolve to zero opacity
-//     before reaching viewport boundaries, eliminating any straight-line cuts
-//   * Controlled organic scatter envelope: cards disperse naturally across widescreen
-//     without exceeding the visible field of view
-//   * Expanded canvas viewport: taller vertical range with seamless negative margins
-// - Movement according to CURSOR and SCROLL:
-//   * Active Cursor Steering / Tilt: Sphere dynamically angles toward mouse position
-//   * Cursor Kinetic Impulse: Fast cursor swishes add fluid momentum
+// - Minimal abstract floating outlined squares background with subtle opacity (matching getty.edu/tracingart/):
+//   * 70+ minimal vector outlined squares with subtle opacities (0.04 to 0.12)
+//   * Overlapping and nested blueprint squares with natural grid-jitter distribution
+//   * Gentle floating harmonic drift and smooth interactive cursor parallax
+//   * Seamless vertical gradient fade mask (zero hard edges)
+// - Completely borderless free movement (zero rectangular clipping box)
+// - Full-range reactive movement according to CURSOR and SCROLL:
+//   * Cursor Steering: Sphere dynamically angles toward mouse position
+//   * Cursor Kinetic Impulse: Fast cursor flicks impart rotational momentum
 //   * Direct 3D Drag: 360-degree rotation with inertia damping
-//   * Scroll Scrub: Scrolling actively spins the whole sphere across dual axes
-//   * Scroll Bloom: Blooms from compact inner core into hollow sphere when entering
+//   * Scroll Scrub: Scrolling actively drives dual-axis 3D spin
+//   * Scroll Bloom: Blooms from compact core into hollow sphere when entering
 //   * Harmonic Breathing: Each frame gently pulses at unique frequencies (bysanthosh.me)
 // - 10 vibrant color spectrums: sapphire blue, emerald green, ruby red, sunset orange,
 //   amethyst violet, turquoise cyan, magenta, golden champagne, terracotta & ebony
-// - Ambient floating wireframe background rectangles with mouse parallax
 
 const ATLAS_URL = '/images/art-frames-atlas.png';
 const ATLAS_COLS = 10;
@@ -27,6 +26,7 @@ const TOTAL_FRAMES = 1850;
 export default function TracingArtGlobe() {
   const containerRef = useRef(null);
   const mountRef = useRef(null);
+  const bgLayerRef = useRef(null);
 
   const stateRef = useRef({
     // Mouse / Cursor Tracking
@@ -57,7 +57,58 @@ export default function TracingArtGlobe() {
     lastScrollY: typeof window !== 'undefined' ? window.scrollY : 0,
   });
 
-  // Generate 1,850+ miniature artwork frames with organic borderless envelope
+  // ── 1. MINIMAL ABSTRACT FLOATING OUTLINED SQUARES BACKGROUND DATA ──
+  const bgSquares = useMemo(() => {
+    const items = [];
+    let seed = 2026;
+    const random = () => {
+      seed = (seed * 16807) % 2147483647;
+      return (seed - 1) / 2147483646;
+    };
+
+    const COLS = 10;
+    const ROWS = 7;
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const xPercent = (c / COLS) * 100 + (random() - 0.5) * 7.5;
+        const yPercent = (r / ROWS) * 100 + (random() - 0.5) * 9.0;
+
+        const sizeBase = 28 + random() * 64;
+        let w = sizeBase;
+        let h = sizeBase;
+        const aspect = random();
+        if (aspect < 0.28) h *= 1.35; // portrait rectangle
+        else if (aspect < 0.52) w *= 1.35; // landscape rectangle
+
+        const opacity = 0.04 + random() * 0.08;
+        const hasOverlap = random() < 0.40; // overlapping companion box
+        const overlapDx = (random() - 0.5) * 26;
+        const overlapDy = (random() - 0.5) * 26;
+        const hasNested = !hasOverlap && random() < 0.32; // nested inner box
+
+        const driftDuration = 5.0 + random() * 4.5;
+        const delay = -random() * 8.0;
+
+        items.push({
+          id: `${r}-${c}`,
+          x: Math.max(1, Math.min(96, xPercent)),
+          y: Math.max(2, Math.min(94, yPercent)),
+          w: Math.round(w),
+          h: Math.round(h),
+          opacity: Number(opacity.toFixed(3)),
+          hasOverlap,
+          overlapDx: Math.round(overlapDx),
+          overlapDy: Math.round(overlapDy),
+          hasNested,
+          driftDuration,
+          delay,
+        });
+      }
+    }
+    return items;
+  }, []);
+
+  // ── 2. MINIATURE ARTWORK FRAMES DATA ──
   const framesData = useMemo(() => {
     const items = [];
     const BASE_RADIUS = 2.65;
@@ -70,7 +121,6 @@ export default function TracingArtGlobe() {
     };
 
     for (let i = 0; i < TOTAL_FRAMES; i++) {
-      // 1. Uniform isotropic distribution on sphere shell (independent of any axis)
       const u = random() * 2 - 1;
       const theta = random() * Math.PI * 2;
       const r_xy = Math.sqrt(Math.max(0, 1 - u * u));
@@ -79,39 +129,29 @@ export default function TracingArtGlobe() {
       const ny = u;
       const nz = r_xy * Math.sin(theta);
 
-      // 2. Hollow sphere shell volume
       const radius = (BASE_RADIUS - SHELL_THICKNESS * 0.5) + random() * SHELL_THICKNESS;
       const restPos = new THREE.Vector3(nx * radius, ny * radius, nz * radius);
-
-      // Contracted core position for scroll bloom (20% of radius)
       const corePos = restPos.clone().multiplyScalar(0.20);
 
-      // 3. Atlas index (100 vibrant colorful varieties across 10x10 grid)
       const atlasIdx = i % (ATLAS_COLS * ATLAS_ROWS);
       const col = atlasIdx % ATLAS_COLS;
       const row = Math.floor(atlasIdx / ATLAS_COLS);
 
-      // 4. Individual frame size variation
       let size = 0.17 + random() * 0.06;
-      if (i % 23 === 0) size *= 1.28; // Accent feature frame
-      if (i % 7 === 0) size *= 0.84;  // Delicate gem frame
+      if (i % 23 === 0) size *= 1.28;
+      if (i % 7 === 0) size *= 0.84;
 
-      // 5. Per-element movement dynamics (matching bysanthosh.me)
       const scaleFreq = 0.7 + random() * 0.9;
       const phase = random() * Math.PI * 2;
       const rotSpeedX = (random() - 0.5) * 0.15;
       const rotSpeedY = (random() - 0.5) * 0.15;
       const rotSpeedZ = (random() - 0.5) * 0.15;
 
-      // Radial stagger delay for bloom
       const radialDelay = (restPos.length() / (BASE_RADIUS + SHELL_THICKNESS * 0.5)) * 0.15;
 
-      // Natural hanging tilt
-      const tiltRoll = (random() - 0.5) * 0.22; // +- 6.5 degrees
+      const tiltRoll = (random() - 0.5) * 0.22;
       const tiltQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), tiltRoll);
 
-      // 6. Controlled widescreen organic scatter envelope (NO rectangular border hits!)
-      // Spreads wide horizontally (X) while gently undulating vertically (Y) so it never clips
       const scatterDistX = 2.8 + random() * 2.5;
       const scatterDistY = 1.1 + random() * 1.2;
       const scatterDistZ = 1.6 + random() * 1.8;
@@ -132,7 +172,6 @@ export default function TracingArtGlobe() {
       ).normalize();
       const tumbleSpeed = 1.0 + random() * 1.6;
 
-      // UV coordinates in 1280x1280 atlas (10x10 grid)
       const uScale = 1.0 / ATLAS_COLS;
       const vScale = 1.0 / ATLAS_ROWS;
       const uOffset = col * uScale;
@@ -160,7 +199,7 @@ export default function TracingArtGlobe() {
     return items;
   }, []);
 
-  // Scroll listener: continuous scroll scrubbing
+  // ── 3. SCROLL SCRUBBING ──
   useEffect(() => {
     stateRef.current.lastScrollY = window.scrollY;
 
@@ -188,7 +227,7 @@ export default function TracingArtGlobe() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Three.js 3D Scene Setup & Render Loop
+  // ── 4. THREE.JS 3D SCENE SETUP & RENDER LOOP ──
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
@@ -200,7 +239,6 @@ export default function TracingArtGlobe() {
 
     let { width, height } = getViewportSize();
 
-    // 1. Scene & Perspective Camera with generous field of view
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
     camera.position.set(0, 0, 11.5);
@@ -216,7 +254,7 @@ export default function TracingArtGlobe() {
     renderer.toneMappingExposure = 1.05;
     mount.appendChild(renderer.domElement);
 
-    // 2. Ambient Floating Wireframe Rectangles (Contained inside viewport)
+    // 3D Depth Wireframe Rectangles (complementing the HTML background)
     const wireframesGroup = new THREE.Group();
     scene.add(wireframesGroup);
 
@@ -232,10 +270,10 @@ export default function TracingArtGlobe() {
     const wireMat = new THREE.LineBasicMaterial({
       color: 0x222222,
       transparent: true,
-      opacity: 0.06,
+      opacity: 0.05,
     });
 
-    const WIREFRAME_COUNT = 48;
+    const WIREFRAME_COUNT = 44;
     for (let i = 0; i < WIREFRAME_COUNT; i++) {
       const line = new THREE.LineSegments(wireGeo, wireMat);
       const aspectType = i % 4;
@@ -246,7 +284,6 @@ export default function TracingArtGlobe() {
       if (aspectType === 3) hh *= 1.6;
 
       line.scale.set(ww, hh, 1);
-      // Confine wireframes comfortably within frustum bounds (x in -9..9, y in -3..3)
       line.position.set(
         ((i * 1.67) % 20) - 10 + (Math.sin(i * 3.7) * 1.0),
         ((i * 1.25) % 8) - 4 + (Math.cos(i * 2.3) * 0.6),
@@ -263,7 +300,7 @@ export default function TracingArtGlobe() {
       wireframesGroup.add(line);
     }
 
-    // 3. Texture Atlas & Custom Multi-Color Material with Seamless Edge Dissolve
+    // Texture Atlas & Material
     const texLoader = new THREE.TextureLoader();
     const atlasTex = texLoader.load(ATLAS_URL);
     atlasTex.generateMipmaps = true;
@@ -277,7 +314,6 @@ export default function TracingArtGlobe() {
       side: THREE.DoubleSide,
     });
 
-    // Custom shader injection: Seamless organic edge fade eliminates any rectangular clipping borders!
     frameMat.onBeforeCompile = (shader) => {
       shader.vertexShader = `
         attribute vec4 aInstanceUV;
@@ -297,7 +333,6 @@ export default function TracingArtGlobe() {
         '#include <project_vertex>',
         `
         #include <project_vertex>
-        // Normalized device coordinates for borderless soft edge dissolve:
         vScreenPos = gl_Position.xy / gl_Position.w;
         `
       );
@@ -314,15 +349,11 @@ export default function TracingArtGlobe() {
           vec4 sampledDiffuseColor = texture2D(map, vAtlasUv);
           if (sampledDiffuseColor.a < 0.02) discard;
 
-          // ── ORGANIC BORDERLESS EDGE DISSOLVE ──
-          // Smoothly fades to 0 opacity before reaching viewport bounds,
-          // ensuring frames move freely without any rectangular border cuts!
           float fadeX = smoothstep(1.0, 0.82, abs(vScreenPos.x));
           float fadeY = smoothstep(1.0, 0.76, abs(vScreenPos.y));
           float edgeAlpha = fadeX * fadeY;
           if (edgeAlpha < 0.01) discard;
 
-          // Atmospheric hollow depth: back cards softly muted, front cards crisp and bright
           float depthShade = mix(0.70, 1.05, vDepthFactor);
           sampledDiffuseColor.rgb *= depthShade;
           sampledDiffuseColor.a *= edgeAlpha;
@@ -333,9 +364,7 @@ export default function TracingArtGlobe() {
       );
     };
 
-    // 4. Instanced 3D Mesh for 1,850+ miniature framed artworks
     const planeGeo = new THREE.PlaneGeometry(1, 1);
-
     const uvArray = new Float32Array(framesData.length * 4);
     for (let i = 0; i < framesData.length; i++) {
       const uv = framesData[i].uv;
@@ -350,7 +379,7 @@ export default function TracingArtGlobe() {
     instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     scene.add(instancedMesh);
 
-    // 5. Interactive Cursor Movement & Drag Orbit
+    // Mouse / Pointer handlers
     const handleMouseMove = (e) => {
       const normX = (e.clientX / window.innerWidth) * 2 - 1;
       const normY = (e.clientY / window.innerHeight) * 2 - 1;
@@ -428,7 +457,7 @@ export default function TracingArtGlobe() {
     };
     window.addEventListener('resize', handleResize);
 
-    // 6. Animation & Render Loop with Exact Cursor & Scroll Dynamics
+    // Animation loop
     let animId;
     const dummyMatrix = new THREE.Matrix4();
     const dummyPos = new THREE.Vector3();
@@ -445,7 +474,7 @@ export default function TracingArtGlobe() {
       animId = requestAnimationFrame(animate);
       const time = performance.now() * 0.001;
 
-      // 1. Cursor tracking with lerp
+      // Cursor tracking with lerp
       stateRef.current.cursorCurX += (stateRef.current.cursorTargetX - stateRef.current.cursorCurX) * 0.08;
       stateRef.current.cursorCurY += (stateRef.current.cursorTargetY - stateRef.current.cursorCurY) * 0.08;
 
@@ -454,7 +483,7 @@ export default function TracingArtGlobe() {
       stateRef.current.kineticRotY += stateRef.current.cursorVelX;
       stateRef.current.kineticRotX += stateRef.current.cursorVelY;
 
-      // Drag inertia damping
+      // Drag inertia
       if (!stateRef.current.isDown) {
         stateRef.current.dragVelY *= 0.94;
         stateRef.current.dragVelX *= 0.94;
@@ -462,12 +491,12 @@ export default function TracingArtGlobe() {
         stateRef.current.dragRotX += stateRef.current.dragVelX;
       }
 
-      // 2. Scroll scrub progress smoothing
+      // Scroll progress
       stateRef.current.scrollProgress += (stateRef.current.targetScrollProgress - stateRef.current.scrollProgress) * 0.075;
       stateRef.current.scrollVelocity *= 0.90;
       const sp = stateRef.current.scrollProgress;
 
-      // 3. Dual-axis sphere rotation driven by cursor + scroll
+      // Dual-axis sphere rotation
       const ambientY = time * 0.12;
       const ambientX = Math.sin(time * 0.08) * 0.06;
 
@@ -488,7 +517,14 @@ export default function TracingArtGlobe() {
       wireframesGroup.position.x = -stateRef.current.cursorCurX * 0.6;
       wireframesGroup.position.y = -stateRef.current.cursorCurY * 0.45;
 
-      // 4. Scroll bloom & organic scatter stages
+      // Apply mouse parallax to the minimal abstract HTML floating squares background
+      if (bgLayerRef.current) {
+        const bgParallaxX = -stateRef.current.cursorCurX * 24;
+        const bgParallaxY = -stateRef.current.cursorCurY * 18;
+        bgLayerRef.current.style.transform = `translate3d(${bgParallaxX.toFixed(2)}px, ${bgParallaxY.toFixed(2)}px, 0)`;
+      }
+
+      // Scroll bloom & scatter
       let bloomT = 1.0;
       if (sp < 0.45) {
         bloomT = Math.max(0.0, Math.min(1.0, sp / 0.45));
@@ -503,34 +539,29 @@ export default function TracingArtGlobe() {
       scatter = Math.min(1.25, scatter + stateRef.current.scrollVelocity * 0.35);
       if (scatter < 0.002) scatter = 0.0;
 
-      // 5. Update all 1,850+ miniature frames
+      // Update 1,850+ frames
       for (let i = 0; i < framesData.length; i++) {
         const f = framesData[i];
 
-        // Staggered bloom
         const frameBloom = Math.max(0.0, Math.min(1.0, (bloomT - f.radialDelay * 0.4) / (1.0 - f.radialDelay * 0.4 + 0.001)));
         const smoothBloom = frameBloom * frameBloom * (3.0 - 2.0 * frameBloom);
 
         dummyPos.copy(f.corePos).lerp(f.restPos, smoothBloom);
         dummyPos.applyQuaternion(globeQuat);
 
-        // Scatter outward along trajectory
         if (scatter > 0.001) {
           dummyScatterVec.copy(f.scatterDir).applyQuaternion(globeQuat);
           dummyPos.addScaledVector(dummyScatterVec, scatter);
         }
 
-        // Harmonic breathing
         const breath = 1.0 + 0.07 * Math.sin(time * f.scaleFreq + f.phase);
         const bloomScale = THREE.MathUtils.lerp(0.35, 1.0, smoothBloom);
         const currentSize = f.size * breath * bloomScale;
 
-        // Billboard orientation
         forwardVec.set(dummyPos.x * 0.12, dummyPos.y * 0.12, 1.0).normalize();
         dummyQuat.setFromUnitVectors(baseForward, forwardVec);
         dummyQuat.multiply(f.tiltQuat);
 
-        // Organic wobble
         wobbleEuler.set(
           Math.sin(time * 0.6 + f.phase) * f.rotSpeedX,
           Math.cos(time * 0.6 + f.phase) * f.rotSpeedY,
@@ -578,6 +609,71 @@ export default function TracingArtGlobe() {
       className="relative z-10 w-screen left-1/2 -translate-x-1/2 -my-8 sm:-my-16 min-h-[850px] h-[95vh] lg:h-[1050px] flex items-center justify-center select-none overflow-visible pointer-events-auto"
       aria-label="Interactive 3D Art Gallery Globe with 1,850+ Miniature Multi-Colored Framed Artworks"
     >
+      {/* ── MINIMAL ABSTRACT FLOATING OUTLINED SQUARES BACKGROUND (SUBTLE OPACITY) ── */}
+      <div
+        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden select-none"
+        style={{
+          maskImage: 'linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%)',
+        }}
+        aria-hidden="true"
+      >
+        <style>{`
+          @keyframes floatOutlineSq {
+            0% { transform: translate3d(0, -6px, 0); }
+            50% { transform: translate3d(2px, 4px, 0); }
+            100% { transform: translate3d(-2px, -6px, 0); }
+          }
+        `}</style>
+
+        <div
+          ref={bgLayerRef}
+          className="relative size-full will-change-transform"
+        >
+          {bgSquares.map((sq) => (
+            <React.Fragment key={sq.id}>
+              {/* Primary outlined square / rectangle */}
+              <div
+                className="absolute border border-zinc-900 pointer-events-none rounded-[1px]"
+                style={{
+                  left: `${sq.x}%`,
+                  top: `${sq.y}%`,
+                  width: `${sq.w}px`,
+                  height: `${sq.h}px`,
+                  opacity: sq.opacity,
+                  animation: `floatOutlineSq ${sq.driftDuration}s ease-in-out infinite`,
+                  animationDelay: `${sq.delay}s`,
+                }}
+              >
+                {/* Nested inner outlined square (matching Getty catalog blueprint style) */}
+                {sq.hasNested && (
+                  <div
+                    className="absolute inset-2 border border-zinc-900 rounded-[1px]"
+                    style={{ opacity: 0.65 }}
+                  />
+                )}
+              </div>
+
+              {/* Overlapping companion outlined square */}
+              {sq.hasOverlap && (
+                <div
+                  className="absolute border border-zinc-900 pointer-events-none rounded-[1px]"
+                  style={{
+                    left: `calc(${sq.x}% + ${sq.overlapDx}px)`,
+                    top: `calc(${sq.y}% + ${sq.overlapDy}px)`,
+                    width: `${Math.round(sq.w * 0.82)}px`,
+                    height: `${Math.round(sq.h * 0.82)}px`,
+                    opacity: sq.opacity * 0.75,
+                    animation: `floatOutlineSq ${sq.driftDuration * 1.15}s ease-in-out infinite`,
+                    animationDelay: `${sq.delay + 1.5}s`,
+                  }}
+                />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
       {/* ── BORDERLESS FULL-VIEW HOLLOW 3D MULTI-COLORED ART PICTURE SPHERE ── */}
       <div
         ref={mountRef}
