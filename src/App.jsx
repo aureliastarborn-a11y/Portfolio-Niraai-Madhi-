@@ -20,8 +20,6 @@ import {
 
 export default function App() {
   const [burstVisible, setBurstVisible] = useState(false);
-  const [burstRotation, setBurstRotation] = useState(0);
-  const [burstParallax, setBurstParallax] = useState(0);
   const [burstKey, setBurstKey] = useState(0);
   const burstContainerRef = useRef(null);
 
@@ -32,12 +30,6 @@ export default function App() {
   const { personal, skills, projects, experiences, education, certifications } = portfolioData;
 
   useEffect(() => {
-    let animId;
-    let targetRotation = 0;
-    let currentRotation = 0;
-    let targetParallax = 0;
-    let currentParallax = 0;
-
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
@@ -70,28 +62,11 @@ export default function App() {
       }
 
       setBurstVisible(!inHeroPhase && !inFooterPhase);
-
-      // Movement for the burst while scrolling:
-      // Smooth dynamic rotation as the page scrolls
-      targetRotation = (scrollY * 0.12) % 360;
-      // Gentle parallax floating drift
-      const heroHeight = heroEl ? heroEl.offsetHeight : windowHeight * 0.75;
-      const middleProgress = Math.max(0, scrollY - heroHeight);
-      targetParallax = (middleProgress * 0.08) % 180 - 90;
-    };
-
-    const loop = () => {
-      currentRotation += (targetRotation - currentRotation) * 0.1;
-      currentParallax += (targetParallax - currentParallax) * 0.1;
-      setBurstRotation(currentRotation);
-      setBurstParallax(currentParallax);
-      animId = requestAnimationFrame(loop);
     };
 
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll);
-    animId = requestAnimationFrame(loop);
 
     // Fast-scroll guarantee: IntersectionObserver cuts off burst instantly before footer sphere rotation
     let footerObserver;
@@ -113,7 +88,6 @@ export default function App() {
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
-      cancelAnimationFrame(animId);
       if (footerObserver) footerObserver.disconnect();
     };
   }, []);
@@ -211,15 +185,12 @@ export default function App() {
             </div>
           </header>
 
-          {/* ── DYNAMIC BACKGROUND BURST (PRESENT IN BACKGROUND OF MIDDLE CONTENT) ── */}
+          {/* ── BACKGROUND BURST (STATIC IN POSITION & FORM, BURSTS ON CLICK) ── */}
           <div
             ref={burstContainerRef}
-            className={`fixed top-1/2 right-[-40px] sm:right-[2%] lg:right-[6%] w-[440px] h-[440px] sm:w-[560px] sm:h-[560px] lg:w-[680px] lg:h-[680px] z-1 select-none overflow-visible transition-opacity duration-200 ease-out ${
+            className={`fixed top-1/2 -translate-y-1/2 right-[-40px] sm:right-[2%] lg:right-[6%] w-[440px] h-[440px] sm:w-[560px] sm:h-[560px] lg:w-[680px] lg:h-[680px] z-1 select-none overflow-visible transition-opacity duration-200 ease-out ${
               burstVisible ? 'opacity-35 lg:opacity-45 hover:opacity-75 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'
             }`}
-            style={{
-              transform: `translate3d(0, calc(-50% + ${burstParallax}px), 0) rotate(${burstRotation}deg)`
-            }}
             onClick={handleBurstClick}
             title="Click to burst"
             aria-label="Click to burst"
@@ -229,7 +200,7 @@ export default function App() {
               tentacleCount={260}
               radius={0.48}
               duration={1.35}
-              breathe={true}
+              breathe={false}
               theme="light"
               startSettled={true}
               replayKey={burstKey}

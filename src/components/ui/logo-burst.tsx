@@ -289,10 +289,10 @@ function createSparkles(count = 56, seed = 88): Sparkle[] {
       baseSize: 0.65 + rand() * 1.05, // 0.65px - 1.7px mini tiny!
       speed: 1.4 + rand() * 2.6, // natural twinkle frequency
       phase: rand() * Math.PI * 2,
-      orbitSpeed: (rand() - 0.5) * 0.035, // very gentle, slow organic orbital drift
+      orbitSpeed: 0, // static in position
       hasStarGlint: rand() < 0.35, // delicate 4-point glint on select sparkles
-      floatAmp: 2 + rand() * 5, // subtle 2-7px radial floating
-      floatFreq: 0.4 + rand() * 0.8,
+      floatAmp: 0, // static in position
+      floatFreq: 0,
       alpha: 0.35 + rand() * 0.45,
     })
   }
