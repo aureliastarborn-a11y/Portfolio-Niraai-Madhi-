@@ -9,6 +9,7 @@ import PolaroidLineCarousel from '@/components/ui/polaroid-line-carousel';
 import TracingArtGlobe from './components/TracingArtGlobe';
 import MosaicShaderBackground from '@/components/ui/mosaic-shader-background';
 import ProjectExperienceModal from './components/ProjectExperienceModal';
+import { RulerCarousel } from '@/components/ui/ruler-carousel';
 import { portfolioData } from './data/portfolioData';
 import {
   Sparkles,
@@ -122,8 +123,32 @@ export default function App() {
                     {personal.bio[1]}
                   </p>
 
+                  {/* ── INTERACTIVE RULER CAROUSEL (SMALL DETAILS: EDUCATION, LOCATION, SPECIFICATION) ── */}
+                  <div className="rounded-2xl border border-black/[0.06] bg-white/70 backdrop-blur-sm p-4 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden">
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">
+                        Profile Metrics &amp; Specifications
+                      </span>
+                      <span className="text-[10px] font-mono text-zinc-400 hidden sm:inline">
+                        Use ← → keys or drag ruler
+                      </span>
+                    </div>
+                    <RulerCarousel
+                      originalItems={[
+                        { id: 1, title: "EDUCATION", subtitle: "B.Tech AI & DS · CGPA 8.0 (2023–2027)" },
+                        { id: 2, title: "LOCATION", subtitle: "Chennai, India · Open to Remote & Onsite" },
+                        { id: 3, title: "SPECIFICATION", subtitle: "Data Analytics & Web Development" },
+                        { id: 4, title: "DATA ANALYTICS", subtitle: "Power BI · EDA · Multi-Source SQL ETL" },
+                        { id: 5, title: "WEB DEVELOPMENT", subtitle: "Responsive Web Applications · React · Tailwind" },
+                      ]}
+                      height="h-[200px] sm:h-[220px]"
+                      itemWidth={320}
+                      gap={50}
+                    />
+                  </div>
+
                   {/* Quick Highlights Bento Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
                     <div className="p-4 rounded-xl bg-white/80 backdrop-blur-sm border border-black/[0.06] space-y-1 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
                       <div className="flex items-center gap-2 text-zinc-500 text-xs font-mono">
                         <GraduationCap className="size-3.5" />
@@ -145,10 +170,10 @@ export default function App() {
                     <div className="p-4 rounded-xl bg-white/80 backdrop-blur-sm border border-black/[0.06] space-y-1 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
                       <div className="flex items-center gap-2 text-zinc-500 text-xs font-mono">
                         <Sparkles className="size-3.5" />
-                        <span>Specialization</span>
+                        <span>Specification</span>
                       </div>
-                      <div className="text-sm font-medium text-zinc-900">GenAI & Agents</div>
-                      <div className="text-xs text-zinc-500">LLMs & Data Warehousing</div>
+                      <div className="text-sm font-medium text-zinc-900">Data Analytics &amp; Web</div>
+                      <div className="text-xs text-zinc-500">Analytics &amp; Modern UIs</div>
                     </div>
                   </div>
 
