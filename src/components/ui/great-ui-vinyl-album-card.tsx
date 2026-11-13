@@ -153,10 +153,6 @@ export default function VinylAlbumCard({
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 contrast-[1.25] saturate-[1.35] brightness-[0.92]"
           />
 
-          {/* ── PROMINENT DARKENED CIRCULAR RING DESIGN OVERLAY ── */}
-          <div className="absolute inset-3.5 sm:inset-4 rounded-full border-2 border-[#4A3F31]/75 shadow-[0_0_2px_rgba(0,0,0,0.45),inset_0_0_6px_rgba(0,0,0,0.18)] pointer-events-none transition-transform duration-300 group-hover:scale-[1.02]" />
-          <div className="absolute inset-5 sm:inset-5.5 rounded-full border border-[#6E614E]/35 pointer-events-none" />
-
           {/* Translucent Backdrop Veil - Keeps Ring and Watercolor Sharp while Enhancing Title Legibility */}
           <div className="absolute inset-0 bg-white/20 backdrop-blur-[1px] flex flex-col items-center justify-center p-4 sm:p-5 text-center select-none">
             <h3
@@ -167,11 +163,6 @@ export default function VinylAlbumCard({
             >
               {title}
             </h3>
-
-            {/* Subtle Hover Cue: Click for Details */}
-            <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-zinc-900/80 backdrop-blur-sm text-[10px] font-mono font-medium uppercase tracking-wider text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-sm whitespace-nowrap">
-              Click to view
-            </div>
           </div>
         </motion.div>
       </div>

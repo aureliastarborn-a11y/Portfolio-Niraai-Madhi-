@@ -59,13 +59,11 @@ function formatSkillLines(name) {
  * - Long skill names break cleanly into double lines so no words get cut off
  */
 function SmallRotatableCuboid3D({ category, items, index, isReading }) {
-  const Icon = CATEGORY_ICONS[category] || Sparkles;
-
   // 3D rotation state (degrees)
-  const [rotX, setRotX] = useState(-10);
-  const [rotY, setRotY] = useState(15);
+  const [rotX, setRotX] = useState(0);
+  const [rotY, setRotY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0, rotX: -10, rotY: 15 });
+  const dragStartRef = useRef({ x: 0, y: 0, rotX: 0, rotY: 0, moved: false });
 
   const handlePointerDown = (e) => {
     setIsDragging(true);
@@ -74,6 +72,7 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
       y: e.clientY,
       rotX,
       rotY,
+      moved: false,
     };
     e.currentTarget.setPointerCapture(e.pointerId);
   };
@@ -82,6 +81,9 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
     if (!isDragging) return;
     const deltaX = e.clientX - dragStartRef.current.x;
     const deltaY = e.clientY - dragStartRef.current.y;
+    if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) {
+      dragStartRef.current.moved = true;
+    }
     const newRotY = dragStartRef.current.rotY + deltaX * 0.75;
     const newRotX = Math.max(-50, Math.min(50, dragStartRef.current.rotX - deltaY * 0.75));
     setRotY(newRotY);
@@ -95,10 +97,13 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
     } catch (_) {}
   };
 
-  const handleResetRotation = (e) => {
+  const handleCuboidClick = (e) => {
     e.stopPropagation();
-    setRotX(-10);
-    setRotY(15);
+    // Only toggle flip if user didn't drag
+    if (!dragStartRef.current.moved) {
+      setRotX(0);
+      setRotY((prev) => (Math.abs(prev % 360) < 90 ? 180 : 0));
+    }
   };
 
   // Dimensions of the 3D cuboid
@@ -151,7 +156,8 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
                 transition: { duration: 0.22, ease: 'easeInOut' },
               }
         }
-        className="cursor-grab active:cursor-grabbing p-0.5"
+        data-cuboid={category}
+        className="cursor-pointer p-0.5"
         style={{
           width: `${W}px`,
           height: `${H}px`,
@@ -159,54 +165,51 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
+        onClick={handleCuboidClick}
+        title="Click to flip or drag to rotate in 3D"
       >
         <div
-          className="relative w-full h-full transition-transform duration-75"
+          className="relative w-full h-full transition-transform duration-500 ease-out"
           style={{
             transformStyle: 'preserve-3d',
             transform: `rotateX(${rotX}deg) rotateY(${rotY}deg)`,
           }}
         >
-          {/* 1. FRONT FACE - DOUBLE LINE WRAP FOR LONG WORDS, NO CUT OFF */}
+          {/* 1. FRONT FACE - SHOWS ONLY THE HEADER IN THE CENTER */}
           <div
-            className="absolute inset-0 rounded-lg bg-gradient-to-b from-white via-zinc-50/95 to-zinc-100/90 border border-zinc-200/90 shadow-xs p-2 flex flex-col justify-between backdrop-blur-xs"
+            className="absolute inset-0 rounded-xl bg-gradient-to-b from-white via-zinc-50/95 to-zinc-100/90 border-2 border-zinc-300/80 shadow-md p-4 flex items-center justify-center text-center backdrop-blur-xs select-none"
             style={{
               transform: `translateZ(${D / 2}px)`,
               backfaceVisibility: 'hidden',
             }}
           >
-            {/* Header: Icon, Category Name, Count */}
-            <div>
-              <div className="flex items-center justify-between gap-1 pb-0.5 border-b border-zinc-200/60">
-                <div className="flex items-center gap-1 min-w-0">
-                  <div className="p-0.5 rounded bg-zinc-900 text-white shrink-0 self-center">
-                    <Icon className="size-2.5" />
-                  </div>
-                  <h4 className="text-[9.5px] font-bold text-zinc-900 tracking-tight leading-[1.15]">
-                    {CATEGORY_LINE_SPLITS[category] ? (
-                      <>
-                        <span className="block whitespace-nowrap">{CATEGORY_LINE_SPLITS[category][0]}</span>
-                        <span className="block whitespace-nowrap">{CATEGORY_LINE_SPLITS[category][1]}</span>
-                      </>
-                    ) : (
-                      <span className="truncate block">{category}</span>
-                    )}
-                  </h4>
-                </div>
-                <span className="font-mono text-[8px] font-semibold px-1 py-0.2 rounded-full bg-zinc-200/80 text-zinc-700 shrink-0">
-                  {items.length}
-                </span>
-              </div>
-            </div>
+            <h4 className="text-[13px] sm:text-[14px] font-bold text-zinc-900 tracking-tight leading-snug drop-shadow-xs">
+              {CATEGORY_LINE_SPLITS[category] ? (
+                <>
+                  <span className="block whitespace-nowrap">{CATEGORY_LINE_SPLITS[category][0]}</span>
+                  <span className="block whitespace-nowrap">{CATEGORY_LINE_SPLITS[category][1]}</span>
+                </>
+              ) : (
+                <span className="block">{category}</span>
+              )}
+            </h4>
+          </div>
 
-            {/* Skill Badges - Long names cut and made double line so no words are cut off */}
-            <div className="flex flex-wrap gap-1 py-0.5">
+          {/* 2. BACK FACE (THE BLACK AREA) - PRESENTS THE SKILLS CONTENT */}
+          <div
+            className="absolute inset-0 rounded-xl bg-zinc-900 border-2 border-zinc-700 text-white p-3 flex flex-col items-center justify-center shadow-xl select-none"
+            style={{
+              transform: `rotateY(180deg) translateZ(${D / 2}px)`,
+              backfaceVisibility: 'hidden',
+            }}
+          >
+            <div className="flex flex-wrap gap-1.5 items-center justify-center">
               {items.map((item, idx) => {
                 const lines = formatSkillLines(item);
                 return (
                   <span
                     key={idx}
-                    className="inline-flex flex-col items-center justify-center px-1.5 py-0.5 text-[8px] sm:text-[8.5px] font-medium text-zinc-800 bg-white rounded border border-zinc-200/90 shadow-2xs hover:bg-zinc-900 hover:text-white transition-colors leading-[1.1] text-center"
+                    className="inline-flex flex-col items-center justify-center px-1.5 py-0.5 text-[8.5px] sm:text-[9px] font-medium text-zinc-100 bg-zinc-800/90 rounded border border-zinc-700/80 shadow-xs leading-[1.1] text-center hover:bg-zinc-700 transition-colors"
                   >
                     {lines.map((line, lIdx) => (
                       <span key={lIdx} className="block whitespace-nowrap">
@@ -216,52 +219,6 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
                   </span>
                 );
               })}
-            </div>
-
-            {/* 3D Rotate Hint */}
-            <div className="flex items-center justify-between pt-0.5 border-t border-zinc-100">
-              <span className="text-[7px] font-mono text-zinc-400 flex items-center gap-0.5">
-                <Rotate3d className="size-1.5 text-zinc-500" />
-                3D
-              </span>
-              <button
-                type="button"
-                onClick={handleResetRotation}
-                className="text-[7px] font-mono text-zinc-500 hover:text-zinc-900 underline px-0.5 rounded hover:bg-zinc-100"
-              >
-                Reset
-              </button>
-            </div>
-          </div>
-
-          {/* 2. BACK FACE */}
-          <div
-            className="absolute inset-0 rounded-lg bg-zinc-900 border border-zinc-700 text-white p-2 flex flex-col justify-between shadow-lg"
-            style={{
-              transform: `rotateY(180deg) translateZ(${D / 2}px)`,
-              backfaceVisibility: 'hidden',
-            }}
-          >
-            <div>
-              <div className="flex items-center gap-1 pb-0.5 border-b border-zinc-800">
-                <Icon className="size-2 text-zinc-300 shrink-0 self-center" />
-                <span className="text-[9px] font-bold text-zinc-100 leading-[1.15]">
-                  {CATEGORY_LINE_SPLITS[category] ? (
-                    <>
-                      <span className="block whitespace-nowrap">{CATEGORY_LINE_SPLITS[category][0]}</span>
-                      <span className="block whitespace-nowrap">{CATEGORY_LINE_SPLITS[category][1]}</span>
-                    </>
-                  ) : (
-                    <span className="truncate block">{category}</span>
-                  )}
-                </span>
-              </div>
-              <p className="text-[7.5px] text-zinc-300 font-mono mt-0.5 leading-tight line-clamp-2">
-                Production-ready technical skills & tooling.
-              </p>
-            </div>
-            <div className="text-right">
-              <span className="text-[6.5px] font-mono text-zinc-500">3D Side B</span>
             </div>
           </div>
 
