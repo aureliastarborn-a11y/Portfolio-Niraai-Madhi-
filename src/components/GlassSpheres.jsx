@@ -274,8 +274,8 @@ const THIRD_PI = Math.PI / 3;
 const ringPhaseOffset = (len) => ((len - 1) / len) * Math.PI * 2 + THIRD_PI + Math.PI / 24;
 
 export function calcRingPosition(idx, total, width, height, timeMs, prefersReduced, parentHeight = height, scrollRot = 0, pitch = 0) {
-  const ringRadius = Math.min(320, 0.37 * width, 0.38 * height);
-  const baseSphereRadius = Math.max(28, Math.min(64, 0.27 * ringRadius));
+  const ringRadius = Math.min(270, 0.34 * width, 0.30 * height);
+  const baseSphereRadius = Math.max(26, Math.min(50, 0.24 * ringRadius));
   const progress = prefersReduced ? 1 : clamp(timeMs / 2100);
   const angleSpread = Math.max(0, ringPhaseOffset(total) * (1 - Math.pow(1 - progress, 3)) - (idx / total) * Math.PI * 2);
   const smoothAngle = clamp(angleSpread / THIRD_PI);
@@ -794,8 +794,8 @@ export default function GlassSpheres({
         }
 
         // Distinct vertical & lateral floating bob for ring spheres
-        const ringBobY = motionQuery.matches ? 0 : Math.sin(1.4 * elapsedSec + idx * 0.78) * 16;
-        const ringBobX = motionQuery.matches ? 0 : Math.cos(1.05 * elapsedSec + idx * 0.65) * 6;
+        const ringBobY = motionQuery.matches ? 0 : Math.sin(1.4 * elapsedSec + idx * 0.78) * 10;
+        const ringBobX = motionQuery.matches ? 0 : Math.cos(1.05 * elapsedSec + idx * 0.65) * 5;
 
         const sphereRadius = ringPos?.radius ?? baseRadius * coord.size * depthScale;
         const sphereX = ringPos ? ringPos.x + ringBobX : clientW / 2 + rotCoord.x * clientW * 0.48;
