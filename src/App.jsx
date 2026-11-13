@@ -3,6 +3,7 @@ import SphereRing from './components/SphereRing';
 import SphereFooter from './components/SphereFooter';
 import FolderCard from './components/FolderCard';
 import LoadingScreen from './components/LoadingScreen';
+import { ShaderBackground } from '@/components/ui/neuro-noise-sensation';
 import { LogoBurst } from '@/components/ui/logo-burst';
 import VinylAlbumCard from '@/components/ui/great-ui-vinyl-album-card';
 import Interactive3DSkillsTree from './components/Interactive3DSkillsTree';
@@ -22,6 +23,7 @@ import {
 export default function App() {
   const [burstVisible, setBurstVisible] = useState(false);
   const [burstKey, setBurstKey] = useState(0);
+  const [showShaderBg, setShowShaderBg] = useState(false);
   const burstContainerRef = useRef(null);
 
   const handleBurstClick = () => {
@@ -146,6 +148,32 @@ export default function App() {
     <div className="min-h-full flex flex-col font-sans bg-background text-foreground antialiased selection:bg-zinc-200">
       {/* ── PRELOADER / LOADING PAGE WITH HAMSTER WHEEL ── */}
       <LoadingScreen />
+
+      {/* ── INTERACTIVE NEURO NOISE SHADER BACKGROUND PREVIEW ── */}
+      {showShaderBg && (
+        <div className="fixed inset-0 z-40 overflow-hidden pointer-events-auto flex items-center justify-center animate-fade-in">
+          <ShaderBackground className="absolute inset-0 size-full" />
+          <div className="absolute top-5 left-5 z-50 px-4 py-2.5 rounded-2xl bg-black/60 backdrop-blur-md border border-white/20 text-white shadow-2xl pointer-events-none">
+            <p className="text-xs font-mono uppercase tracking-widest text-pink-400 font-semibold">
+              Neuro Noise Sensation
+            </p>
+            <p className="text-[11px] text-zinc-300 font-mono mt-0.5">
+              WebGL Neural Fluid Field · Move cursor across screen
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ── FLOATING SHADER PREVIEW TOGGLE BUTTON ── */}
+      <button
+        type="button"
+        onClick={() => setShowShaderBg((prev) => !prev)}
+        className="fixed bottom-5 left-5 z-50 px-4 py-2 rounded-full text-xs font-mono font-medium flex items-center gap-2.5 bg-zinc-900/90 text-white backdrop-blur-md border border-white/20 shadow-2xl hover:bg-zinc-800 transition-all hover:scale-105 cursor-pointer"
+        title="Toggle Neuro Noise Shader Background"
+      >
+        <span className={`size-2 rounded-full ${showShaderBg ? 'bg-pink-400' : 'bg-pink-500 animate-pulse'}`} />
+        {showShaderBg ? 'Exit Shader Preview' : '✨ Try Neuro Noise Shader'}
+      </button>
 
       {/* Accessibility Skip Link */}
       <a

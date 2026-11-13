@@ -1,9 +1,9 @@
-import VinylAlbumCard from "@/components/ui/great-ui-vinyl-album-card"
+import { ShaderBackground } from "@/components/ui/neuro-noise-sensation"
 
-export default function VinylAlbumCardPreview() {
+export default function ShaderBackgroundDemo() {
   return (
-    <div className="flex w-full items-center justify-center p-6">
-      <VinylAlbumCard />
+    <div className="relative h-screen w-full overflow-hidden">
+      <ShaderBackground className="h-full w-full" />
     </div>
   )
 }
