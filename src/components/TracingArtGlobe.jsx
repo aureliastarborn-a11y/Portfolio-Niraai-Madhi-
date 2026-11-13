@@ -80,7 +80,7 @@ export default function TracingArtGlobe() {
         if (aspect < 0.28) h *= 1.35; // portrait rectangle
         else if (aspect < 0.52) w *= 1.35; // landscape rectangle
 
-        const opacity = 0.04 + random() * 0.08;
+        const opacity = 0.12 + random() * 0.14; // Slightly darker subtle opacity (0.12 to 0.26)
         const hasOverlap = random() < 0.40; // overlapping companion box
         const overlapDx = (random() - 0.5) * 26;
         const overlapDy = (random() - 0.5) * 26;
@@ -268,9 +268,9 @@ export default function TracingArtGlobe() {
     wireGeo.setAttribute('position', new THREE.BufferAttribute(wirePositions, 3));
 
     const wireMat = new THREE.LineBasicMaterial({
-      color: 0x222222,
+      color: 0x18181b,
       transparent: true,
-      opacity: 0.05,
+      opacity: 0.12,
     });
 
     const WIREFRAME_COUNT = 44;
@@ -649,7 +649,7 @@ export default function TracingArtGlobe() {
                 {sq.hasNested && (
                   <div
                     className="absolute inset-2 border border-zinc-900 rounded-[1px]"
-                    style={{ opacity: 0.65 }}
+                    style={{ opacity: 0.85 }}
                   />
                 )}
               </div>
@@ -663,7 +663,7 @@ export default function TracingArtGlobe() {
                     top: `calc(${sq.y}% + ${sq.overlapDy}px)`,
                     width: `${Math.round(sq.w * 0.82)}px`,
                     height: `${Math.round(sq.h * 0.82)}px`,
-                    opacity: sq.opacity * 0.75,
+                    opacity: sq.opacity * 0.88,
                     animation: `floatOutlineSq ${sq.driftDuration * 1.15}s ease-in-out infinite`,
                     animationDelay: `${sq.delay + 1.5}s`,
                   }}
