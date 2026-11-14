@@ -43,11 +43,11 @@ export default function ProjectExperienceModal({ item, onClose }) {
           onClick={onClose}
         />
 
-        {/* ── EXPLANATION CARD (MATCHING REFERENCE DESIGN: FROSTED LAVENDER/SLATE CARD WITH ISOMETRIC CUBES & PILL) ── */}
+        {/* ── EXPLANATION CARD (SAGE GOLD SHADE WITH ISOMETRIC CUBES & GOLD JEWEL PILL) ── */}
         <motion.div
-          className="relative z-10 w-full max-w-lg sm:max-w-xl rounded-[28px] sm:rounded-[32px] overflow-hidden border border-white/35 shadow-[0_25px_60px_rgba(25,15,40,0.35)] p-6 sm:p-8 flex flex-col justify-between"
+          className="relative z-10 w-full max-w-lg sm:max-w-xl rounded-[28px] sm:rounded-[32px] overflow-hidden border border-white/35 shadow-[0_25px_60px_rgba(35,38,28,0.32)] p-6 sm:p-8 flex flex-col justify-between"
           style={{
-            background: 'linear-gradient(135deg, #d2cadf 0%, #b8adc8 50%, #9e91b2 100%)',
+            background: 'linear-gradient(135deg, #cfc9b0 0%, #b2ab8f 50%, #8e876b 100%)',
           }}
           initial={{ opacity: 0, scale: 0.92, y: 16 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -57,42 +57,42 @@ export default function ProjectExperienceModal({ item, onClose }) {
         >
           {/* Subtle Ambient Radial Lighting Sheen */}
           <div
-            className="pointer-events-none absolute inset-0 bg-radial from-white/35 via-transparent to-transparent opacity-60"
+            className="pointer-events-none absolute inset-0 bg-radial from-white/30 via-transparent to-transparent opacity-60"
             aria-hidden="true"
           />
 
-          {/* ── 3D PURPLE ISOMETRIC CUBES GRAPHIC (BOTTOM-RIGHT - MATCHING REFERENCE IMAGE 2) ── */}
+          {/* ── 3D SAGE GOLD ISOMETRIC CUBES GRAPHIC (BOTTOM-RIGHT) ── */}
           <div
             className="pointer-events-none absolute -bottom-6 -right-6 sm:-bottom-4 sm:-right-4 w-48 h-48 sm:w-56 sm:h-56 opacity-90 select-none z-0"
             aria-hidden="true"
           >
-            <svg viewBox="0 0 200 200" fill="none" className="w-full h-full drop-shadow-[0_12px_24px_rgba(40,20,60,0.25)]">
+            <svg viewBox="0 0 200 200" fill="none" className="w-full h-full drop-shadow-[0_12px_24px_rgba(40,42,30,0.28)]">
               {/* Cube 1 (Back Upper Cube) */}
               <g transform="translate(100, 35)">
-                <path d="M 0,-26 L 26,-11 L 0,4 L -26,-11 Z" fill="#b196cf" />
-                <path d="M -26,-11 L 0,4 L 0,34 L -26,19 Z" fill="#8f73b0" />
-                <path d="M 0,4 L 26,-11 L 26,19 L 0,34 Z" fill="#755a96" />
+                <path d="M 0,-26 L 26,-11 L 0,4 L -26,-11 Z" fill="#d5cfae" />
+                <path d="M -26,-11 L 0,4 L 0,34 L -26,19 Z" fill="#b0a986" />
+                <path d="M 0,4 L 26,-11 L 26,19 L 0,34 Z" fill="#8f8865" />
               </g>
 
               {/* Cube 2 (Middle Left Cube) */}
               <g transform="translate(68, 75)">
-                <path d="M 0,-26 L 26,-11 L 0,4 L -26,-11 Z" fill="#a88dc6" />
-                <path d="M -26,-11 L 0,4 L 0,34 L -26,19 Z" fill="#886ca9" />
-                <path d="M 0,4 L 26,-11 L 26,19 L 0,34 Z" fill="#6d538e" />
+                <path d="M 0,-26 L 26,-11 L 0,4 L -26,-11 Z" fill="#cdc6a4" />
+                <path d="M -26,-11 L 0,4 L 0,34 L -26,19 Z" fill="#a7a07c" />
+                <path d="M 0,4 L 26,-11 L 26,19 L 0,34 Z" fill="#857e5b" />
               </g>
 
               {/* Cube 3 (Middle Right Cube) */}
               <g transform="translate(132, 75)">
-                <path d="M 0,-26 L 26,-11 L 0,4 L -26,-11 Z" fill="#9f84bd" />
-                <path d="M -26,-11 L 0,4 L 0,34 L -26,19 Z" fill="#7f63a0" />
-                <path d="M 0,4 L 26,-11 L 26,19 L 0,34 Z" fill="#654b85" />
+                <path d="M 0,-26 L 26,-11 L 0,4 L -26,-11 Z" fill="#c3bc99" />
+                <path d="M -26,-11 L 0,4 L 0,34 L -26,19 Z" fill="#9e9673" />
+                <path d="M 0,4 L 26,-11 L 26,19 L 0,34 Z" fill="#7c7451" />
               </g>
 
               {/* Cube 4 (Front Bottom Cube) */}
               <g transform="translate(100, 115)">
-                <path d="M 0,-28 L 28,-12 L 0,4 L -28,-12 Z" fill="#987db7" />
-                <path d="M -28,-12 L 0,4 L 0,36 L -28,20 Z" fill="#785c99" />
-                <path d="M 0,4 L 28,-12 L 28,20 L 0,36 Z" fill="#5f457f" />
+                <path d="M 0,-28 L 28,-12 L 0,4 L -28,-12 Z" fill="#bab28e" />
+                <path d="M -28,-12 L 0,4 L 0,36 L -28,20 Z" fill="#948b68" />
+                <path d="M 0,4 L 28,-12 L 28,20 L 0,36 Z" fill="#716947" />
               </g>
             </svg>
           </div>
@@ -101,9 +101,9 @@ export default function ProjectExperienceModal({ item, onClose }) {
           <div className="relative z-10 flex flex-col justify-between min-h-[300px] sm:min-h-[340px]">
             {/* Top Bar: Pill Badge + Close Button */}
             <div className="flex items-center justify-between gap-3">
-              {/* Dark Pill Badge with Glowing Purple/Indigo Dot (Matching Image 2) */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#463f52]/85 backdrop-blur-md text-white text-xs font-medium shadow-xs border border-white/10">
-                <span className="size-2 rounded-full bg-[#8272f2] shadow-[0_0_8px_#8272f2]" />
+              {/* Dark Sage Slate Pill Badge with Glowing Gold Jewel Dot */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#36382e]/85 backdrop-blur-md text-white text-xs font-medium shadow-xs border border-white/15">
+                <span className="size-2 rounded-full bg-[#e5c96a] shadow-[0_0_8px_#e5c96a]" />
                 <span className="tracking-wide">
                   {isProject ? 'Project Showcase' : data.period ? data.period : 'Work Experience'}
                 </span>
@@ -155,7 +155,7 @@ export default function ProjectExperienceModal({ item, onClose }) {
                   {data.tags.map((tag, idx) => (
                     <span
                       key={idx}
-                      className="px-2.5 py-0.5 rounded-full bg-black/15 text-white/90 text-[11px] font-mono border border-white/10"
+                      className="px-2.5 py-0.5 rounded-full bg-black/20 text-white/95 text-[11px] font-mono border border-white/15"
                     >
                       {tag}
                     </span>
@@ -171,7 +171,7 @@ export default function ProjectExperienceModal({ item, onClose }) {
                   href={data.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-white font-medium text-sm hover:underline group/link transition-all"
+                  className="inline-flex items-center gap-1.5 text-white hover:text-amber-100 font-medium text-sm hover:underline group/link transition-all"
                 >
                   <span>View Project on GitHub</span>
                   <ArrowRight className="size-4 transition-transform group-hover/link:translate-x-1" />
