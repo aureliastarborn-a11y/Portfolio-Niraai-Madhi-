@@ -10,7 +10,7 @@ import TracingArtGlobe from './components/TracingArtGlobe';
 import MosaicShaderBackground from '@/components/ui/mosaic-shader-background';
 import ProjectExperienceModal from './components/ProjectExperienceModal';
 import { RulerCarousel } from '@/components/ui/ruler-carousel';
-import { GridCard } from '@/components/ui/grid-card';
+import FramedEducationCard from '@/components/ui/FramedEducationCard';
 import { portfolioData } from './data/portfolioData';
 import {
   Sparkles,
@@ -234,19 +234,8 @@ export default function App() {
 
                 {/* Right Content */}
                 <div className="lg:col-span-8 space-y-6">
-                  {/* Formal Education Card with Interactive Grid Pattern */}
-                  <GridCard className="rounded-2xl border-black/[0.08] bg-white/85 backdrop-blur-sm p-6 space-y-2">
-                    <div className="flex items-center justify-between text-xs font-mono text-zinc-500">
-                      <span>{education[0].institution}</span>
-                      <span>{education[0].period}</span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-zinc-900">
-                      {education[0].degree}
-                    </h3>
-                    <p className="text-sm text-zinc-600 leading-relaxed">
-                      {education[0].detail}
-                    </p>
-                  </GridCard>
+                  {/* Formal Education Card - Dexter-st Framed Animated Card */}
+                  <FramedEducationCard educationItem={education[0]} />
 
                   {/* Certifications - POLAROID LINE CAROUSEL (Clothesline & Pegs from 21st.dev) */}
                   <div className="w-full pt-1">
