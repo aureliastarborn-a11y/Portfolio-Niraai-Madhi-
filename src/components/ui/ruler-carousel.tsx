@@ -189,13 +189,13 @@ export function RulerCarousel({
                   {item.title}
                 </span>
 
-                {/* Deep Brown Content (Bitter Chocolate #241008) */}
+                {/* Deep Brown Content (Rich Mahogany #462015) */}
                 {item.subtitle && (
                   <span
                     className={`text-xs sm:text-[13px] font-bold tracking-tight mt-0.5 max-w-[320px] truncate transition-opacity duration-200 ${
                       isActive ? "opacity-100" : "opacity-90"
                     }`}
-                    style={{ color: "#241008" }}
+                    style={{ color: "#462015" }}
                   >
                     {item.subtitle}
                   </span>
