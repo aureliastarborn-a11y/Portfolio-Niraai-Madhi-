@@ -1,63 +1,117 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useState, useCallback, useId } from 'react';
 import { cn } from '@/lib/utils';
-import { GridPattern } from '@/components/ui/grid-pattern';
+
+export interface GridCardProps extends React.ComponentProps<'div'> {
+	cellSize?: number;
+}
 
 export function GridCard({
 	className,
 	children,
+	cellSize = 38,
 	...props
-}: React.ComponentProps<'div'>) {
-	const squares = useMemo(() => getRandomPattern(6), []);
-	const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
+}: GridCardProps) {
+	const patternId = useId();
+	const [hoveredCell, setHoveredCell] = useState<{ col: number; row: number } | null>(null);
+	const [trail, setTrail] = useState<Array<{ id: string; col: number; row: number }>>([]);
 
 	const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
 		const rect = e.currentTarget.getBoundingClientRect();
-		setMousePos({
-			x: e.clientX - rect.left,
-			y: e.clientY - rect.top,
+		const x = e.clientX - rect.left;
+		const y = e.clientY - rect.top;
+
+		const col = Math.floor(x / cellSize);
+		const row = Math.floor(y / cellSize);
+
+		setHoveredCell((prev) => {
+			if (prev && prev.col === col && prev.row === row) {
+				return prev;
+			}
+			if (prev) {
+				const id = `${prev.col}-${prev.row}-${Date.now()}`;
+				setTrail((current) => [...current.slice(-5), { id, col: prev.col, row: prev.row }]);
+				setTimeout(() => {
+					setTrail((current) => current.filter((item) => item.id !== id));
+				}, 450);
+			}
+			return { col, row };
 		});
-	}, []);
+	}, [cellSize]);
 
 	const handleMouseLeave = useCallback(() => {
-		setMousePos(null);
-	}, []);
+		if (hoveredCell) {
+			const id = `${hoveredCell.col}-${hoveredCell.row}-${Date.now()}`;
+			setTrail((current) => [...current.slice(-5), { id, col: hoveredCell.col, row: hoveredCell.row }]);
+			setTimeout(() => {
+				setTrail((current) => current.filter((item) => item.id !== id));
+			}, 450);
+		}
+		setHoveredCell(null);
+	}, [hoveredCell]);
 
 	return (
 		<div
 			onMouseMove={handleMouseMove}
 			onMouseLeave={handleMouseLeave}
 			className={cn(
-				'group relative isolate z-0 flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-black/[0.08] bg-white/90 backdrop-blur-sm transition-all duration-300 hover:bg-zinc-100/95 hover:border-black/[0.16] hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)]',
+				'group relative isolate z-0 flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-black/[0.08] bg-white/85 backdrop-blur-sm transition-shadow duration-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)]',
 				className,
 			)}
 			{...props}
 		>
-			<div className="absolute inset-0 pointer-events-none">
-				{/* Darkening surface overlay on hover */}
-				<div className="absolute inset-0 bg-transparent transition-colors duration-300 group-hover:bg-black/[0.045] dark:group-hover:bg-black/[0.25]" />
+			{/* Interactive Grid with Individual Box Darkening */}
+			<svg
+				aria-hidden="true"
+				className="pointer-events-none absolute inset-0 size-full"
+			>
+				<defs>
+					<pattern
+						id={patternId}
+						width={cellSize}
+						height={cellSize}
+						patternUnits="userSpaceOnUse"
+					>
+						<path
+							d={`M ${cellSize} 0 L 0 0 0 ${cellSize}`}
+							fill="none"
+							stroke="rgba(0, 0, 0, 0.08)"
+							strokeWidth="1"
+						/>
+					</pattern>
+				</defs>
 
-				{/* Dynamic cursor-following darkening shadow */}
-				{mousePos && (
-					<div
-						className="absolute inset-0 transition-opacity duration-200"
-						style={{
-							background: `radial-gradient(320px circle at ${mousePos.x}px ${mousePos.y}px, rgba(0,0,0,0.06), transparent 70%)`,
-						}}
+				{/* Base Grid Lines (Steady, Visible Grid) */}
+				<rect width="100%" height="100%" fill={`url(#${patternId})`} />
+
+				{/* Fading Trailing Boxes Recently Touched */}
+				{trail.map((item) => (
+					<rect
+						key={item.id}
+						x={item.col * cellSize}
+						y={item.row * cellSize}
+						width={cellSize}
+						height={cellSize}
+						fill="rgba(0, 0, 0, 0.08)"
+						stroke="rgba(0, 0, 0, 0.16)"
+						strokeWidth="1"
+						className="transition-opacity duration-300 opacity-60"
+					/>
+				))}
+
+				{/* Active Box Under Cursor (Darkened Box) */}
+				{hoveredCell && (
+					<rect
+						x={hoveredCell.col * cellSize}
+						y={hoveredCell.row * cellSize}
+						width={cellSize}
+						height={cellSize}
+						fill="rgba(0, 0, 0, 0.20)"
+						stroke="rgba(0, 0, 0, 0.40)"
+						strokeWidth="1"
+						className="transition-all duration-75"
 					/>
 				)}
-
-				{/* Grid Pattern that darkens when touched by cursor */}
-				<div className="absolute -inset-[25%] -skew-y-12 [mask-image:linear-gradient(225deg,black,transparent)] opacity-45 transition-opacity duration-300 group-hover:opacity-95">
-					<GridPattern
-						width={30}
-						height={30}
-						x={0}
-						y={0}
-						squares={squares}
-						className="fill-zinc-500/15 stroke-zinc-400/35 transition-colors duration-300 group-hover:fill-zinc-800/40 group-hover:stroke-zinc-700/70 absolute inset-0 size-full translate-y-2 transition-transform duration-200 ease-out group-hover:translate-y-0"
-					/>
-				</div>
-			</div>
+			</svg>
 
 			{/* Foreground Content */}
 			<div className="relative z-10 w-full">
@@ -65,12 +119,4 @@ export function GridCard({
 			</div>
 		</div>
 	);
-}
-
-function getRandomPattern(length?: number): [x: number, y: number][] {
-	length = length ?? 6;
-	return Array.from({ length }, () => [
-		Math.floor(Math.random() * 4) + 7, // random x between 7 and 10
-		Math.floor(Math.random() * 6) + 1, // random y between 1 and 6
-	]);
 }
