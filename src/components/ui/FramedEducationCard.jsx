@@ -43,17 +43,17 @@ export default function FramedEducationCard({ educationItem, className = '' }) {
           <div className="txt-box">
             {/* Primary / Resting State */}
             <div className="txt text-left">
-              <div className="flex items-center justify-between text-xs font-mono text-zinc-500 mb-1">
+              <div className="flex items-center justify-between text-xs font-mono text-zinc-600 mb-1">
                 <span className="font-semibold text-zinc-800 tracking-wide flex items-center gap-1.5">
-                  <GraduationCap className="w-3.5 h-3.5 text-amber-700/80" />
+                  <GraduationCap className="w-3.5 h-3.5 text-zinc-600" />
                   {institution}
                 </span>
-                <span className="text-amber-800/80 font-medium">{period}</span>
+                <span className="text-zinc-600 font-medium">{period}</span>
               </div>
               <h3 className="text-base sm:text-lg font-semibold tracking-tight text-zinc-900 leading-snug mb-1">
                 {degree}
               </h3>
-              <p className="text-xs sm:text-[13px] text-zinc-600 leading-relaxed font-normal">
+              <p className="text-xs sm:text-[13px] text-zinc-700 leading-relaxed font-normal">
                 {detail}
               </p>
             </div>
@@ -61,16 +61,16 @@ export default function FramedEducationCard({ educationItem, className = '' }) {
             {/* Secondary / Hover State */}
             <div className="txt text-left">
               <div className="flex items-center justify-between text-xs font-mono text-zinc-600 mb-1">
-                <span className="font-semibold text-amber-800 tracking-wide flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                <span className="font-semibold text-zinc-800 tracking-wide flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#4a5d48]" />
                   Anna University Affiliation · Chennai
                 </span>
-                <span className="text-amber-800 font-medium font-mono">CGPA: 8.0 / 10.0</span>
+                <span className="text-zinc-800 font-medium font-mono">CGPA: 8.0 / 10.0</span>
               </div>
               <h3 className="text-base sm:text-lg font-semibold tracking-tight text-zinc-900 leading-snug mb-1">
                 Artificial Intelligence &amp; Autonomous Systems Specialization
               </h3>
-              <p className="text-xs sm:text-[13px] text-zinc-600 leading-relaxed font-normal">
+              <p className="text-xs sm:text-[13px] text-zinc-700 leading-relaxed font-normal">
                 Core Domain: Machine Learning, Deep Neural Networks, ETL Warehousing, &amp; Cloud AI Deployment
               </p>
             </div>

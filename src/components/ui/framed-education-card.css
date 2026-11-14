@@ -6,12 +6,12 @@
 }
 
 .framed-education-container .btn-wrapper {
-  --color: #faf6ee;
+  --color: #E1E3D5; /* Pale Sage Green (very light muted green-grey) */
   --txt-color: #1f2937;
   --txt-color-2: #111827;
   --point-size: 8px;
   --point-color: #ffffff;
-  --line-color: rgba(197, 160, 89, 0.35);
+  --line-color: rgba(60, 75, 55, 0.22);
   --line-style: solid;
   --line-weight: 1px;
   --anim-speed: 1s;
@@ -35,7 +35,7 @@
   font:
     400 0.75em "Inter",
     sans-serif;
-  color: #8c7853;
+  color: #646d5e;
   font-style: italic;
   white-space: nowrap;
   pointer-events: none;
@@ -77,19 +77,9 @@
   animation: frame-half calc(var(--anim-speed, 1s) * 0.5) forwards;
 }
 
-/* Faded Gold / Beige Gold Sheen Shimmer Overlay */
+/* Shade difference completely removed - uniform solid shade throughout */
 .framed-education-container .txt-box::after {
-  content: "";
-  position: absolute;
-  inset: var(--point-size, 8px);
-  background: repeating-linear-gradient(45deg, #c5a059, #fbf7ee 15%, #ffffff 20%);
-  mix-blend-mode: hard-light;
-  background-size: 440%;
-  transition: background-size 0.4s ease-in;
-  filter: blur(1px);
-  z-index: 1;
-  opacity: 0.15;
-  pointer-events: none;
+  display: none;
 }
 
 .framed-education-container .txt {
@@ -118,19 +108,20 @@
   animation: none;
 }
 
+/* Full rectangle box in uniform Pale Sage Green (#E1E3D5) */
 .framed-education-container .frame {
   position: absolute;
   inset: 0 0%;
   z-index: 1;
   border: var(--line-style, solid) var(--line-weight, 1px)
-    var(--line-color, rgba(197, 160, 89, 0.35));
-  background-color: var(--color, #faf6ee);
+    var(--line-color, rgba(60, 75, 55, 0.22));
+  background-color: var(--color, #E1E3D5);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   transition-delay: calc(var(--anim-speed, 1s) * 0.5);
-  box-shadow: 0 4px 14px -2px rgba(184, 134, 11, 0.08),
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05),
     0 2px 4px -2px rgba(0, 0, 0, 0.03),
-    inset 0 1px 3px 1px rgba(255, 255, 255, 0.9);
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.5);
   animation: frame-half calc(var(--anim-speed, 1s) * 0.5) forwards;
 }
 
@@ -140,9 +131,9 @@
   width: var(--point-size, 8px);
   aspect-ratio: 1;
   border-radius: 25%;
-  border: solid var(--line-weight, 1px) rgba(197, 160, 89, 0.55);
+  border: solid var(--line-weight, 1px) rgba(60, 75, 55, 0.35);
   background-color: var(--point-color, #ffffff);
-  background-image: radial-gradient(circle at 50% 120%, rgba(197, 160, 89, 0.3), #ffffff);
+  background-image: radial-gradient(circle at 50% 120%, rgba(60, 75, 55, 0.2), #ffffff);
   z-index: 4;
 }
 
@@ -168,9 +159,6 @@
 
 .framed-education-container .btn:hover .txt-box {
   animation: frame var(--anim-speed, 1s) ease;
-}
-.framed-education-container .btn:hover .txt-box::after {
-  background-size: 700%;
 }
 
 .framed-education-container .btn:hover .frame {
@@ -227,7 +215,7 @@
     500 0.85em "Inter",
     sans-serif;
   letter-spacing: 0.03em;
-  color: #855b18;
+  color: #2f3e33;
   z-index: 10;
   filter: blur(12px);
   opacity: 0;
@@ -236,7 +224,7 @@
 }
 
 .framed-education-container .btn:active .txt-box {
-  filter: contrast(1.4) brightness(1.4);
+  filter: contrast(1.2) brightness(1.05);
 }
 
 .framed-education-container .btn:focus::before {
