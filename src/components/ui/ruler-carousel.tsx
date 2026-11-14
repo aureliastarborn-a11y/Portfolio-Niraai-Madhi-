@@ -29,10 +29,10 @@ const RulerLines = ({
 
     if (isCenter) {
       height = "h-3.5 sm:h-4";
-      color = "bg-amber-600 dark:bg-amber-400";
+      color = "bg-zinc-900 dark:bg-white";
     } else if (isFifth) {
       height = "h-2.5 sm:h-3";
-      color = "bg-zinc-500 dark:bg-zinc-400";
+      color = "bg-zinc-600 dark:bg-zinc-400";
     }
 
     const positionClass = top ? "top-0" : "bottom-0";
@@ -144,8 +144,8 @@ export function RulerCarousel({
 
       {/* Dynamic Cursor-Scrubbed Text Content */}
       <div className="relative w-full h-[58px] flex items-center justify-center overflow-hidden">
-        {/* Center alignment guide indicator */}
-        <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[2px] bg-amber-500/20 pointer-events-none" />
+        {/* Subtle center tick indicator line */}
+        <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[1.5px] bg-zinc-300 dark:bg-zinc-700 pointer-events-none" />
 
         <motion.div
           className="flex items-center absolute"
@@ -171,7 +171,7 @@ export function RulerCarousel({
                 }}
                 animate={{
                   scale: isActive ? 1 : 0.9,
-                  opacity: isActive ? 1 : 0.7,
+                  opacity: isActive ? 1 : 0.72,
                 }}
                 transition={{
                   type: "spring",
@@ -179,24 +179,24 @@ export function RulerCarousel({
                   damping: 28,
                 }}
               >
-                {/* Golden Title (e.g. ACADEMICS) */}
+                {/* Golden Header (e.g. ACADEMICS, LOCATION, SPECIFICATION) */}
                 <span
                   className={`text-lg sm:text-xl font-bold tracking-wider font-mono transition-colors duration-200 ${
                     isActive
-                      ? "text-[#b45309] dark:text-[#f59e0b] drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]"
-                      : "text-[#b45309]/75 dark:text-[#f59e0b]/70"
+                      ? "text-[#b8860b] dark:text-[#f3b73e]"
+                      : "text-[#b8860b]/75 dark:text-[#f3b73e]/70"
                   }`}
                 >
                   {item.title}
                 </span>
 
-                {/* Dark Brown Subtitle (e.g. B.Tech AI & DS · CGPA 8.0) */}
+                {/* Deep Brown Content (e.g. B.Tech AI & DS · CGPA 8.0) */}
                 {item.subtitle && (
                   <span
                     className={`text-xs sm:text-[13px] font-semibold tracking-tight mt-0.5 max-w-[280px] truncate transition-colors duration-200 ${
                       isActive
-                        ? "text-[#3d2314] dark:text-[#e2d5c3]"
-                        : "text-[#4a2e1b]/80 dark:text-[#c4b5a2]/80"
+                        ? "text-[#2e180d] dark:text-[#f0dfc8]"
+                        : "text-[#2e180d]/80 dark:text-[#d5c3aa]/75"
                     }`}
                   >
                     {item.subtitle}

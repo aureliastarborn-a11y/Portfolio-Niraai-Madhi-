@@ -124,16 +124,16 @@ export default function App() {
                     {personal.bio[1]}
                   </p>
 
-                  {/* ── INTERACTIVE RULER CAROUSEL (NO LEFT/RIGHT BORDER: ONLY TOP AND BOTTOM BORDERS) ── */}
-                  <div className="border-t border-b border-l-0 border-r-0 border-black/[0.08] dark:border-white/[0.08] bg-white/60 dark:bg-zinc-900/40 backdrop-blur-xs py-2 px-1 shadow-[0_1px_2px_rgba(0,0,0,0.02)] overflow-hidden">
+                  {/* ── INTERACTIVE RULER CAROUSEL (NO LEFT/RIGHT BORDERS: STRICTLY TOP & BOTTOM ONLY) ── */}
+                  <div className="border-t border-b border-x-0 border-black/[0.08] dark:border-white/[0.08] py-2 px-0 overflow-hidden">
                     <RulerCarousel
                       originalItems={[
                         { id: 1, title: "ACADEMICS", subtitle: "B.Tech AI & DS · CGPA 8.0" },
                         { id: 2, title: "EDUCATION", subtitle: "Tagore Engineering College (2023–2027)" },
-                        { id: 3, title: "LOCATION", subtitle: "Tamil Nadu, India · Open to Remote & Onsite" },
+                        { id: 3, title: "LOCATION", subtitle: "Chennai, Tamil Nadu · Open to Remote & Onsite" },
                         { id: 4, title: "SPECIFICATION", subtitle: "Data Analytics & Web Development" },
                       ]}
-                      height="h-[110px]"
+                      height="h-[105px]"
                       itemWidth={280}
                       gap={36}
                     />
