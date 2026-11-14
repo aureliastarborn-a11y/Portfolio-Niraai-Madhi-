@@ -62,7 +62,7 @@ export default function FramedEducationCard({ educationItem, className = '' }) {
             <div className="txt text-left">
               <div className="flex items-center justify-between text-xs font-mono text-zinc-600 mb-1">
                 <span className="font-semibold text-zinc-800 tracking-wide flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-[#4a5d48]" />
+                  <Sparkles className="w-3.5 h-3.5 text-[#7a5a3a]" />
                   Anna University Affiliation · Chennai
                 </span>
                 <span className="text-zinc-800 font-medium font-mono">CGPA: 8.0 / 10.0</span>
