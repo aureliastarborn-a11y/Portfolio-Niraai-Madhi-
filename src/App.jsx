@@ -10,7 +10,6 @@ import TracingArtGlobe from './components/TracingArtGlobe';
 import MosaicShaderBackground from '@/components/ui/mosaic-shader-background';
 import ProjectExperienceModal from './components/ProjectExperienceModal';
 import { RulerCarousel } from '@/components/ui/ruler-carousel';
-import GridCard from '@/components/ui/grid-card';
 import { portfolioData } from './data/portfolioData';
 import {
   Sparkles,
@@ -232,61 +231,55 @@ export default function App() {
                   </p>
                 </div>
 
-                {/* Right Content — Grid Card Layout */}
-                <div className="lg:col-span-8 space-y-5">
-                  {/* Formal Education — Grid Card */}
-                  <GridCard className="p-0">
-                    <div className="p-6 space-y-2">
-                      <div className="flex items-center justify-between text-xs font-mono text-zinc-500">
-                        <span>{education[0].institution}</span>
-                        <span>{education[0].period}</span>
-                      </div>
-                      <h3 className="text-lg font-semibold text-zinc-900">
-                        {education[0].degree}
-                      </h3>
-                      <p className="text-sm text-zinc-600 leading-relaxed">
-                        {education[0].detail}
-                      </p>
+                {/* Right Content */}
+                <div className="lg:col-span-8 space-y-6">
+                  {/* Formal Education Card */}
+                  <div className="p-6 rounded-2xl bg-white/85 backdrop-blur-sm border border-black/[0.06] space-y-2">
+                    <div className="flex items-center justify-between text-xs font-mono text-zinc-500">
+                      <span>{education[0].institution}</span>
+                      <span>{education[0].period}</span>
                     </div>
-                  </GridCard>
+                    <h3 className="text-lg font-semibold text-zinc-900">
+                      {education[0].degree}
+                    </h3>
+                    <p className="text-sm text-zinc-600 leading-relaxed">
+                      {education[0].detail}
+                    </p>
+                  </div>
 
-                  {/* Certifications — Grid of Small Grid Cards */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {certifications.map((cert, idx) => {
-                      const credentialImages = [
-                        "/images/covers/cover-teal.jpg",
-                        "/images/covers/cover-amber.jpg",
-                        "/images/covers/cover-blue.jpg",
-                        "/images/covers/cover-emerald.jpg",
-                        "/images/covers/cover-lavender.jpg",
-                        "/images/covers/cover-rose.jpg",
-                        "/images/covers/cover-original.jpg",
-                        "/images/covers/cover-indigo.jpg",
-                      ];
-                      return (
-                        <GridCard key={idx} className="p-0" gridSize={20}>
-                          <div className="flex flex-col items-center text-center p-4 gap-2.5">
-                            {/* Cert Image Circle */}
-                            <div className="w-14 h-14 rounded-full overflow-hidden border border-black/[0.06] shadow-sm flex-shrink-0">
-                              <img
-                                src={credentialImages[idx % credentialImages.length]}
-                                alt={cert.name}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            {/* Cert Details */}
-                            <div className="space-y-0.5 min-w-0">
-                              <h4 className="text-xs font-semibold text-zinc-800 leading-tight">
-                                {cert.shortTitle || cert.name}
-                              </h4>
-                              <p className="text-[10px] text-zinc-500 font-mono">
-                                {cert.issuer} · {cert.year}
-                              </p>
-                            </div>
-                          </div>
-                        </GridCard>
-                      );
-                    })}
+                  {/* Certifications - POLAROID LINE CAROUSEL (Clothesline & Pegs from 21st.dev) */}
+                  <div className="w-full pt-1">
+                    <PolaroidLineCarousel
+                      slides={certifications.map((cert, idx) => {
+                        const credentialImages = [
+                          "/images/covers/cover-teal.jpg",
+                          "/images/covers/cover-amber.jpg",
+                          "/images/covers/cover-blue.jpg",
+                          "/images/covers/cover-emerald.jpg",
+                          "/images/covers/cover-lavender.jpg",
+                          "/images/covers/cover-rose.jpg",
+                          "/images/covers/cover-original.jpg",
+                          "/images/covers/cover-indigo.jpg",
+                        ];
+                        return {
+                          image: credentialImages[idx % credentialImages.length],
+                          title: cert.shortTitle || cert.name,
+                          issuer: cert.issuer,
+                          caption: `${cert.issuer} • Issued ${cert.year}`,
+                          alt: `${cert.name} - ${cert.issuer}`,
+                        };
+                      })}
+                      height="165px"
+                      cardWidth={92}
+                      sag={12}
+                      swing={1}
+                      autoplay={3800}
+                      string="#71717a"
+                      background="transparent"
+                      ink="#18181b"
+                      showBar={false}
+                      ariaLabel="Certifications clothesline carousel"
+                    />
                   </div>
                 </div>
               </section>
