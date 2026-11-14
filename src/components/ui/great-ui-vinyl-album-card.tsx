@@ -130,7 +130,7 @@ export default function VinylAlbumCard({
         {/* ── ALBUM COVER SLEEVE (LIGHTENED SHADE & BORDER + CENTER HEADER ONLY) ── */}
         <motion.div
           className={cn(
-            "absolute z-20 overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.025)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-black/[0.035] cursor-pointer bg-white transition-all duration-300",
+            "absolute z-20 overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)] border border-black/[0.04] cursor-pointer bg-white transition-all duration-300",
             isSmall
               ? "h-48 w-48 sm:h-52 sm:w-52 rounded-2xl"
               : isCompact
@@ -146,19 +146,19 @@ export default function VinylAlbumCard({
           }}
           transition={{ type: "spring", stiffness: 150, damping: 20 }}
         >
-          {/* Cover Artwork Image with Softer, Delicate Tone */}
+          {/* Cover Artwork Image with Lightened, Luminous Tone */}
           <img
             src={coverImage}
             alt={title}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 contrast-[1.03] saturate-[1.06] brightness-[1.02]"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 contrast-[1.08] saturate-[1.15] brightness-[1.03]"
           />
 
           {/* Light Translucent Backdrop Veil */}
           <div className="absolute inset-0 bg-white/10 backdrop-blur-[0.5px] flex flex-col items-center justify-center p-4 sm:p-5 text-center select-none">
             <h3
               className={cn(
-                "relative z-10 font-serif font-normal text-zinc-800 tracking-tight leading-snug drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)] text-balance",
-                isSmall ? "text-[15px] sm:text-[17px]" : "text-base sm:text-lg",
+                "relative z-10 font-serif font-medium text-zinc-900 tracking-tight leading-snug drop-shadow-[0_1px_2px_rgba(255,255,255,0.95)] text-balance",
+                isSmall ? "text-base sm:text-lg" : "text-lg sm:text-xl",
               )}
             >
               {title}

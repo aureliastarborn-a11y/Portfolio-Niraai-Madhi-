@@ -1,22 +1,20 @@
-"use client";
+import { GridCard } from "@/components/ui/grid-card";
+import { Grid2x2Check } from 'lucide-react';
 
-import { RulerCarousel, type CarouselItem } from "@/components/ui/ruler-carousel";
-
-export function Demo() {
-  const originalItems: CarouselItem[] = [
-    { id: 1, title: "NIKE" },
-    { id: 2, title: "ALO" },
-    { id: 3, title: "CONVERSE" },
-    { id: 4, title: "UNIQLO" },
-    { id: 5, title: "ON CLOUD" },
-    { id: 6, title: "SKIMS" },
-    { id: 7, title: "ADIDAS" },
-    { id: 8, title: "PUMA" },
-    { id: 9, title: "REEBOK" },
-  ];
-  return (
-    <div className="min-h-screen overflow-hidden flex items-center justify-center">
-      <RulerCarousel originalItems={originalItems} />
-    </div>
-  );
+export default function DemoOne() {
+ 	return (
+		<div className="relative flex min-h-screen w-full items-center justify-center">
+			<GridCard className="size-72">
+				<Grid2x2Check className="text-foreground/80 relative size-8" />
+				<div className="relative">
+					<span className="text-foreground/80 text-lg font-medium">
+						Grid Card
+					</span>
+					<p className="text-muted-foreground text-sm">
+						Have you ever wondered how to create a grid card with a hover effect?
+					</p>
+				</div>
+			</GridCard>
+		</div>
+	);
 }
