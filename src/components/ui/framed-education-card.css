@@ -6,12 +6,12 @@
 }
 
 .framed-education-container .btn-wrapper {
-  --color: #EFE7DA; /* Lightened Hazel Wood */
+  --color: #F8F7F4; /* Half White / Broken White */
   --txt-color: #1f2937;
   --txt-color-2: #111827;
   --point-size: 8px;
   --point-color: #ffffff;
-  --line-color: rgba(120, 95, 65, 0.2);
+  --line-color: rgba(0, 0, 0, 0.1);
   --line-style: solid;
   --line-weight: 1px;
   --anim-speed: 1s;
@@ -35,7 +35,7 @@
   font:
     400 0.75em "Inter",
     sans-serif;
-  color: #8c7a68;
+  color: #71717a;
   font-style: italic;
   white-space: nowrap;
   pointer-events: none;
@@ -108,20 +108,20 @@
   animation: none;
 }
 
-/* Full rectangle box in uniform Lightened Hazel Wood (#EFE7DA) */
+/* Full rectangle box in uniform Half White (#F8F7F4) */
 .framed-education-container .frame {
   position: absolute;
   inset: 0 0%;
   z-index: 1;
   border: var(--line-style, solid) var(--line-weight, 1px)
-    var(--line-color, rgba(120, 95, 65, 0.2));
-  background-color: var(--color, #EFE7DA);
+    var(--line-color, rgba(0, 0, 0, 0.1));
+  background-color: var(--color, #F8F7F4);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   transition-delay: calc(var(--anim-speed, 1s) * 0.5);
-  box-shadow: 0 4px 14px -2px rgba(80, 55, 30, 0.05),
+  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.04),
     0 2px 4px -2px rgba(0, 0, 0, 0.02),
-    inset 0 1px 2px 0 rgba(255, 255, 255, 0.7);
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.9);
   animation: frame-half calc(var(--anim-speed, 1s) * 0.5) forwards;
 }
 
@@ -131,9 +131,9 @@
   width: var(--point-size, 8px);
   aspect-ratio: 1;
   border-radius: 25%;
-  border: solid var(--line-weight, 1px) rgba(120, 95, 65, 0.3);
+  border: solid var(--line-weight, 1px) rgba(0, 0, 0, 0.16);
   background-color: var(--point-color, #ffffff);
-  background-image: radial-gradient(circle at 50% 120%, rgba(120, 95, 65, 0.18), #ffffff);
+  background-image: radial-gradient(circle at 50% 120%, rgba(0, 0, 0, 0.08), #ffffff);
   z-index: 4;
 }
 
@@ -215,7 +215,7 @@
     500 0.85em "Inter",
     sans-serif;
   letter-spacing: 0.03em;
-  color: #4a3724;
+  color: #18181b;
   z-index: 10;
   filter: blur(12px);
   opacity: 0;
@@ -224,7 +224,7 @@
 }
 
 .framed-education-container .btn:active .txt-box {
-  filter: contrast(1.2) brightness(1.05);
+  filter: contrast(1.1) brightness(1.02);
 }
 
 .framed-education-container .btn:focus::before {
