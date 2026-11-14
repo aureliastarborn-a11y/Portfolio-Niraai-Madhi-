@@ -188,11 +188,11 @@ export function RulerCarousel({
                   {item.title}
                 </span>
 
-                {/* Deep Brown Content (e.g. B.Tech AI & DS · CGPA 8.0, Chennai, Data Analytics) */}
+                {/* Deep Brown Content (Bitter Chocolate #241008) */}
                 {item.subtitle && (
                   <span
-                    className={`text-xs sm:text-[13px] font-bold tracking-tight mt-0.5 max-w-[320px] truncate transition-opacity duration-200 text-[#2e180d] dark:text-[#f0dfc8] ${
-                      isActive ? "opacity-100" : "opacity-85"
+                    className={`text-xs sm:text-[13px] font-bold tracking-tight mt-0.5 max-w-[320px] truncate transition-opacity duration-200 text-[#241008] dark:text-[#f3e9dc] ${
+                      isActive ? "opacity-100" : "opacity-90"
                     }`}
                   >
                     {item.subtitle}
