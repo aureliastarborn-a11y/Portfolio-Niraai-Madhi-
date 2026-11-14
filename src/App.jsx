@@ -129,12 +129,12 @@ export default function App() {
                     <RulerCarousel
                       originalItems={[
                         { id: 1, title: "ACADEMICS", subtitle: "B.Tech AI & DS · CGPA 8.0" },
-                        { id: 2, title: "EDUCATION", subtitle: "Tagore Engineering College (2023–2027)" },
-                        { id: 3, title: "LOCATION", subtitle: "Chennai, Tamil Nadu · Open to Remote & Onsite" },
+                        { id: 2, title: "EDUCATION", subtitle: "2023–2027" },
+                        { id: 3, title: "LOCATION", subtitle: "Chennai, Tamil Nadu · Remote & Onsite" },
                         { id: 4, title: "SPECIFICATION", subtitle: "Data Analytics & Web Development" },
                       ]}
                       height="h-[105px]"
-                      itemWidth={280}
+                      itemWidth={300}
                       gap={36}
                     />
                   </div>

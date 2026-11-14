@@ -170,8 +170,8 @@ export function RulerCarousel({
                   minWidth: `${itemWidth}px`,
                 }}
                 animate={{
-                  scale: isActive ? 1 : 0.9,
-                  opacity: isActive ? 1 : 0.72,
+                  scale: isActive ? 1 : 0.92,
+                  opacity: isActive ? 1 : 0.85,
                 }}
                 transition={{
                   type: "spring",
@@ -181,22 +181,18 @@ export function RulerCarousel({
               >
                 {/* Golden Header (e.g. ACADEMICS, LOCATION, SPECIFICATION) */}
                 <span
-                  className={`text-lg sm:text-xl font-bold tracking-wider font-mono transition-colors duration-200 ${
-                    isActive
-                      ? "text-[#b8860b] dark:text-[#f3b73e]"
-                      : "text-[#b8860b]/75 dark:text-[#f3b73e]/70"
+                  className={`text-lg sm:text-xl font-bold tracking-wider font-mono transition-opacity duration-200 text-[#b8860b] dark:text-[#f3b73e] ${
+                    isActive ? "opacity-100" : "opacity-80"
                   }`}
                 >
                   {item.title}
                 </span>
 
-                {/* Deep Brown Content (e.g. B.Tech AI & DS · CGPA 8.0) */}
+                {/* Deep Brown Content (e.g. B.Tech AI & DS · CGPA 8.0, Chennai, Data Analytics) */}
                 {item.subtitle && (
                   <span
-                    className={`text-xs sm:text-[13px] font-semibold tracking-tight mt-0.5 max-w-[280px] truncate transition-colors duration-200 ${
-                      isActive
-                        ? "text-[#2e180d] dark:text-[#f0dfc8]"
-                        : "text-[#2e180d]/80 dark:text-[#d5c3aa]/75"
+                    className={`text-xs sm:text-[13px] font-bold tracking-tight mt-0.5 max-w-[320px] truncate transition-opacity duration-200 text-[#2e180d] dark:text-[#f0dfc8] ${
+                      isActive ? "opacity-100" : "opacity-85"
                     }`}
                   >
                     {item.subtitle}
