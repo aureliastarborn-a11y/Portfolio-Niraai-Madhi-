@@ -181,9 +181,10 @@ export function RulerCarousel({
               >
                 {/* Golden Header (e.g. ACADEMICS, LOCATION, SPECIFICATION) */}
                 <span
-                  className={`text-lg sm:text-xl font-bold tracking-wider font-mono transition-opacity duration-200 text-[#b8860b] dark:text-[#f3b73e] ${
+                  className={`text-lg sm:text-xl font-bold tracking-wider font-mono transition-opacity duration-200 ${
                     isActive ? "opacity-100" : "opacity-80"
                   }`}
+                  style={{ color: "#b8860b" }}
                 >
                   {item.title}
                 </span>
@@ -191,9 +192,10 @@ export function RulerCarousel({
                 {/* Deep Brown Content (Bitter Chocolate #241008) */}
                 {item.subtitle && (
                   <span
-                    className={`text-xs sm:text-[13px] font-bold tracking-tight mt-0.5 max-w-[320px] truncate transition-opacity duration-200 text-[#241008] dark:text-[#f3e9dc] ${
+                    className={`text-xs sm:text-[13px] font-bold tracking-tight mt-0.5 max-w-[320px] truncate transition-opacity duration-200 ${
                       isActive ? "opacity-100" : "opacity-90"
                     }`}
+                    style={{ color: "#241008" }}
                   >
                     {item.subtitle}
                   </span>
