@@ -108,7 +108,7 @@ export default function VinylAlbumCard({
           {/* Center Album Label */}
           <div
             className={cn(
-              "relative flex items-center justify-center overflow-hidden rounded-full shadow-xs border border-black/[0.04] bg-white",
+              "relative flex items-center justify-center overflow-hidden rounded-full shadow-xs border border-black/[0.04] bg-[#F2EFE9]",
               isSmall ? "h-16 w-16" : isCompact ? "h-20 w-20" : "h-24 w-24",
             )}
           >
@@ -127,10 +127,10 @@ export default function VinylAlbumCard({
           <div className="pointer-events-none absolute inset-0 -rotate-45 bg-gradient-to-br from-transparent via-white/45 to-transparent mix-blend-overlay" />
         </motion.div>
 
-        {/* ── ALBUM COVER SLEEVE (LIGHTENED SHADE & BORDER + CENTER HEADER ONLY) ── */}
+        {/* ── ALBUM COVER SLEEVE (LIGHT CHAMPAGNE / PALE BEIGE #F2EFE9) ── */}
         <motion.div
           className={cn(
-            "absolute z-20 overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)] border border-black/[0.04] cursor-pointer bg-white transition-all duration-300",
+            "absolute z-20 overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)] border border-[#E2DDD3] cursor-pointer bg-[#F2EFE9] transition-all duration-300",
             isSmall
               ? "h-48 w-48 sm:h-52 sm:w-52 rounded-2xl"
               : isCompact
@@ -153,8 +153,8 @@ export default function VinylAlbumCard({
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 contrast-[1.08] saturate-[1.15] brightness-[1.03]"
           />
 
-          {/* Light Translucent Backdrop Veil */}
-          <div className="absolute inset-0 bg-white/10 backdrop-blur-[0.5px] flex flex-col items-center justify-center p-4 sm:p-5 text-center select-none">
+          {/* Light Translucent Backdrop Veil in Pale Beige */}
+          <div className="absolute inset-0 bg-[#F2EFE9]/10 backdrop-blur-[0.5px] flex flex-col items-center justify-center p-4 sm:p-5 text-center select-none">
             <h3
               className={cn(
                 "relative z-10 font-serif font-medium text-zinc-900 tracking-tight leading-snug drop-shadow-[0_1px_2px_rgba(255,255,255,0.95)] text-balance",

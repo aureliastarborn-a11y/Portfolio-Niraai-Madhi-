@@ -57,7 +57,7 @@ export const portfolioData = {
       title: "AI LinkedIn Job Finder",
       tagline: "Autonomous Agent & LLM Pipelines",
       description: "Developed an AI-powered career assistance system to analyze resumes and identify relevant LinkedIn job opportunities using LLMs and prompt engineering.",
-      bg: "/images/covers/cover-original.jpg",
+      bg: "/images/covers_champagne/cover-original.jpg",
       screenshot: "/images/project-screenshots/desktop-agent.png",
       tags: ["Python", "LLMs", "Prompt Engineering"],
       link: "https://github.com/niraai-madhi"
@@ -67,7 +67,7 @@ export const portfolioData = {
       title: "Data Warehouse",
       tagline: "Multi-Source Analytics & ETL",
       description: "Designed and implemented a data warehouse to organize and manage data from multiple sources using SQL and data transformation techniques.",
-      bg: "/images/covers/cover-teal.jpg",
+      bg: "/images/covers_champagne/cover-teal.jpg",
       screenshot: "/images/project-screenshots/cli-agent.png",
       tags: ["SQL", "ETL", "Data Modeling"],
       link: "https://github.com/niraai-madhi"
@@ -77,7 +77,7 @@ export const portfolioData = {
       title: "Personal Portfolio Website",
       tagline: "Interactive Web Experience",
       description: "Developed a responsive personal portfolio website to showcase projects, technical skills, certifications, and experience using modern UI tools.",
-      bg: "/images/covers/cover-indigo.jpg",
+      bg: "/images/covers_champagne/cover-indigo.jpg",
       screenshot: "/images/project-screenshots/desktop-agent.png",
       tags: ["React", "Tailwind CSS", "JavaScript"],
       link: "https://github.com/niraai-madhi"
@@ -87,7 +87,7 @@ export const portfolioData = {
       title: "NYC Airbnb Revenue Analysis",
       tagline: "10,000+ Records EDA & Modeling",
       description: "Analyzed 10,000+ Airbnb listing records using Excel and Python (Pandas) to evaluate pricing trends, revenue patterns, and location dynamics.",
-      bg: "/images/covers/cover-amber.jpg",
+      bg: "/images/covers_champagne/cover-amber.jpg",
       screenshot: "/images/project-screenshots/editor-plan.png",
       tags: ["Python", "Pandas", "Excel", "EDA"],
       link: "https://github.com/niraai-madhi"
@@ -97,7 +97,7 @@ export const portfolioData = {
       title: "Customer Behavior Analysis",
       tagline: "SQL Querying & Segmentation",
       description: "Analyzed customer transaction data using SQL queries (GROUP BY, JOINs) to derive insights related to customer segmentation and purchasing patterns.",
-      bg: "/images/covers/cover-rose.jpg",
+      bg: "/images/covers_champagne/cover-rose.jpg",
       screenshot: "/images/project-screenshots/cli-agent.png",
       tags: ["SQL", "Joins", "Aggregation"],
       link: "https://github.com/niraai-madhi"
@@ -107,7 +107,7 @@ export const portfolioData = {
       title: "Expense Tracker",
       tagline: "Interactive Dashboard & Monitoring",
       description: "Developed an interactive expense tracking application to record, categorize, and monitor personal expenses with dashboard-style summaries.",
-      bg: "/images/covers/cover-lavender.jpg",
+      bg: "/images/covers_champagne/cover-lavender.jpg",
       screenshot: "/images/project-screenshots/editor-plan.png",
       tags: ["JavaScript", "Dashboard", "Analytics"],
       link: "https://github.com/niraai-madhi"
@@ -117,7 +117,7 @@ export const portfolioData = {
       title: "CGPA Calculator",
       tagline: "Python Academic Logic Utility",
       description: "Developed a Python-based calculator to compute semester and cumulative CGPA implementing logical conditions for grade-to-point conversion.",
-      bg: "/images/covers/cover-emerald.jpg",
+      bg: "/images/covers_champagne/cover-emerald.jpg",
       screenshot: "/images/project-screenshots/cli-agent.png",
       tags: ["Python", "CLI", "Logic"],
       link: "https://github.com/niraai-madhi"
@@ -127,7 +127,7 @@ export const portfolioData = {
       title: "Resume Creator &\nATS Score Checker",
       tagline: "Python Resume Parsing & Scoring",
       description: "Developed a Python-based Resume Checker to analyze resumes, evaluate overall quality, perform ATS compatibility checks, and provide skill matching suggestions.",
-      bg: "/images/covers/cover-blue.jpg",
+      bg: "/images/covers_champagne/cover-blue.jpg",
       screenshot: "/images/project-screenshots/desktop-agent.png",
       tags: ["Python", "ATS Scoring", "NLP"],
       link: "https://github.com/niraai-madhi"
@@ -140,7 +140,7 @@ export const portfolioData = {
       role: "Machine Learning Intern",
       organization: "Sparwix",
       summary: "Data preprocessing, exploratory data analysis (EDA), and interactive Power BI dashboards for business insights.",
-      bg: "/images/covers/cover-rose.jpg",
+      bg: "/images/covers_champagne/cover-rose.jpg",
       tags: ["Machine Learning", "EDA", "Power BI", "Python"]
     },
     {
@@ -148,7 +148,7 @@ export const portfolioData = {
       role: "AI Agent Developer",
       organization: "Independent",
       summary: "Constructed autonomous LLM agents, prompt engineering pipelines, and automated resume analysis tools.",
-      bg: "/images/covers/cover-lavender.jpg",
+      bg: "/images/covers_champagne/cover-lavender.jpg",
       tags: ["Autonomous Agents", "LLMs", "Prompt Engineering", "Python"]
     },
     {
@@ -156,7 +156,7 @@ export const portfolioData = {
       role: "Data Warehouse Developer",
       organization: "Academic Projects",
       summary: "Implemented star-schema data models, analytical SQL queries, and multi-source reporting pipelines.",
-      bg: "/images/covers/cover-emerald.jpg",
+      bg: "/images/covers_champagne/cover-emerald.jpg",
       tags: ["SQL", "Star Schema", "ETL"]
     },
     {
@@ -164,7 +164,7 @@ export const portfolioData = {
       role: "Web Developer",
       organization: "Self-Employed",
       summary: "Designed and developed responsive websites and web applications using HTML, CSS, JavaScript, and API integrations.",
-      bg: "/images/covers/cover-indigo.jpg",
+      bg: "/images/covers_champagne/cover-indigo.jpg",
       tags: ["HTML", "CSS", "JavaScript", "APIs"]
     },
     {
@@ -172,7 +172,7 @@ export const portfolioData = {
       role: "Data Analytics and Reporting",
       organization: "Self-Employed",
       summary: "Engineered customized data analytics, business reporting workflows, and interactive performance-focused dashboards.",
-      bg: "/images/covers/cover-blue.jpg",
+      bg: "/images/covers_champagne/cover-blue.jpg",
       tags: ["Data Analytics", "Reporting", "Dashboards"]
     }
   ],
