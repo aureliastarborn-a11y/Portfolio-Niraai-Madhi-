@@ -164,18 +164,14 @@ export function RulerCarousel({
                 key={item.id}
                 type="button"
                 onClick={() => handleItemClick(index)}
-                className={`flex flex-col items-center justify-center text-center cursor-pointer transition-colors duration-200 ${
-                  isActive
-                    ? "text-zinc-900 dark:text-zinc-50"
-                    : "text-zinc-400/80 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-                }`}
+                className="flex flex-col items-center justify-center text-center cursor-pointer select-none"
                 style={{
                   width: `${itemWidth}px`,
                   minWidth: `${itemWidth}px`,
                 }}
                 animate={{
-                  scale: isActive ? 1 : 0.88,
-                  opacity: isActive ? 1 : 0.35,
+                  scale: isActive ? 1 : 0.9,
+                  opacity: isActive ? 1 : 0.7,
                 }}
                 transition={{
                   type: "spring",
@@ -183,15 +179,24 @@ export function RulerCarousel({
                   damping: 28,
                 }}
               >
-                <span className="text-lg sm:text-xl font-bold tracking-wider font-mono">
+                {/* Golden Title (e.g. ACADEMICS) */}
+                <span
+                  className={`text-lg sm:text-xl font-bold tracking-wider font-mono transition-colors duration-200 ${
+                    isActive
+                      ? "text-[#b45309] dark:text-[#f59e0b] drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]"
+                      : "text-[#b45309]/75 dark:text-[#f59e0b]/70"
+                  }`}
+                >
                   {item.title}
                 </span>
+
+                {/* Dark Brown Subtitle (e.g. B.Tech AI & DS · CGPA 8.0) */}
                 {item.subtitle && (
                   <span
-                    className={`text-xs font-medium tracking-tight mt-0.5 max-w-[270px] truncate transition-opacity duration-200 ${
+                    className={`text-xs sm:text-[13px] font-semibold tracking-tight mt-0.5 max-w-[280px] truncate transition-colors duration-200 ${
                       isActive
-                        ? "text-zinc-600 dark:text-zinc-300 opacity-100"
-                        : "text-zinc-400 opacity-50"
+                        ? "text-[#3d2314] dark:text-[#e2d5c3]"
+                        : "text-[#4a2e1b]/80 dark:text-[#c4b5a2]/80"
                     }`}
                   >
                     {item.subtitle}
