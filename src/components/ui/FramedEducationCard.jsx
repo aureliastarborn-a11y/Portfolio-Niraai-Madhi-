@@ -44,11 +44,11 @@ export default function FramedEducationCard({ educationItem, className = '' }) {
             {/* Primary / Resting State */}
             <div className="txt text-left">
               <div className="flex items-center justify-between text-xs font-mono text-zinc-500 mb-1">
-                <span className="font-semibold text-zinc-700 tracking-wide flex items-center gap-1.5">
-                  <GraduationCap className="w-3.5 h-3.5 text-zinc-500" />
+                <span className="font-semibold text-zinc-800 tracking-wide flex items-center gap-1.5">
+                  <GraduationCap className="w-3.5 h-3.5 text-amber-700/80" />
                   {institution}
                 </span>
-                <span className="text-zinc-500 font-medium">{period}</span>
+                <span className="text-amber-800/80 font-medium">{period}</span>
               </div>
               <h3 className="text-base sm:text-lg font-semibold tracking-tight text-zinc-900 leading-snug mb-1">
                 {degree}
@@ -61,11 +61,11 @@ export default function FramedEducationCard({ educationItem, className = '' }) {
             {/* Secondary / Hover State */}
             <div className="txt text-left">
               <div className="flex items-center justify-between text-xs font-mono text-zinc-600 mb-1">
-                <span className="font-semibold text-emerald-800 tracking-wide flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="font-semibold text-amber-800 tracking-wide flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                   Anna University Affiliation · Chennai
                 </span>
-                <span className="text-emerald-800 font-medium">CGPA: 8.0 / 10.0</span>
+                <span className="text-amber-800 font-medium font-mono">CGPA: 8.0 / 10.0</span>
               </div>
               <h3 className="text-base sm:text-lg font-semibold tracking-tight text-zinc-900 leading-snug mb-1">
                 Artificial Intelligence &amp; Autonomous Systems Specialization
