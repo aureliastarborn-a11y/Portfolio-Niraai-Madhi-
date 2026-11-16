@@ -1,0 +1,143 @@
+/* From Uiverse.io by Smit-Prajapati / imtausef - Customized Half-White Edition (No Black) */
+.uiv-front-parent {
+  width: 100%;
+  max-width: 230px;
+  padding: 6px;
+  perspective: 900px;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  margin: 0 auto;
+}
+
+.uiv-front-card {
+  position: relative;
+  padding-top: 22px;
+  border: 2.5px solid rgb(255, 255, 255);
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  will-change: transform;
+  background: linear-gradient(135deg, #0000 18.75%, #f3f3f3 0 31.25%, #0000 0),
+    repeating-linear-gradient(45deg, #f3f3f3 -6.25% 6.25%, #ffffff 0 18.75%);
+  background-size: 36px 36px;
+  background-position: 0 0, 0 0;
+  background-color: #f0f0f0;
+  width: 100%;
+  box-shadow: rgba(142, 142, 142, 0.3) 0px 14px 18px -8px;
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .uiv-front-card:hover {
+    transform: rotate3d(0.5, 1, 0, 20deg) scale3d(1.04, 1.04, 1.04);
+    box-shadow: rgba(142, 142, 142, 0.45) 0px 22px 24px -10px;
+  }
+
+  .uiv-front-card:hover .content-box {
+    transform: translate3d(0px, 0px, 20px);
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 8px 16px -4px;
+  }
+
+  .uiv-front-card:hover .card-title {
+    transform: translate3d(0px, 0px, 36px);
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.uiv-front-card.is-active-3d {
+  transform: rotate3d(0.4, 1, 0, 20deg) scale3d(1.04, 1.04, 1.04);
+  box-shadow: rgba(142, 142, 142, 0.5) 0px 20px 24px -8px;
+  z-index: 20;
+}
+
+.uiv-front-card.is-active-3d .content-box {
+  transform: translate3d(0px, 0px, 20px);
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 8px 16px -4px;
+}
+
+.uiv-front-card.is-active-3d .card-title {
+  transform: translate3d(0px, 0px, 36px);
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.uiv-front-card .content-box {
+  background: #fbf9f5;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.25s ease;
+  will-change: transform;
+  padding: 18px 14px;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.uiv-front-card .content-box .card-title {
+  display: block;
+  font-family: 'Foglihten', serif;
+  color: #18181b;
+  font-size: 18.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  white-space: pre-line;
+  text-align: center;
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+  will-change: transform;
+  transform: translate3d(0px, 0px, 12px);
+}
+
+/* ── RESPONSIVE SCALING FOR MOBILE & TABLET ── */
+@media (max-width: 640px) {
+  .uiv-front-parent {
+    max-width: 100%;
+    padding: 1px;
+    perspective: 750px;
+  }
+
+  .uiv-front-card {
+    padding-top: 10px;
+    background-size: 20px 20px;
+    border-width: 1.5px;
+  }
+
+  .uiv-front-card.is-active-3d {
+    transform: rotate3d(0.35, 1, 0, 18deg) scale3d(1.04, 1.04, 1.04);
+    box-shadow: rgba(142, 142, 142, 0.5) 0px 16px 20px -6px;
+    z-index: 20;
+  }
+
+  .uiv-front-card .content-box {
+    padding: 8px 3px;
+    min-height: 60px;
+  }
+
+  .uiv-front-card .content-box .card-title {
+    font-size: clamp(9.5px, 2.7vw, 11.5px);
+    line-height: 1.18;
+    transform: translate3d(0px, 0px, 10px);
+  }
+
+  .uiv-front-card.is-active-3d .content-box {
+    transform: translate3d(0px, 0px, 16px);
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 6px 12px -3px;
+  }
+
+  .uiv-front-card.is-active-3d .card-title {
+    transform: translate3d(0px, 0px, 28px);
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .uiv-front-parent {
+    max-width: 280px;
+  }
+
+  .uiv-front-card .content-box .card-title {
+    font-size: 15.5px;
+  }
+}

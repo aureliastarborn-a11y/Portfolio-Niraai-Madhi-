@@ -274,8 +274,19 @@ const THIRD_PI = Math.PI / 3;
 const ringPhaseOffset = (len) => ((len - 1) / len) * Math.PI * 2 + THIRD_PI + Math.PI / 24;
 
 export function calcRingPosition(idx, total, width, height, timeMs, prefersReduced, parentHeight = height, scrollRot = 0, pitch = 0) {
-  const ringRadius = Math.min(270, 0.34 * width, 0.30 * height);
-  const baseSphereRadius = Math.max(26, Math.min(50, 0.24 * ringRadius));
+  const isMobile = width < 640;
+  const isTablet = width >= 640 && width < 1024;
+  const ringRadius = isMobile
+    ? Math.min(185, Math.max(145, 0.44 * width), 0.28 * height)
+    : isTablet
+    ? Math.min(230, 0.35 * width, 0.30 * height)
+    : Math.min(270, 0.34 * width, 0.30 * height);
+
+  const baseSphereRadius = isMobile
+    ? Math.max(20, Math.min(34, 0.18 * ringRadius))
+    : isTablet
+    ? Math.max(24, Math.min(42, 0.21 * ringRadius))
+    : Math.max(26, Math.min(50, 0.24 * ringRadius));
   const progress = prefersReduced ? 1 : clamp(timeMs / 2100);
   const angleSpread = Math.max(0, ringPhaseOffset(total) * (1 - Math.pow(1 - progress, 3)) - (idx / total) * Math.PI * 2);
   const smoothAngle = clamp(angleSpread / THIRD_PI);
@@ -680,6 +691,9 @@ export default function GlassSpheres({
     }));
 
     const renderList = [];
+    let lastRectTime = 0;
+    let cachedCanvasTop = 0;
+    let cachedParentTop = 0;
 
     const frameLoop = (timestamp) => {
       animFrameId = 0;
@@ -755,18 +769,16 @@ export default function GlassSpheres({
       let coverLeft = 0, coverRight = 0, coverTop = 0, coverBottom = 0;
 
       if (variant === 'field') {
-        const canvasRect = canvas.getBoundingClientRect();
-        const parentRect = canvas.parentElement?.getBoundingClientRect();
-        const coverRect = coverRef?.current?.getBoundingClientRect();
-
-        if (coverRect) {
-          coverLeft = coverRect.left - canvasRect.left + 32;
-          coverRight = coverRect.right - canvasRect.left - 32;
-          coverTop = coverRect.top - canvasRect.top + 32;
-          coverBottom = coverRect.bottom - canvasRect.top - 32;
+        const now = performance.now();
+        if (now - lastRectTime > 100) {
+          lastRectTime = now;
+          const canvasRect = canvas.getBoundingClientRect();
+          const parentRect = canvas.parentElement?.getBoundingClientRect();
+          cachedCanvasTop = canvasRect.top;
+          cachedParentTop = parentRect ? parentRect.top : canvasRect.top;
         }
 
-        scissorTop = Math.max(0, -canvasRect.top, (parentRect?.top ?? canvasRect.top) - canvasRect.top);
+        scissorTop = Math.max(0, -cachedCanvasTop, cachedParentTop - cachedCanvasTop);
         if (scissorTop >= (scissorBottom = clientH)) return;
       }
 

@@ -321,8 +321,10 @@ export default function MosaicShaderBackground({
     const s = state.current
     let w = 0
     let h = 0
+    let cachedR = { left: 0, height: 1, bottom: 1 }
     const size = () => {
       const r = root.getBoundingClientRect()
+      cachedR = { left: r.left, height: r.height || 1, bottom: r.bottom }
       // three quarters of the device resolution: the tiles hide it
       const scale = Math.min(window.devicePixelRatio || 1, 1.5) * 0.75
       w = Math.max(1, Math.round(r.width * scale))
@@ -370,8 +372,8 @@ export default function MosaicShaderBackground({
 
     let ptrTimer: any = 0
     const move = (e: PointerEvent) => {
-      const r = root.getBoundingClientRect()
-      s.ptr = [(e.clientX - r.left) / r.height, (r.bottom - e.clientY) / r.height]
+      if (e.pointerType === 'touch') return // Skip mobile scroll touches
+      s.ptr = [(e.clientX - cachedR.left) / cachedR.height, (cachedR.bottom - e.clientY) / cachedR.height]
       s.ptrOn = 1.0
       s.dirty = true
       clearTimeout(ptrTimer)
@@ -394,8 +396,8 @@ export default function MosaicShaderBackground({
       s.dirty = true
     }
     if (interactive) {
-      window.addEventListener("pointermove", move)
-      window.addEventListener("pointerleave", leave)
+      window.addEventListener("pointermove", move, { passive: true })
+      window.addEventListener("pointerleave", leave, { passive: true })
     }
 
     return () => {

@@ -1,0 +1,142 @@
+# Niraai Madhi — Comprehensive Resume & Engineering Profile (Full LLM Reference)
+
+This document is optimized for consumption by AI models, agents, search spiders, and automated indexing crawlers.
+
+## Identity & Professional Overview
+- Full Name: Niraai Madhi
+- Gender Pronouns: she/her
+- Location: Tamil Nadu, India
+- Email: niraai.she.her@gmail.com
+- Telephone: +91 9342322829
+- LinkedIn Profile: https://www.linkedin.com/in/niraai-madhi-a46960324
+- GitHub Organization / Profile: https://github.com/niraai-madhi
+- Repository: https://github.com/aureliastarborn-a11y/Portfolio-Niraai-Madhi-
+
+Niraai Madhi is an Artificial Intelligence and Data Science undergraduate at Tagore Engineering College (2022–2026). She specializes in Autonomous AI Agents, Machine Learning pipelines, Star-Schema Data Warehouses, and modern interactive web engineering with React, Tailwind CSS, and WebGL 3D.
+
+---
+
+## Detailed Technical Skills
+
+### 1. Programming Languages
+- Python (Pandas, NumPy, Matplotlib, Scikit-Learn, Regex)
+- SQL (PostgreSQL, MySQL, Complex Queries, Joins, Aggregation, Subqueries, CTEs)
+- JavaScript / ECMAScript 2024 (ES6+, DOM, Promises, Async/Await)
+- HTML5, Modern CSS3 (CSS Grid, Flexbox, 3D Transforms, Responsive Design)
+
+### 2. Artificial Intelligence & Generative AI
+- Large Language Models (LLMs) Integration & Prompt Engineering
+- Autonomous AI Agents architecture and task execution
+- Generative AI pipelines and automated workflow tooling
+- NLP for resume analysis, text extraction, and ATS match scoring
+
+### 3. Data Science, Analytics & Warehousing
+- Exploratory Data Analysis (EDA) and Data Cleaning
+- Descriptive and inferential statistics
+- Star Schema and Snowflake Schema dimensional data modeling
+- ETL (Extract, Transform, Load) pipelines
+- Business Intelligence Tools: Microsoft Power BI, Tableau, Advanced MS Excel (Pivot Tables, Lookups, Modeling)
+
+### 4. Web & Software Engineering
+- React.js (Hooks, Custom State Management, AnimatePresence, Framer Motion)
+- Tailwind CSS (Custom themes, responsive typography, 3D CSS perspective)
+- Three.js / WebGL (Interactive 3D geometry, mesh vertex transformation, responsive canvas)
+- Git & GitHub (Branch management, commit hygiene, open source collaboration)
+- Performance Optimization (IntersectionObserver for offscreen canvas pausing, throttled scroll/resize, GPU acceleration)
+
+---
+
+## Work Experience
+
+### Machine Learning Intern — Sparwix
+- Tenure: 2024 – Present
+- Location: Tamil Nadu, India
+- Role Highlights:
+  - Performed data preprocessing, anomaly detection, and data cleaning across diverse tabular datasets.
+  - Conducted in-depth exploratory data analysis (EDA) to uncover operational trends and KPIs.
+  - Built interactive, high-impact Power BI business dashboards supporting executive decision-making.
+
+### AI Agent Developer — Independent Engineering
+- Tenure: 2024
+- Role Highlights:
+  - Constructed autonomous LLM-powered agents to streamline job application workflows.
+  - Designed automated resume parsing pipelines and job recommendation models using prompt engineering.
+  - Implemented structured output validation and error handling for multi-step agent actions.
+
+### Data Warehouse Developer — Academic Projects
+- Tenure: 2023 – 2024
+- Role Highlights:
+  - Designed and deployed relational star-schema data models optimized for analytical queries.
+  - Built multi-source SQL ETL scripts and reporting pipelines.
+  - Implemented data hygiene checks and indexing strategies for optimized read performance.
+
+### Web Developer — Self-Employed
+- Tenure: 2023 – Present
+- Role Highlights:
+  - Developed responsive, accessible web applications adhering to modern UX principles and semantic HTML.
+  - Built interactive UI components with React, modern CSS, and REST API integrations.
+
+### Data Analytics and Reporting — Self-Employed
+- Tenure: 2023 – Present
+- Role Highlights:
+  - Delivered custom data analytics workflows, statistical data processing, and performance tracking dashboards for personal and academic clients.
+
+---
+
+## Academic Background & Credentials
+
+### Formal Education
+- Degree: Bachelor of Technology (B.Tech) in Artificial Intelligence and Data Science
+- Institution: Tagore Engineering College, Tamil Nadu, India
+- Expected Graduation: 2026
+
+### Verified Certifications & Coursework
+- Foundations of Artificial Intelligence & Machine Learning
+- Enterprise Data Warehousing & SQL Masterclass
+- Prompt Engineering for Generative AI & Autonomous Agents
+- Data Visualization with Power BI and Tableau
+- Python for Data Science and Scientific Computing
+
+---
+
+## Projects Catalog
+
+1. **AI LinkedIn Job Finder**
+   - Goal: Autonomous Agent & LLM Pipelines for Career Discovery.
+   - Stack: Python, LLMs, Prompt Engineering, REST APIs.
+   - Summary: An automated assistant that extracts user resume data, queries job boards, scores job alignment via LLMs, and drafts tailored applications.
+
+2. **Data Warehouse**
+   - Goal: Enterprise Multi-Source Analytics & ETL Architecture.
+   - Stack: SQL, ETL, Star Schema, Dimensional Modeling.
+   - Summary: A centralized data repository integrating transactional data with fact and dimension tables for high-speed OLAP queries.
+
+3. **Personal Portfolio Website**
+   - Goal: Interactive 3D Portfolio and Showcase.
+   - Stack: React, Tailwind CSS, Vite, Three.js, CSS 3D.
+   - Summary: Modern portfolio featuring 3D perspective cards, GPU-accelerated globe visualization, and responsive mobile architecture.
+
+4. **NYC Airbnb Revenue Analysis**
+   - Goal: 10,000+ Records EDA & Market Modeling.
+   - Stack: Python, Pandas, Matplotlib, Excel.
+   - Summary: Analysis of price determinants, neighborhood occupancy rates, and host revenue distributions across New York City.
+
+5. **Customer Behavior Analysis**
+   - Goal: Retail Analytics & Customer Segmentation.
+   - Stack: Python, Statistics, Clustering.
+   - Summary: Applied RFM (Recency, Frequency, Monetary) analysis and unsupervised clustering to segment customer purchasing behavior.
+
+6. **Expense Tracker**
+   - Goal: Personal Finance Management System.
+   - Stack: JavaScript, LocalStorage, Canvas/Chart.js.
+   - Summary: Lightweight tracker with category-level expenditure breakdown, visual dashboards, and exportable monthly summaries.
+
+7. **CGPA Calculator**
+   - Goal: Academic Credit & Grade Calculator.
+   - Stack: JavaScript, HTML5, CSS3.
+   - Summary: Accurate grading utility matching collegiate credit scoring and weighted GPA formulas.
+
+8. **Resume Creator & ATS Score Checker**
+   - Goal: ATS Optimization & Resume Engineering Tool.
+   - Stack: Python, NLP, Regex, PDF Parsing.
+   - Summary: Generates clean, machine-parsable resumes and analyzes keyword density against target job descriptions.

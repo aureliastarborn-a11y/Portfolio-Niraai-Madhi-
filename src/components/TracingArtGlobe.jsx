@@ -20,7 +20,7 @@ import * as THREE from 'three';
 const ATLAS_URL = '/images/art-frames-atlas.png';
 const ATLAS_COLS = 10;
 const ATLAS_ROWS = 10;
-const TOTAL_FRAMES = 1850;
+const TOTAL_FRAMES = 3600; // Rich volumetric sphere with dense inner core & floating random frames
 
 export default function TracingArtGlobe() {
   const containerRef = useRef(null);
@@ -127,42 +127,46 @@ export default function TracingArtGlobe() {
       const radiusAtY = Math.sqrt(Math.max(0, 1 - y * y));
       const phi = i * GOLDEN_ANGLE;
 
-      // Natural jitter for organic Getty-style museum distribution
-      const jitterPhi = phi + (random() - 0.5) * 0.15;
-      const jitterY = Math.max(-0.995, Math.min(0.995, y + (random() - 0.5) * 0.025));
+      // Enhanced organic jitter for diverse, floating random frame cloud
+      const jitterPhi = phi + (random() - 0.5) * 0.40;
+      const jitterY = Math.max(-0.995, Math.min(0.995, y + (random() - 0.5) * 0.05));
       const jitterR = Math.sqrt(Math.max(0, 1 - jitterY * jitterY));
 
       const nx = Math.cos(jitterPhi) * jitterR;
       const ny = jitterY;
       const nz = Math.sin(jitterPhi) * jitterR;
 
-      // Shell radius (hollow sphere)
-      const radius = (BASE_RADIUS - SHELL_THICKNESS * 0.5) + random() * SHELL_THICKNESS;
+      // Volumetric sphere distribution: densely fills inner core, mid-volume, and outer layers
+      const u = random();
+      const minRadius = 0.28;
+      const maxRadius = 2.75;
+      const radius = minRadius + (maxRadius - minRadius) * Math.pow(u, 0.55);
       const restPos = new THREE.Vector3(nx * radius, ny * radius, nz * radius);
-      const corePos = restPos.clone().multiplyScalar(0.45); // compact core for entrance bloom
+      const corePos = restPos.clone().multiplyScalar(0.38); // compact core for entrance bloom
 
-      // Varied frame dimensions: miniature square, portrait, and landscape rectangles
+      // Varied frame dimensions & scaling based on volumetric depth
       const atlasIdx = i % (ATLAS_COLS * ATLAS_ROWS);
       const col = atlasIdx % ATLAS_COLS;
       const row = Math.floor(atlasIdx / ATLAS_COLS);
 
-      let size = 0.15 + random() * 0.05;
-      if (i % 19 === 0) size *= 1.32; // Occasional larger highlight frame
-      if (i % 7 === 0) size *= 0.82;  // Miniature accent frame
+      const depthRatio = radius / maxRadius; // 0.10 to 1.0
+      let size = (0.13 + random() * 0.06) * (0.82 + depthRatio * 0.28);
+      if (i % 23 === 0) size *= 1.35; // Occasional larger highlight frame
+      if (i % 11 === 0) size *= 0.80; // Miniature accent frame
 
       // Breathing frequency & phase for organic pulsing
-      const scaleFreq = 0.8 + random() * 1.0;
+      const scaleFreq = 0.7 + random() * 1.2;
       const phase = random() * Math.PI * 2;
 
       // Individual frame wobble speeds
-      const rotSpeedX = (random() - 0.5) * 0.12;
-      const rotSpeedY = (random() - 0.5) * 0.12;
-      const rotSpeedZ = (random() - 0.5) * 0.12;
+      const rotSpeedX = (random() - 0.5) * 0.18;
+      const rotSpeedY = (random() - 0.5) * 0.18;
+      const rotSpeedZ = (random() - 0.5) * 0.18;
 
-      // Subtle outward tilt & roll jitter so frames mount organically on the 3D sphere
-      const roll = (random() - 0.5) * 0.30;
-      const pitch = (random() - 0.5) * 0.22;
-      const yaw = (random() - 0.5) * 0.22;
+      // Enhanced organic 3D tilt & roll jitter
+      const roll = (random() - 0.5) * 0.70;
+      const pitch = (random() - 0.5) * 0.45;
+      const yaw = (random() - 0.5) * 0.45;
       const tiltQuat = new THREE.Quaternion().setFromEuler(new THREE.Euler(pitch, yaw, roll));
 
       // UV coordinates in 10x10 atlas
@@ -194,6 +198,7 @@ export default function TracingArtGlobe() {
   useEffect(() => {
     stateRef.current.lastScrollY = window.scrollY;
 
+    let ticking = false;
     const handleScroll = () => {
       const currentY = window.scrollY;
       const deltaY = currentY - stateRef.current.lastScrollY;
@@ -201,15 +206,19 @@ export default function TracingArtGlobe() {
 
       stateRef.current.scrollVelocity = Math.min(1.5, stateRef.current.scrollVelocity + Math.abs(deltaY) * 0.02);
 
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        const vh = window.innerHeight;
-
-        const totalTravel = vh + rect.height;
-        const currentTravel = vh - rect.top;
-        const progress = Math.max(0, Math.min(1, currentTravel / totalTravel));
-
-        stateRef.current.targetScrollProgress = progress;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          if (containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            const vh = window.innerHeight;
+            const totalTravel = vh + rect.height;
+            const currentTravel = vh - rect.top;
+            const progress = Math.max(0, Math.min(1, currentTravel / totalTravel));
+            stateRef.current.targetScrollProgress = progress;
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
@@ -251,10 +260,10 @@ export default function TracingArtGlobe() {
 
     const wireGeo = new THREE.BufferGeometry();
     const wirePositions = new Float32Array([
-      -0.5, -0.5, 0,   0.5, -0.5, 0,
-       0.5, -0.5, 0,   0.5,  0.5, 0,
-       0.5,  0.5, 0,  -0.5,  0.5, 0,
-      -0.5,  0.5, 0,  -0.5, -0.5, 0,
+      -0.5, -0.5, 0, 0.5, -0.5, 0,
+      0.5, -0.5, 0, 0.5, 0.5, 0,
+      0.5, 0.5, 0, -0.5, 0.5, 0,
+      -0.5, 0.5, 0, -0.5, -0.5, 0,
     ]);
     wireGeo.setAttribute('position', new THREE.BufferAttribute(wirePositions, 3));
 
@@ -564,7 +573,7 @@ export default function TracingArtGlobe() {
   return (
     <div
       ref={containerRef}
-      className="relative z-10 w-screen left-1/2 -translate-x-1/2 my-12 sm:my-20 min-h-[750px] h-[85vh] lg:h-[900px] flex items-center justify-center select-none overflow-visible pointer-events-auto"
+      className="relative z-10 w-screen left-1/2 -translate-x-1/2 my-8 sm:my-16 lg:my-20 min-h-[460px] sm:min-h-[620px] lg:min-h-[750px] h-[65vh] sm:h-[80vh] lg:h-[900px] flex items-center justify-center select-none overflow-visible pointer-events-auto"
       aria-label="Interactive 3D Art Gallery Globe with 1,850+ Miniature Multi-Colored Framed Artworks"
     >
       {/* ── MINIMAL ABSTRACT FLOATING OUTLINED SQUARES BACKGROUND (SUBTLE OPACITY) ── */}

@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 *.mp4
+
+# Temporary and scratch test artifacts
+scratch/

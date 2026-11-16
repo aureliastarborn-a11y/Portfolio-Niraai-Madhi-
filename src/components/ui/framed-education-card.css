@@ -2,11 +2,13 @@
 .framed-education-container {
   position: relative;
   width: 100%;
-  margin-bottom: 2rem; /* Clean clearance above Credentials clothesline */
+  margin-bottom: 2rem;
+  /* Clean clearance above Credentials clothesline */
 }
 
 .framed-education-container .btn-wrapper {
-  --color: #F8F7F4; /* Half White / Broken White */
+  --color: #F8F7F4;
+  /* Half White / Broken White */
   --txt-color: #1f2937;
   --txt-color-2: #111827;
   --point-size: 8px;
@@ -14,7 +16,7 @@
   --line-color: rgba(0, 0, 0, 0.1);
   --line-style: solid;
   --line-weight: 1px;
-  --anim-speed: 1s;
+  --anim-speed: 0.75s;
 
   position: relative;
   display: grid;
@@ -113,12 +115,8 @@
   position: absolute;
   inset: 0 0%;
   z-index: 1;
-  border: var(--line-style, solid) var(--line-weight, 1px)
-    var(--line-color, rgba(0, 0, 0, 0.1));
+  border: var(--line-style, solid) var(--line-weight, 1px) var(--line-color, rgba(0, 0, 0, 0.1));
   background-color: var(--color, #F8F7F4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition-delay: calc(var(--anim-speed, 1s) * 0.5);
   box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.04),
     0 2px 4px -2px rgba(0, 0, 0, 0.02),
     inset 0 1px 2px 0 rgba(255, 255, 255, 0.9);
@@ -140,12 +138,15 @@
 .framed-education-container .point.top {
   top: calc(var(--point-size, 8px) * -0.5);
 }
+
 .framed-education-container .point.bottom {
   bottom: calc(var(--point-size, 8px) * -0.5);
 }
+
 .framed-education-container .point.left {
   left: calc(var(--point-size, 8px) * -0.5);
 }
+
 .framed-education-container .point.right {
   right: calc(var(--point-size, 8px) * -0.5);
 }
@@ -153,6 +154,7 @@
 .framed-education-container .btn:hover .txt {
   animation: txt-out calc(var(--anim-speed, 1s) * 0.5) forwards;
 }
+
 .framed-education-container .btn:hover .txt:last-child {
   animation: txt-in calc(var(--anim-speed, 1s) * 0.5) forwards;
 }
@@ -165,15 +167,19 @@
   animation: frame var(--anim-speed, 1s) ease;
 }
 
-.framed-education-container .btn:hover ~ #hint1 {
+.framed-education-container .btn:hover~#hint1 {
   opacity: 0;
 }
-.framed-education-container .btn:hover ~ #hint2 {
+
+.framed-education-container .btn:hover~#hint2 {
   opacity: 1;
 }
 
 @keyframes txt-in {
-  90% {
+  0% {
+    opacity: 0;
+  }
+  50% {
     opacity: 0;
   }
   100% {
@@ -182,8 +188,11 @@
 }
 
 @keyframes txt-out {
-  50% {
+  0% {
     opacity: 1;
+  }
+  50% {
+    opacity: 0;
   }
   100% {
     opacity: 0;
@@ -194,6 +203,7 @@
   0% {
     inset: 0 50%;
   }
+
   100% {
     inset: 0 0%;
   }
@@ -228,8 +238,7 @@
 }
 
 .framed-education-container .btn:focus::before {
-  animation: appear calc(var(--anim-speed, 1s) * 1.5)
-    cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: appear calc(var(--anim-speed, 1s) * 1.5) cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 @keyframes appear {
@@ -238,17 +247,38 @@
     transform: translate(-50%, 0);
     filter: blur(8px);
   }
+
   40% {
     opacity: 1;
     filter: blur(0px);
   }
+
   70% {
     opacity: 0.9;
     filter: blur(0px);
   }
+
   100% {
     opacity: 0;
     transform: translate(-50%, -24px);
     filter: blur(4px);
+  }
+}
+
+/* ── RESPONSIVE SCALING FOR MOBILE & TABLET ── */
+@media (max-width: 640px) {
+  .framed-education-container .btn-wrapper {
+    padding: 1rem 1.15rem;
+    min-height: 140px;
+  }
+  .framed-education-container .txt {
+    padding: 1rem 1.15rem;
+  }
+  .framed-education-container .txt-secondary {
+    font-size: 0.7em;
+    bottom: -1.85rem;
+    white-space: normal;
+    text-align: center;
+    width: 90%;
   }
 }

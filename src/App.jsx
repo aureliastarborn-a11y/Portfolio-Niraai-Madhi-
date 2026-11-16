@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SphereRing from './components/SphereRing';
 import SphereFooter from './components/SphereFooter';
 import FolderCard from './components/FolderCard';
@@ -10,7 +10,9 @@ import TracingArtGlobe from './components/TracingArtGlobe';
 import MosaicShaderBackground from '@/components/ui/mosaic-shader-background';
 import ProjectExperienceModal from './components/ProjectExperienceModal';
 import { RulerCarousel } from '@/components/ui/ruler-carousel';
+import UiverseFrontCard from './components/UiverseFrontCard';
 import FramedEducationCard from '@/components/ui/FramedEducationCard';
+import KeyCompetenciesMercury from './components/KeyCompetenciesMercury';
 import { portfolioData } from './data/portfolioData';
 import {
   Sparkles,
@@ -26,6 +28,25 @@ import {
 export default function App() {
   const { personal, skills, projects, experiences, education, certifications } = portfolioData;
   const [selectedItem, setSelectedItem] = useState(null);
+  const [activeCardId, setActiveCardId] = useState(null);
+
+  // Mobile: Tap outside any front card resets the 3D tilt
+  useEffect(() => {
+    if (!activeCardId) return;
+
+    const handlePointerDown = (e) => {
+      if (!e.target.closest('.uiv-front-parent')) {
+        setActiveCardId(null);
+      }
+    };
+
+    window.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('touchstart', handlePointerDown, { passive: true });
+    return () => {
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('touchstart', handlePointerDown);
+    };
+  }, [activeCardId]);
 
   return (
     <div className="min-h-full flex flex-col font-sans bg-background text-foreground antialiased selection:bg-zinc-200">
@@ -81,7 +102,7 @@ export default function App() {
               className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 select-none px-4"
               data-hero-copy="true"
             >
-              <div className="pointer-events-auto max-w-[280px] w-full text-center">
+              <div className="pointer-events-auto max-w-[240px] sm:max-w-[280px] w-full text-center">
                 <h1 id="intro-heading" className="mb-2 flex justify-center items-center focus:outline-none">
                   <span className="font-signature text-2xl sm:text-3xl md:text-[32px] text-zinc-900 select-none whitespace-nowrap leading-none tracking-normal py-0.5">
                     {personal.shortName}
@@ -99,14 +120,14 @@ export default function App() {
           </header>
 
           {/* ── MIDDLE PHASE: MODERN EDITORIAL ASYMMETRIC / BENTO LAYOUT ── */}
-          <div className="relative z-10 w-full pt-44 sm:pt-56 lg:pt-64 pb-20 px-6 sm:px-10 lg:px-16 max-w-6xl mx-auto">
-            <div className="flex flex-col gap-44 sm:gap-52">
+          <div className="relative z-10 w-full pt-32 sm:pt-48 lg:pt-60 pb-20 px-4 sm:px-8 lg:px-12 max-w-6xl mx-auto">
+            <div className="flex flex-col gap-24 sm:gap-36 lg:gap-48">
 
               {/* ── 01. ABOUT ME ──────────────────────────────────── */}
               <section id="about" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-                  <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+                  <h2 className="text-3xl sm:text-4xl font-serif font-semibold tracking-tight text-zinc-900">
                     About Me
                   </h2>
                   <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
@@ -139,22 +160,8 @@ export default function App() {
                     />
                   </div>
 
-                  {/* Soft Skills Pill Badges */}
-                  <div className="pt-2">
-                    <div className="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-2">
-                      Key Competencies
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {personal.softSkills.map((skill, sIdx) => (
-                        <span
-                          key={sIdx}
-                          className="px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white/90 backdrop-blur-sm rounded-lg border border-black/[0.08] shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                  {/* ── SOFT SKILLS WITH MERCURY RAIL LOADER (FROM 21ST.DEV SCREEN RECORDING) ── */}
+                  <KeyCompetenciesMercury skills={personal.softSkills} />
                 </div>
               </section>
 
@@ -162,60 +169,68 @@ export default function App() {
               <section id="projects" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-                  <h2 className="text-3xl sm:text-4xl font-serif font-normal tracking-tight text-zinc-900">
+                  <h2 className="text-3xl sm:text-4xl font-serif font-semibold tracking-tight text-zinc-900">
                     Projects
                   </h2>
-                  <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
+                  <p className="text-xs sm:text-sm text-zinc-500 max-w-xs leading-relaxed block">
                     Autonomous agents, enterprise data warehousing solutions, and exploratory analytics. Click any album to view full project details and tech stack.
                   </p>
                 </div>
 
-                {/* Right Projects Grid with Interactive Vinyl Cards */}
+                {/* Right Projects Grid with 3D Uiverse Header Cards */}
                 <div className="lg:col-span-8">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-                    {projects.map((proj) => (
-                      <VinylAlbumCard
-                        key={proj.id}
-                        title={proj.title}
-                        artist={proj.tagline}
-                        coverImage={proj.bg}
-                        description={proj.description}
-                        tags={proj.tags}
-                        size="small"
-                        onClick={() => setSelectedItem({ type: 'project', data: proj })}
-                      />
-                    ))}
+                  <div className="grid grid-cols-3 gap-1.5 sm:gap-4">
+                    {projects.map((proj) => {
+                      const cardId = `proj-${proj.id}`;
+                      return (
+                        <UiverseFrontCard
+                          key={proj.id}
+                          id={cardId}
+                          title={proj.title}
+                          isActive3D={activeCardId === cardId}
+                          onActivate={() => setActiveCardId(cardId)}
+                          onOpen={() => {
+                            setActiveCardId(null);
+                            setSelectedItem({ type: 'project', data: proj });
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
               </section>
 
-              {/* ── 03. EXPERIENCE (VINYL ALBUM CARDS) ─────────────── */}
+              {/* ── 03. EXPERIENCE (3D UIVERSE CARDS) ─────────────── */}
               <section id="experience" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-                  <h2 className="text-3xl sm:text-4xl font-serif font-normal tracking-tight text-zinc-900">
+                  <h2 className="text-3xl sm:text-4xl font-serif font-semibold tracking-tight text-zinc-900">
                     Experience
                   </h2>
-                  <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
-                    Internship tenures, independent engineering, and technical development showcased as vinyl records. Click any album to view full role details and milestones.
+                  <p className="text-xs sm:text-sm text-zinc-500 max-w-xs leading-relaxed block">
+                    Internship tenures, independent engineering, and technical development showcased in interactive 3D perspective cards. Click any card to view full role details and milestones.
                   </p>
                 </div>
 
-                {/* Right Experience Grid with Interactive Vinyl Cards */}
+                {/* Right Experience Grid with 3D Uiverse Header Cards */}
                 <div className="lg:col-span-8">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-                    {experiences.map((exp, idx) => (
-                      <VinylAlbumCard
-                        key={idx}
-                        title={exp.role}
-                        artist={exp.organization}
-                        coverImage={exp.bg}
-                        description={exp.summary}
-                        tags={exp.tags || [exp.organization]}
-                        size="small"
-                        onClick={() => setSelectedItem({ type: 'experience', data: exp })}
-                      />
-                    ))}
+                  <div className="grid grid-cols-3 gap-1.5 sm:gap-4">
+                    {experiences.map((exp, idx) => {
+                      const cardId = `exp-${idx}`;
+                      return (
+                        <UiverseFrontCard
+                          key={idx}
+                          id={cardId}
+                          title={exp.role}
+                          isActive3D={activeCardId === cardId}
+                          onActivate={() => setActiveCardId(cardId)}
+                          onOpen={() => {
+                            setActiveCardId(null);
+                            setSelectedItem({ type: 'experience', data: exp });
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
               </section>
@@ -224,7 +239,7 @@ export default function App() {
               <section id="education" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-                  <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+                  <h2 className="text-3xl sm:text-4xl font-serif font-semibold tracking-tight text-zinc-900">
                     Education &amp; Credentials
                   </h2>
                   <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
@@ -281,7 +296,7 @@ export default function App() {
               <section id="skills" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-                  <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+                  <h2 className="text-3xl sm:text-4xl font-serif font-semibold tracking-tight text-zinc-900">
                     Technical Stack
                   </h2>
                   <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
@@ -299,7 +314,7 @@ export default function App() {
               <section id="contact" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start scroll-mt-20">
                 {/* Left Header Column (Sticky) */}
                 <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-                  <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+                  <h2 className="text-3xl sm:text-4xl font-serif font-semibold tracking-tight text-zinc-900">
                     Get in Touch
                   </h2>
                   <p className="text-sm text-zinc-500 max-w-xs leading-relaxed hidden sm:block">
@@ -346,10 +361,13 @@ export default function App() {
         <SphereFooter />
 
         {/* ── PROJECT & EXPERIENCE INTERACTIVE DETAIL MODAL DIALOG ── */}
-        <ProjectExperienceModal
-          item={selectedItem}
-          onClose={() => setSelectedItem(null)}
-        />
+        {selectedItem && (
+          <ProjectExperienceModal
+            key={selectedItem.type + '-' + (selectedItem.data.id || selectedItem.data.role)}
+            item={selectedItem}
+            onClose={() => setSelectedItem(null)}
+          />
+        )}
       </main>
     </div>
   );

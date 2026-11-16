@@ -1,0 +1,74 @@
+# Niraai Madhi — Personal Portfolio & Resume
+
+> Artificial Intelligence and Data Science undergraduate at Tagore Engineering College with hands-on experience in machine learning, autonomous LLM agents, data warehousing, and interactive full-stack web applications.
+
+## Personal Information
+- **Name**: Niraai Madhi
+- **Location**: Tamil Nadu, India
+- **Email**: niraai.she.her@gmail.com
+- **Phone**: +91 9342322829
+- **LinkedIn**: https://www.linkedin.com/in/niraai-madhi-a46960324
+- **GitHub**: https://github.com/niraai-madhi
+- **Portfolio Repository**: https://github.com/aureliastarborn-a11y/Portfolio-Niraai-Madhi-
+
+## Core Competencies & Technical Skills
+- **Programming Languages**: Python, SQL, JavaScript, HTML5, CSS3
+- **Artificial Intelligence & Generative AI**: Large Language Models (LLMs), Prompt Engineering, Generative AI, Autonomous AI Agents, AI Automation Pipelines
+- **Data Science & Analytics**: Pandas, NumPy, Data Cleaning, Exploratory Data Analysis (EDA), Statistical Analysis, MS Excel, Power BI, Tableau
+- **Database & Data Architecture**: SQL Queries, Filtering, Aggregation, Table Joins, Star Schema Data Modeling, ETL Pipelines, Data Warehousing
+- **Web & Software Development**: React.js, Tailwind CSS, Vite, REST API Integrations, Three.js / WebGL 3D, Responsive UI/UX Design, Git, GitHub
+- **Soft Skills**: Analytical Thinking, Problem Solving, Team Collaboration, Quick Learner
+
+## Education
+- **Degree**: Bachelor of Technology (B.Tech) in Artificial Intelligence & Data Science
+- **Institution**: Tagore Engineering College
+- **Tenure**: 2022 – 2026
+
+## Work & Internship Experience
+- **Machine Learning Intern** — Sparwix (2024 – Present)
+  - Data preprocessing, exploratory data analysis (EDA), and interactive Power BI dashboards for business insights.
+  - Tech: Machine Learning, EDA, Power BI, Python.
+- **AI Agent Developer** — Independent (2024)
+  - Constructed autonomous LLM agents, prompt engineering pipelines, and automated resume analysis tools.
+  - Tech: Autonomous Agents, LLMs, Prompt Engineering, Python.
+- **Data Warehouse Developer** — Academic Projects (2023 – 2024)
+  - Implemented star-schema data models, analytical SQL queries, and multi-source reporting pipelines.
+  - Tech: SQL, Star Schema, ETL, Data Modeling.
+- **Web Developer** — Self-Employed (2023 – Present)
+  - Designed and developed responsive websites and web applications using HTML, CSS, JavaScript, React, and API integrations.
+  - Tech: HTML, CSS, JavaScript, APIs, Responsive Design.
+- **Data Analytics and Reporting** — Self-Employed (2023 – Present)
+  - Engineered customized data analytics, business reporting workflows, and interactive performance-focused dashboards.
+  - Tech: Data Analytics, Reporting, Dashboards, SQL, Excel.
+
+## Key Projects
+- **AI LinkedIn Job Finder**
+  - Autonomous Agent & LLM Pipelines. Developed an AI-powered career assistance system to analyze resumes and identify relevant LinkedIn job opportunities using LLMs and prompt engineering.
+  - Tech: Python, LLMs, Prompt Engineering.
+  - GitHub: https://github.com/niraai-madhi
+- **Data Warehouse**
+  - Multi-Source Analytics & ETL. Designed and implemented a data warehouse to organize and manage data from multiple sources using SQL and data transformation techniques.
+  - Tech: SQL, ETL, Data Modeling.
+  - GitHub: https://github.com/niraai-madhi
+- **Personal Portfolio Website**
+  - Interactive Web Experience. Developed a responsive personal portfolio website with interactive 3D cards, Three.js WebGL effects, and responsive mobile architecture.
+  - Tech: React, Tailwind CSS, JavaScript, Three.js, Vite.
+  - GitHub: https://github.com/niraai-madhi
+- **NYC Airbnb Revenue Analysis**
+  - Analyzed 10,000+ Airbnb listing records using Excel and Python (Pandas) to evaluate pricing trends, revenue patterns, and location dynamics.
+  - Tech: Python, Pandas, Data Cleaning, EDA.
+- **Customer Behavior Analysis**
+  - Explored retail transaction datasets to identify purchasing patterns, customer segmentation, and repeat buying behavior using statistical analysis.
+  - Tech: Python, Statistics, Customer Segmentation, Data Mining.
+- **Expense Tracker**
+  - Built an interactive expense tracking application to record, categorize, and monitor personal expenses with dashboard-style summaries.
+  - Tech: JavaScript, Dashboard, Analytics, LocalStorage.
+- **CGPA Calculator**
+  - Developed a semester GPA and cumulative CGPA calculator aligned with university credit systems.
+  - Tech: JavaScript, Educational Tools, UI/UX.
+- **Resume Creator & ATS Score Checker**
+  - Designed an ATS-friendly resume generator and keyword matching engine that scores resumes against target job descriptions.
+  - Tech: Python, NLP, ATS Scoring, Regex.
+
+## Full Documentation
+- For exhaustive details, see [/llms-full.txt](/llms-full.txt).

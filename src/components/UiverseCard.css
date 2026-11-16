@@ -1,0 +1,208 @@
+/* From Uiverse.io by Smit-Prajapati - Customized Half-White Large Rectangle Edition for Modal */
+.uiv-modal-parent {
+  width: 100%;
+  max-width: 760px;
+  padding: 24px;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  overflow: visible;
+}
+
+.uiv-modal-card {
+  position: relative;
+  padding-top: 48px;
+  border: 3.5px solid rgb(255, 255, 255);
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  will-change: transform;
+  background: linear-gradient(135deg, #0000 18.75%, #f3f3f3 0 31.25%, #0000 0),
+    repeating-linear-gradient(45deg, #f3f3f3 -6.25% 6.25%, #ffffff 0 18.75%);
+  background-size: 60px 60px;
+  background-position: 0 0, 0 0;
+  background-color: #f0f0f0;
+  width: 100%;
+  box-shadow: rgba(142, 142, 142, 0.35) 0px 35px 35px -12px;
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .uiv-modal-card:hover {
+    transform: rotate3d(0.35, 1, 0, 16deg) scale3d(1.02, 1.02, 1.02);
+    box-shadow: rgba(142, 142, 142, 0.45) 0px 42px 40px -12px;
+  }
+
+  .uiv-modal-card:hover .uiv-modal-content-box {
+    transform: translate3d(0px, 0px, 32px);
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 14px 24px -6px;
+  }
+
+  .uiv-modal-card:hover .card-title {
+    transform: translate3d(0px, 0px, 55px);
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .uiv-modal-card:hover .card-subtitle {
+    transform: translate3d(0px, 0px, 42px);
+  }
+
+  .uiv-modal-card:hover .card-content {
+    transform: translate3d(0px, 0px, 36px);
+  }
+
+  .uiv-modal-card:hover .card-tags {
+    transform: translate3d(0px, 0px, 42px);
+  }
+}
+
+.uiv-modal-card.is-active-3d {
+  transform: rotate3d(0.35, 1, 0, 16deg) scale3d(1.02, 1.02, 1.02);
+  box-shadow: rgba(142, 142, 142, 0.5) 0px 42px 40px -12px;
+}
+
+.uiv-modal-card.is-active-3d .uiv-modal-content-box {
+  transform: translate3d(0px, 0px, 32px);
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 14px 24px -6px;
+}
+
+.uiv-modal-card.is-active-3d .card-title {
+  transform: translate3d(0px, 0px, 55px);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.uiv-modal-card.is-active-3d .card-subtitle {
+  transform: translate3d(0px, 0px, 42px);
+}
+
+.uiv-modal-card.is-active-3d .card-content {
+  transform: translate3d(0px, 0px, 36px);
+}
+
+.uiv-modal-card.is-active-3d .card-tags {
+  transform: translate3d(0px, 0px, 42px);
+}
+
+/* Half-white content box */
+.uiv-modal-content-box {
+  background: #fbf9f5;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.25s ease;
+  will-change: transform;
+  padding: 46px 52px 40px 52px;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+.uiv-modal-content-box .card-title {
+  display: inline-block;
+  font-family: 'Foglihten', serif;
+  color: #18181b;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+  will-change: transform;
+  transform: translate3d(0px, 0px, 20px);
+}
+
+.uiv-modal-content-box .card-subtitle {
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+  will-change: transform;
+  transform: translate3d(0px, 0px, 15px);
+}
+
+.uiv-modal-content-box .card-content {
+  margin-top: 14px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.7;
+  color: #3f3f46;
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+  will-change: transform;
+  transform: translate3d(0px, 0px, 12px);
+}
+
+.uiv-modal-content-box .card-tags {
+  margin-top: 20px;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: monospace;
+  color: #52525b;
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+  will-change: transform;
+  transform: translate3d(0px, 0px, 15px);
+}
+
+/* ── RESPONSIVE SCALING FOR MOBILE & TABLET ── */
+@media (max-width: 640px) {
+  .uiv-modal-parent {
+    padding: 12px 16px;
+    max-width: 100%;
+    perspective: 750px;
+    overflow: visible;
+  }
+
+  .uiv-modal-card {
+    padding-top: 24px;
+    border-width: 2.5px;
+    background-size: 36px 36px;
+  }
+
+  .uiv-modal-card.is-active-3d {
+    transform: rotate3d(0.25, 1, 0, 13deg) scale3d(1.015, 1.015, 1.015);
+    box-shadow: rgba(142, 142, 142, 0.45) 0px 18px 24px -8px;
+  }
+
+  .uiv-modal-content-box {
+    padding: 22px 16px 20px 16px;
+  }
+
+  .uiv-modal-card.is-active-3d .uiv-modal-content-box {
+    transform: translate3d(0px, 0px, 24px);
+    box-shadow: rgba(0, 0, 0, 0.14) 0px 10px 18px -4px;
+  }
+
+  .uiv-modal-content-box .card-title {
+    font-size: 21px;
+    line-height: 1.25;
+    transform: translate3d(0px, 0px, 16px);
+  }
+
+  .uiv-modal-card.is-active-3d .card-title {
+    transform: translate3d(0px, 0px, 42px);
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .uiv-modal-card.is-active-3d .card-subtitle {
+    transform: translate3d(0px, 0px, 32px);
+  }
+
+  .uiv-modal-content-box .card-content {
+    margin-top: 10px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    transform: translate3d(0px, 0px, 10px);
+  }
+
+  .uiv-modal-card.is-active-3d .card-content {
+    transform: translate3d(0px, 0px, 26px);
+  }
+
+  .uiv-modal-card.is-active-3d .card-tags {
+    transform: translate3d(0px, 0px, 32px);
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .uiv-modal-parent {
+    padding: 16px;
+  }
+  .uiv-modal-content-box {
+    padding: 36px 36px 30px 36px;
+  }
+  .uiv-modal-content-box .card-title {
+    font-size: 28px;
+  }
+}

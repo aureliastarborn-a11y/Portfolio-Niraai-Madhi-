@@ -69,6 +69,10 @@ export function RulerCarousel({
   const count = originalItems.length;
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(initialIndex);
+  const isInteractingRef = useRef(false);
+  const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoProgressRef = useRef(count > 1 ? initialIndex / (count - 1) : 0);
+  const directionRef = useRef(1);
 
   const stepDistance = itemWidth + gap;
 
@@ -78,13 +82,12 @@ export function RulerCarousel({
   );
 
   const smoothProgress = useSpring(cursorProgress, {
-    stiffness: 280,
-    damping: 30,
-    mass: 0.6,
+    stiffness: 240,
+    damping: 32,
+    mass: 0.5,
   });
 
   // Calculate motion x position directly from smoothed progress
-  // At progress = 0, item 0 is centered. At progress = 1, item (count - 1) is centered.
   const x = useTransform(smoothProgress, (p) => {
     const floatIdx = p * Math.max(1, count - 1);
     return -floatIdx * stepDistance;
@@ -102,31 +105,110 @@ export function RulerCarousel({
     return () => unsubscribe();
   }, [smoothProgress, count]);
 
+  // Gentle continuous auto-glide movement when visible and not interacted
+  useEffect(() => {
+    if (count <= 1) return;
+    let animId = 0;
+    let isVisible = false;
+
+    const autoGlide = () => {
+      if (isVisible && !isInteractingRef.current) {
+        autoProgressRef.current += 0.0016 * directionRef.current;
+        if (autoProgressRef.current >= 1) {
+          autoProgressRef.current = 1;
+          directionRef.current = -1;
+        } else if (autoProgressRef.current <= 0) {
+          autoProgressRef.current = 0;
+          directionRef.current = 1;
+        }
+        cursorProgress.set(autoProgressRef.current);
+      }
+      if (isVisible) {
+        animId = requestAnimationFrame(autoGlide);
+      } else {
+        animId = 0;
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (isVisible && !animId) {
+          animId = requestAnimationFrame(autoGlide);
+        } else if (!isVisible && animId) {
+          cancelAnimationFrame(animId);
+          animId = 0;
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) observer.observe(containerRef.current);
+
+    return () => {
+      observer.disconnect();
+      if (animId) cancelAnimationFrame(animId);
+    };
+  }, [cursorProgress, count]);
+
+  const scheduleResume = () => {
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(() => {
+      isInteractingRef.current = false;
+      autoProgressRef.current = cursorProgress.get();
+    }, 2000);
+  };
+
   // Handle pointer/cursor scrub across the component
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (!containerRef.current || count <= 1) return;
+      isInteractingRef.current = true;
       const rect = containerRef.current.getBoundingClientRect();
       const relativeX = e.clientX - rect.left;
-      // Map padding-aware progress [0.08, 0.92] so edges are easy to reach
       const rawProgress = (relativeX - rect.width * 0.08) / (rect.width * 0.84);
       const clampedProgress = Math.max(0, Math.min(1, rawProgress));
       cursorProgress.set(clampedProgress);
+      scheduleResume();
     },
     [cursorProgress, count]
   );
 
   const handlePointerLeave = useCallback(() => {
-    // Keep on the current closest item cleanly
-    if (count > 1) {
-      cursorProgress.set(activeIndex / (count - 1));
-    }
-  }, [cursorProgress, activeIndex, count]);
+    scheduleResume();
+  }, []);
+
+  // Handle touch drag across mobile touchscreens
+  const handleTouchStart = useCallback(() => {
+    isInteractingRef.current = true;
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+  }, []);
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      if (!containerRef.current || count <= 1 || e.touches.length !== 1) return;
+      isInteractingRef.current = true;
+      const touch = e.touches[0];
+      const rect = containerRef.current.getBoundingClientRect();
+      const relativeX = touch.clientX - rect.left;
+      const rawProgress = (relativeX - rect.width * 0.08) / (rect.width * 0.84);
+      const clampedProgress = Math.max(0, Math.min(1, rawProgress));
+      cursorProgress.set(clampedProgress);
+      scheduleResume();
+    },
+    [cursorProgress, count]
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    scheduleResume();
+  }, []);
 
   const handleItemClick = (index: number) => {
     if (count <= 1) return;
+    isInteractingRef.current = true;
     cursorProgress.set(index / (count - 1));
     setActiveIndex(index);
+    scheduleResume();
   };
 
   return (
@@ -134,8 +216,12 @@ export function RulerCarousel({
       ref={containerRef}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
       className={`w-full ${height} flex flex-col justify-between py-1 bg-transparent select-none cursor-ew-resize relative overflow-hidden group ${className}`}
-      style={{ touchAction: "none" }}
+      style={{ touchAction: "pan-y" }}
     >
       {/* Top Ruler Line */}
       <div className="flex items-center justify-center w-full">
@@ -181,9 +267,8 @@ export function RulerCarousel({
               >
                 {/* Golden Header (e.g. ACADEMICS, LOCATION, SPECIFICATION) */}
                 <span
-                  className={`text-lg sm:text-xl font-bold tracking-wider font-mono transition-opacity duration-200 ${
-                    isActive ? "opacity-100" : "opacity-80"
-                  }`}
+                  className={`text-lg sm:text-xl font-bold tracking-wider font-mono transition-opacity duration-200 ${isActive ? "opacity-100" : "opacity-80"
+                    }`}
                   style={{ color: "#b8860b" }}
                 >
                   {item.title}
@@ -192,9 +277,8 @@ export function RulerCarousel({
                 {/* Deep Brown Content (Rich Mahogany #462015) */}
                 {item.subtitle && (
                   <span
-                    className={`text-xs sm:text-[13px] font-bold tracking-tight mt-0.5 max-w-[320px] truncate transition-opacity duration-200 ${
-                      isActive ? "opacity-100" : "opacity-90"
-                    }`}
+                    className={`text-xs sm:text-[13px] font-bold tracking-tight mt-0.5 max-w-[320px] truncate transition-opacity duration-200 ${isActive ? "opacity-100" : "opacity-90"
+                      }`}
                     style={{ color: "#462015" }}
                   >
                     {item.subtitle}

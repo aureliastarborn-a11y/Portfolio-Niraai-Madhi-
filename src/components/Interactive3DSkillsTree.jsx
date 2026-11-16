@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { 
   Sparkles, 
@@ -58,7 +58,7 @@ function formatSkillLines(name) {
  * - Fully rotatable in 3D by dragging
  * - Long skill names break cleanly into double lines so no words get cut off
  */
-function SmallRotatableCuboid3D({ category, items, index, isReading }) {
+function SmallRotatableCuboid3D({ category, items, index, isReading, isMobile }) {
   // 3D rotation state (degrees) - resting 3D perspective angle showing depth (matching Image 2)
   const [rotX, setRotX] = useState(-10);
   const [rotY, setRotY] = useState(15);
@@ -109,10 +109,10 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
     }
   };
 
-  // Dimensions of the 3D cuboid
-  const W = 146;
-  const H = 140;
-  const D = 34;
+  // Dimensions of the 3D cuboid (Responsive for Mobile & Desktop)
+  const W = isMobile ? 96 : 146;
+  const H = isMobile ? 92 : 140;
+  const D = isMobile ? 24 : 34;
 
   return (
     <div className="relative flex flex-col items-center select-none" style={{ perspective: 900 }}>
@@ -164,6 +164,7 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
         style={{
           width: `${W}px`,
           height: `${H}px`,
+          touchAction: 'none',
         }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -180,13 +181,13 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
         >
           {/* 1. FRONT FACE - SHOWS ONLY THE HEADER IN THE CENTER */}
           <div
-            className="absolute inset-0 rounded-xl bg-gradient-to-b from-white via-zinc-50/95 to-zinc-100/90 border-2 border-zinc-300/80 shadow-md p-4 flex items-center justify-center text-center backdrop-blur-xs select-none"
+            className="absolute inset-0 rounded-xl bg-gradient-to-b from-white via-zinc-50/95 to-zinc-100/90 border-2 border-zinc-300/80 shadow-md p-1.5 sm:p-4 flex items-center justify-center text-center backdrop-blur-xs select-none"
             style={{
               transform: `translateZ(${D / 2}px)`,
               backfaceVisibility: 'hidden',
             }}
           >
-            <h4 className="text-[13px] sm:text-[14px] font-bold text-zinc-900 tracking-tight leading-snug drop-shadow-xs">
+            <h4 className="text-[10.5px] sm:text-[14px] font-bold text-zinc-900 tracking-tight leading-snug drop-shadow-xs">
               {CATEGORY_LINE_SPLITS[category] ? (
                 <>
                   <span className="block whitespace-nowrap">{CATEGORY_LINE_SPLITS[category][0]}</span>
@@ -200,17 +201,17 @@ function SmallRotatableCuboid3D({ category, items, index, isReading }) {
 
           {/* 2. BACK FACE (THE BLACK AREA) - LINEAR ARRANGEMENT WITHOUT INTERIOR CURVY BOXES */}
           <div
-            className="absolute inset-0 rounded-xl bg-zinc-900 border-2 border-zinc-700 text-white p-3 sm:p-3.5 flex flex-col items-center justify-center shadow-xl select-none"
+            className="absolute inset-0 rounded-xl bg-zinc-900 border-2 border-zinc-700 text-white p-2 sm:p-3.5 flex flex-col items-center justify-center shadow-xl select-none"
             style={{
               transform: `rotateY(180deg) translateZ(${D / 2}px)`,
               backfaceVisibility: 'hidden',
             }}
           >
-            <div className="flex flex-col items-center justify-center space-y-1.5 w-full text-center">
+            <div className="flex flex-col items-center justify-center space-y-1 sm:space-y-1.5 w-full text-center">
               {items.map((item, idx) => (
                 <span
                   key={idx}
-                  className="text-[10.5px] sm:text-[11px] font-medium text-zinc-200 tracking-wide leading-tight hover:text-white transition-colors"
+                  className="text-[8px] sm:text-[11px] font-medium text-zinc-200 tracking-wide leading-tight hover:text-white transition-colors"
                 >
                   {item}
                 </span>
@@ -315,6 +316,14 @@ export default function Interactive3DSkillsTree({ skills }) {
   // Active reading window: when the section occupies the central reading zone of the screen
   const isReading = useInView(containerRef, { once: false, amount: 0.3, margin: '-8% 0px -8% 0px' });
   const [manualOpen, setManualOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   const isOpen = isReading || manualOpen;
 
@@ -368,7 +377,7 @@ export default function Interactive3DSkillsTree({ skills }) {
               className="w-full overflow-hidden flex flex-col items-center"
             >
               <div className="w-full flex items-center justify-center py-2">
-                <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 max-w-4xl">
+                <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 max-w-4xl">
                   {skills.map((skillGroup, idx) => (
                     <SmallRotatableCuboid3D
                       key={skillGroup.category}
@@ -376,6 +385,7 @@ export default function Interactive3DSkillsTree({ skills }) {
                       items={skillGroup.items}
                       index={idx}
                       isReading={isOpen}
+                      isMobile={isMobile}
                     />
                   ))}
                 </div>

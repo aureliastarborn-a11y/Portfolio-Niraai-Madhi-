@@ -5,11 +5,12 @@ export default function SphereRing() {
   const [rotation, setRotation] = useState({ yaw: 0, pitch: 0 });
 
   useEffect(() => {
-    let animId;
+    let animId = 0;
     let targetYaw = 0;
     let targetPitch = 0;
     let currentYaw = 0;
     let currentPitch = 0;
+    let isVisible = true;
 
     const handleScroll = () => {
       const scrollY = window.scrollY;
@@ -19,34 +20,71 @@ export default function SphereRing() {
     };
 
     const handleMouseMove = (e) => {
-      // Left/Right cursor movement rotates ring around center
       const normX = (e.clientX / window.innerWidth - 0.5) * 0.8;
-      // Up/Down cursor movement tilts/pitches the ring in 3D perspective
       const normY = (e.clientY / window.innerHeight - 0.5) * 0.7;
-
       const scrollY = window.scrollY;
       const heroHeight = window.innerHeight;
       const progress = Math.min(1, Math.max(0, scrollY / heroHeight));
-
       targetYaw = progress * 0.75 * Math.PI + normX;
       targetPitch = -normY;
     };
 
+    const handleTouchMove = (e) => {
+      if (e.touches && e.touches.length > 0) {
+        const touch = e.touches[0];
+        const normX = (touch.clientX / window.innerWidth - 0.5) * 0.8;
+        const normY = (touch.clientY / window.innerHeight - 0.5) * 0.7;
+        const scrollY = window.scrollY;
+        const heroHeight = window.innerHeight;
+        const progress = Math.min(1, Math.max(0, scrollY / heroHeight));
+        targetYaw = progress * 0.75 * Math.PI + normX;
+        targetPitch = -normY;
+      }
+    };
+
     const loop = () => {
-      currentYaw += (targetYaw - currentYaw) * 0.08;
-      currentPitch += (targetPitch - currentPitch) * 0.08;
-      setRotation({ yaw: currentYaw, pitch: currentPitch });
+      if (!isVisible) {
+        animId = 0;
+        return;
+      }
+      const dYaw = targetYaw - currentYaw;
+      const dPitch = targetPitch - currentPitch;
+      currentYaw += dYaw * 0.08;
+      currentPitch += dPitch * 0.08;
+
+      if (Math.abs(dYaw) > 0.0003 || Math.abs(dPitch) > 0.0003) {
+        setRotation({ yaw: currentYaw, pitch: currentPitch });
+      }
       animId = requestAnimationFrame(loop);
     };
 
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (isVisible && !animId) {
+          animId = requestAnimationFrame(loop);
+        } else if (!isVisible && animId) {
+          cancelAnimationFrame(animId);
+          animId = 0;
+        }
+      },
+      { threshold: 0.05 }
+    );
+
+    const heroEl = document.getElementById('top');
+    if (heroEl) observer.observe(heroEl);
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
     animId = requestAnimationFrame(loop);
 
     return () => {
+      observer.disconnect();
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(animId);
+      window.removeEventListener('touchmove', handleTouchMove);
+      if (animId) cancelAnimationFrame(animId);
     };
   }, []);
 
